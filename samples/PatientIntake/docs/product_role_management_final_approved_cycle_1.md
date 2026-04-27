@@ -1,4 +1,11 @@
 # Role‑Based Access Control Management (Overview)
+
+## Traceability & Version Linking
+- **Source Phase**: Inception (Cycle 1)
+- **Source Requirements**: 
+  - [Business Requirements Spec](inception_business_requirements_spec_final_approved_cycle_1.md) (REQ-004)
+  - [Risk Assessment](inception_risk_assessment_final_approved_cycle_1.md) (FR-004)
+  - [Stakeholder Matrix](inception_stakeholder_analysis_matrix_final_approved_cycle_1.md) (ST-04, ST-05)
                 
 ## Personas for Patient Intake System
 

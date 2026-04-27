@@ -43,7 +43,7 @@ Mobile native applications (only web UI).
 | REQ-004 | Every read/write operation must generate an immutable audit record containing user ID, timestamp, operation type, and affected data identifier. | Audit table contains a new row for each CRUD action; records cannot be altered or deleted; retention ≥7 years verified by audit query. | System Administrator |
 | REQ-005 | Generate a PDF intake summary per patient with visible watermark and export timestamp. | PDF contains watermark text “Confidential – Patient Intake”, includes export timestamp metadata; >99% of generated PDFs pass automated checksum test. | Front‑Desk Staff |
 | REQ-006 | Authorized staff shall be able to export the PDF summary only after successful authentication and role verification. | Export endpoint returns PDF only for users with role clinician or admin; unauthorized attempts receive 403 response logged in audit. | Clinician |
-| REQ-007 | Provide automated unit and integration tests covering form validation, encryption, and RBAC edge cases. | Test suite includes ≥80% code coverage; CI pipeline fails on any test regression; tests executed on each commit. | QA Lead |
+| REQ-007 | Provide automated unit and integration tests covering form validation, encryption, and RBAC edge cases. | Test suite includes ≥90% code coverage; CI pipeline fails on any test regression; tests executed on each commit. | QA Lead |
 | REQ-008 | Deploy entire stack via Docker Compose on‑premises with no external cloud dependencies. | Docker Compose up brings up all containers on a clean host; deployment script completes without external network calls; air‑gap guide validated on isolated network. | IT Operations |
 
 ## 5. Success Criteria / KPIs

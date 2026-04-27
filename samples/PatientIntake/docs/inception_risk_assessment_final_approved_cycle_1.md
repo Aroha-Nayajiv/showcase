@@ -50,7 +50,7 @@ The PatientIntake project will deliver a fully HIPAA‑compliant patient intake 
 
 #### FR-007: Automated Test Suite
 - **Description**: Include unit and integration tests covering form validation, encryption, RBAC enforcement, audit logging, and PDF generation.
-- **Acceptance Criteria**: Test coverage ≥80 % of codebase; CI pipeline fails on any test regression. Tests executed in Docker container using pytest 7.x.
+- **Acceptance Criteria**: Test coverage ≥90 % of codebase; CI pipeline fails on any test regression. Tests executed in Docker container using pytest 7.x.
 - **Stakeholder Owner**: IT Operations Lead
 
 ### Success Metrics (KPIs)
@@ -72,40 +72,6 @@ RISK-004: Deployment Failure in Air‑Gap Environment – Likelihood Medium, Imp
 RISK-005: PDF Generation Vulnerability – Likelihood Low, Impact Medium. **Mitigation:** Use open‑source PDF library with digital signature support; embed visible watermark with patient ID and timestamp; restrict export to Clinician and Admin roles; code review and static analysis before release.
 RISK-006: Performance Degradation Under Load – Likelihood Low, Impact Medium. **Mitigation:** Load testing with k6 simulating 200 concurrent submissions; connection pooling tuned; Nginx caching for static assets; auto‑scale up to 5 replicas validated in scaling test (NFR‑006).
 
-### FR-001: Patient Demographic Capture
-- **Description**: Collect name, DOB, address, phone, email.
-- **Acceptance Criteria**: All fields validated (name non‑empty, DOB ISO‑8601, email RFC 5322, phone E.164); submission rejected if any mandatory field missing; test coverage ≥95% of valid/invalid combos.
-- **Owner**: Front‑Desk Staff
-
-### FR-002: Insurance Information Capture
-- **Description**: Capture insurer name, policy number, group number, coverage dates.
-- **Acceptance Criteria**: Data encrypted at field level using AES‑256 before persisting; audit log entry created for each capture event.
-- **Owner**: Front‑Desk Staff
-
-### FR-003: Medical History Capture
-- **Description**: Record past diagnoses, medications, allergies, surgeries.
-- **Acceptance Criteria**: Free‑text limited to 500 characters, sanitized against XSS (OWASP ESAPI); encrypted at rest.
-- **Owner**: Clinician
-
-### FR-004: Role‑Based Access Control (RBAC)
-- **Description**: Define Admin, Clinician, Front‑Desk roles.
-- **Acceptance Criteria**: Admin CRUD any record; Clinician read/update assigned patients; Front‑Desk create/read only; PostgreSQL row‑level security enforced; unauthorized attempts generate high‑severity audit log.
-- **Owner**: Admin / IT
-
-### FR-005: Immutable Audit Logging
-- **Description**: Log every read/write/update/delete.
-- **Acceptance Criteria**: Append‑only table with SHA‑256 hash chaining; retain ≥7 years; include timestamp UTC, user ID, role, operation type, patient ID, source IP.
-- **Owner**: Compliance Officer
-
-### FR-006: PDF Intake Summary Generation
-- **Description**: Authorized staff can export patient summary as PDF.
-- **Acceptance Criteria**: Generated via wkhtmltopdf 0.12.6; visible watermark \"Confidential – Patient Intake\"; filename includes patient ID and timestamp; export logged in audit log.
-- **Owner**: Clinician / Admin
-
-### FR-007: Automated Test Suite
-- **Description**: Unit and integration tests for validation, encryption, RBAC, audit logging, PDF generation.
-- **Acceptance Criteria**: ≥80% code coverage; CI pipeline fails on regression; tests run in Docker container using pytest 7.x.
-- **Owner**: Development Team
 
 ### NFR-001: Performance
 - **Target**: ≤200 ms response time at 95th percentile for up to 100 concurrent users.

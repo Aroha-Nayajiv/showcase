@@ -43,7 +43,7 @@ KPI-02: System uptime ≥99.9 % measured monthly.
 KPI-03: Zero HIPAA-related security incidents reported in the first 90 days.
 KPI-04: Audit-log retention compliance ≥100 % for 7-year period verified by quarterly audit.
 KPI-05: PDF Export Watermark Accuracy – Every exported PDF contains visible watermark \"Confidential – Patient Intake\" and timestamp of export. Measured by automated PDF validation script; 100 % pass rate on sampled PDFs.
-KPI-06: Test Coverage – Automated unit and integration tests cover ≥85 % of functional requirements and ≥80 % of edge-case scenarios.
+KPI-06: Test Coverage – Automated unit and integration tests cover ≥90 % of functional requirements and ≥90 % of edge-case scenarios.
 KPI-07: Deployment Time – Full stack deployable on air-gapped hardware within 30 minutes from start of script execution.
 KPI-08: Stakeholder Satisfaction – Post-implementation survey yields average satisfaction score ≥4.5/5 from patients, clinicians, and administrators.
 
@@ -96,7 +96,7 @@ RISK-004 (Data Breach – Unauthorized Access) – Mitigation: Host-based firewa
 
 ### 8. Key Performance Indicators (KPIs)
 - **KPI‑01**: Form completion rate ≥92% weekly.
-- **KPI‑02**: System uptime ≥99.9% monthly.<br>- **KPI‑03**: Zero HIPAA‑related security incidents in first 90 days.<br>- **KPI‑04**: Audit‑log retention compliance ≥100% for 7‑year period.<br>- **KPI‑05**: PDF export watermark accuracy – 100% of exported PDFs contain visible watermark and correct timestamp.<br>- **KPI‑06**: Automated test coverage ≥85% of functional requirements and ≥80% of edge‑case scenarios.<br>- **KPI‑07**: Full stack deployable on air‑gapped hardware within 30 minutes.<br>- **KPI‑08**: Stakeholder satisfaction average score ≥4.5/5.<br>
+- **KPI‑02**: System uptime ≥99.9% monthly.<br>- **KPI‑03**: Zero HIPAA‑related security incidents in first 90 days.<br>- **KPI‑04**: Audit‑log retention compliance ≥100% for 7‑year period.<br>- **KPI‑05**: PDF export watermark accuracy – 100% of exported PDFs contain visible watermark and correct timestamp.<br>- **KPI‑06**: Automated test coverage ≥90% of functional requirements and ≥90% of edge‑case scenarios.<br>- **KPI‑07**: Full stack deployable on air‑gapped hardware within 30 minutes.<br>- **KPI‑08**: Stakeholder satisfaction average score ≥4.5/5.<br>
 
 ## Stakeholder Analysis
 - **Patient (ST-01)**: Needs a secure, easy-to-complete intake form; expects privacy per HIPAA §164.530. *Owner: Compliance Officer*.

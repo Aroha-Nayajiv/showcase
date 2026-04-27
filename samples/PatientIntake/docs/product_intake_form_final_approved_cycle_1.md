@@ -1,5 +1,12 @@
 # Patient Intake Web Form (Overview)
 
+## Traceability & Version Linking
+- **Source Phase**: Inception (Cycle 1)
+- **Source Requirements**: 
+  - [Business Requirements Spec](inception_business_requirements_spec_final_approved_cycle_1.md) (REQ-001, REQ-002, REQ-005)
+  - [Risk Assessment](inception_risk_assessment_final_approved_cycle_1.md) (FR-001, FR-002, FR-003, FR-006)
+  - [Stakeholder Matrix](inception_stakeholder_analysis_matrix_final_approved_cycle_1.md) (ST-01, ST-02, ST-03)
+
 ## Personas
 PER-01: Patient
 Goal: Submit personal health information securely so that clinicians can provide appropriate care.

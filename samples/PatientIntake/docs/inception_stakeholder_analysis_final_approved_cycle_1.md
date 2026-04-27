@@ -116,7 +116,7 @@ Provide a secure, open‑source, on‑premise patient intake platform that colle
   - Acceptance: Automated test validates generation time, size, and watermark content.
   - Owner: ST-03 Clinician
 - **REQ-008**: Automated unit and integration tests shall cover form validation, encryption, and RBAC edge cases.
-  - Acceptance: Test coverage ≥80% and CI pipeline passes.
+  - Acceptance: Test coverage ≥90% and CI pipeline passes.
   - Owner: ST-04 Administrator
 - **REQ-009**: Deployment shall be performed via Docker Compose version 2.20 with all images pinned to SHA‑256 digests; full stack up in ≤5 minutes on reference hardware.
   - Acceptance: Deployment script completes without external network access.
