@@ -33,7 +33,7 @@ The PatientIntake system will enable secure, rapid capture and retrieval of pati
 5. **FR-005:** Implement role‑based access control (admin, clinician, front‑desk). *Acceptance:* Unauthorized attempts are blocked and logged.
 6. **FR-006:** Generate PDF summary per patient, exportable only by authorized roles, with watermark containing user ID and timestamp. *Acceptance:* Watermark present on 100 % of exports; audit log entry created.
 7. **FR-007:** Maintain immutable audit log of every read/write operation retained for 7 years. *Acceptance:* Log tamper‑evidence retained; completeness ≥99.9 %.
-8. **FR-008:** Provide automated unit and integration test suite covering form validation, encryption, and access control edge cases. *Acceptance:* Test coverage ≥85 % and all tests pass in CI.
+8. **FR-008:** Provide automated unit and integration test suite covering form validation, encryption, and access control edge cases. *Acceptance:* Test coverage ≥90% and all tests pass in CI.
 9. **FR-009:** Deploy entire stack via Docker Compose in an air‑gapped environment with no external dependencies. *Acceptance:* Deployment script runs without internet access; environment verification passes.
 
 ## 6. Success Criteria / KPIs

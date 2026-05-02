@@ -1,6 +1,5 @@
 # Open-Source Technology Stack Selection
 
-{'status': 'error', 'error': 'All micro-goals failed', 'failed_micro_goals': [{'micro_goal_id': 'auto_goal_1', 'description': 'Consolidate executor content with reviewer feedback into a single coherent artifact artifact. Apply all reviewer improvements while preserving all original content, IDs, and structure. Do not create summaries - enhance and integrate intelligently.', 'result': {'status': 'error', 'error': 'No content generated'}, 'status': 'error', 'error': 'No content generated', 'model': 'gpt-oss-120b'}]}
 
 ## Availability & Reliability
 - **NFR-008** System uptime ≥99.9 % monthly (Prometheus SLA monitoring).
@@ -8,7 +7,7 @@
 - **NFR-010** Air‑gap enforcement: No outbound network traffic after container start; validated by network policy scan.
 
 ## Acceptance Test Outline
-1. **Performance Test**: Simulate 1000 concurrent read requests; verify 90 % complete within 2 s (FR‑001).
+1. **Performance Test**: Simulate 1000 concurrent read requests; verify ≥90 % complete within 2 s (FR‑001).
 2. **Encryption Verification**: Run pgcrypto inspection script; confirm all PHI columns encrypted with AES‑256‑GCM (NFR‑004).
 3. **TLS Scan**: Execute SSL Labs scan; ensure TLS 1.3 only (NFR‑005).
 4. **RBAC Test**: Attempt unauthorized record access with Front‑Desk credentials; expect denial and log entry (FR‑002).

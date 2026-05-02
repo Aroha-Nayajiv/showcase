@@ -69,7 +69,7 @@ Provide a trustworthy, on‑premise intake platform that reduces data entry erro
 
 **FR-012: Automated unit and integration tests covering validation, encryption, and access control**
 - *Stakeholder Need*: Development team requires regression safety net; Compliance Officer needs evidence of test coverage.
-- *KPI*: Test coverage ≥85 % for critical modules; all tests pass in CI pipeline (KPI-014).
+- *KPI*: Test coverage ≥90% for critical modules; all tests pass in CI pipeline (KPI-014).
 - *Acceptance Criteria*: Test suite includes at least one negative‑input case per form field, unauthorized‑access attempt simulation, and encryption‑key‑rotation scenario; test reports are archived with timestamps.
 
 **FR-013: Logging of export timestamps and user IDs on each PDF generation**

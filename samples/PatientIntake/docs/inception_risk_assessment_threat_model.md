@@ -28,7 +28,6 @@ Additional high‑priority requirements include FR‑009 (air‑gap deployment) 
 
 All metrics are measured automatically during CI/CD pipelines and reported in the compliance dashboard for continuous monitoring.
 
-{'status': 'error', 'error': 'All micro-goals failed', 'failed_micro_goals': [{'micro_goal_id': 'auto_goal_1', 'description': 'Consolidate executor content with reviewer feedback into a single coherent artifact artifact. Apply all reviewer improvements while preserving all original content, IDs, and structure. Do not create summaries - enhance and integrate intelligently.', 'result': {'status': 'error', 'error': 'No content generated'}, 'status': 'error', 'error': 'No content generated', 'model': 'gpt-oss-120b'}]}
 
 ## Business Vision
 The PatientIntake system enables secure, rapid collection of patient demographics, insurance information, and medical history via a web form that encrypts data at rest and in transit, stores submissions in a locally hosted PostgreSQL database with strict role‑based access control, generates auditable PDF summaries with watermarking, and is deployed via Docker Compose in an air‑gapped environment. This vision supports timely clinical decision‑making, regulatory compliance (HIPAA, NIST), and operational reliability for on‑premise healthcare facilities.

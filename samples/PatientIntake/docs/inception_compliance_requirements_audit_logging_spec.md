@@ -1,6 +1,5 @@
 # Audit Logging Specification
 
-{'status': 'error', 'error': 'All micro-goals failed', 'failed_micro_goals': [{'micro_goal_id': 'auto_goal_1', 'description': 'Consolidate executor content with reviewer feedback into a single coherent artifact artifact. Apply all reviewer improvements while preserving all original content, IDs, and structure. Do not create summaries - enhance and integrate intelligently.', 'result': {'status': 'error', 'error': 'No content generated'}, 'status': 'error', 'error': 'No content generated', 'model': 'gpt-oss-120b'}]}
 
 ## Audit Logging Specification – Patient Intake System
 

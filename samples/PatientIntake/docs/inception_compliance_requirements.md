@@ -33,7 +33,7 @@
 - **FR-004**: Generate a PDF intake summary per patient with watermark containing export timestamp and exporting user ID.
   - *Acceptance Criteria*: Watermark present on 100% of exported PDFs; export restricted to Admin and Clinician roles.
 - **FR-005**: Provide automated unit and integration tests covering form validation, encryption correctness and access‑control edge cases.
-  - *Acceptance Criteria*: Test coverage ≥85%; all critical tests pass in CI pipeline.
+  - *Acceptance Criteria*: Test coverage ≥90%; all critical tests pass in CI pipeline.
 
 ### 5. Success Criteria / KPIs
 | KPI ID | Metric | Target Value | Measurement Method |

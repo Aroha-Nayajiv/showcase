@@ -25,7 +25,7 @@
 | 3 | FR-003 | Role‑based access control (admin, clinician, front‑desk) | PostgreSQL row‑level security enforces matrix; unauthorized attempts logged and blocked; test suite verifies each role’s permissions | Security Engineer |
 | 4 | FR-004 | Immutable audit log of all read/write operations | Log entries include user ID, timestamp, operation type, record ID; retained 7 years on append‑only storage; tamper‑evidence checksum passes 100 % integrity checks | IT Operations |
 | 5 | FR-005 | PDF intake summary generation with watermark and access timestamp | PDF includes patient ID, generation timestamp, watermark with exporting user ID; only authorized roles can request export; export latency <2 seconds for 95th percentile | Development Lead |
-| 6 | FR-006 | Automated unit and integration tests covering form validation, encryption, access control | Test coverage ≥85 %; CI pipeline fails build on regression; test reports generated per release | QA Lead |
+| 6 | FR-006 | Automated unit and integration tests covering form validation, encryption, access control | Test coverage ≥90%; CI pipeline fails build on regression; test reports generated per release | QA Lead |
 
 ### FR-001: Secure PHI Storage and Transmission
 - All PHI must be encrypted at rest using AES‑256 GCM.
