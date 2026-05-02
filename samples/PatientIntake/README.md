@@ -1,0 +1,4 @@
+# PatientIntake
+
+## Project Requirements
+Build a HIPAA-compliant patient intake system using open source technologies only. (1) Collect patient demographics, insurance information, and medical history via a structured web form with field-level encryption at rest and in transit. (2) Store submissions in a local PostgreSQL database with role-based access control (admin, clinician, front desk) and a full audit log of every read and write operation. (3) Generate a PDF intake summary per patient, exportable by authorized staff only, with watermarking and access timestamps on every export. (4) Include automated unit and integration tests covering form validation, data encryption, and access control edge cases. (5) Deploy via Docker Compose for on-prem environments with no external cloud dependencies and a documented air-gap setup guide.
