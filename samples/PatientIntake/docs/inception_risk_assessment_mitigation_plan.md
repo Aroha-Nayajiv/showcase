@@ -22,19 +22,19 @@
 - **FR-002**: The form shall capture insurance information (provider, policy number, group) with validation against open‑source insurer lookup service. Acceptance: 99% validation success rate on test data set.
 - **FR-003**: The form shall capture medical history (allergies, medications, prior diagnoses) with free‑text and coded entries (ICD‑10). Acceptance: Minimum 95% of coded entries map to valid ICD‑10 codes.
 
-### 3. Access Control
+### 2. Access Control
 - **FR-004**: Role‑based access control (RBAC) shall define three tiers: Admin, Clinician, Front‑Desk. Acceptance: Permission matrix test confirms Admin can read/write all records, Clinician can read all and write notes, Front‑Desk can create and read own submissions only.
 - **FR-005**: All read and write operations shall be logged with user ID, timestamp, and operation type. Acceptance: Audit log query returns matching entries for every transaction in test suite.
 
-### 4. Audit Logging
+### 3. Audit Logging
 - **FR-006**: Audit logs shall be immutable, append‑only, and retained for seven years on WORM storage. Acceptance: Attempted log modification is rejected and audit script reports 0% tampering.
 - **FR-007**: Export actions shall record watermark metadata (exporting user ID, timestamp) in the generated PDF. Acceptance: PDF inspection tool extracts watermark matching logged export event.
 
-### 5. PDF Export
+### 4. PDF Export
 - **FR-008**: Authorized staff may generate a PDF summary per patient. The PDF shall include a visible watermark with user ID and export timestamp. Acceptance: Manual test verifies watermark appears on every page and matches audit log.
 - **FR-009**: PDF generation shall complete within 2 seconds for records under 5 MB. Acceptance: Performance test shows 95th percentile ≤2 s on reference hardware.
 
-### 6. Testing
+### 5. Testing
 - **FR-010**: Automated unit tests shall cover form validation rules for each field with ≥90% code coverage. Acceptance: Coverage report shows 92% overall.
 - **FR-011**: Integration tests shall simulate end‑to‑end submission, encryption, RBAC enforcement, audit logging, and PDF export. Acceptance: All scenarios pass without security violations.
 - **FR-012**: Security regression tests shall include OWASP ZAP scan and encryption key leakage checks. Acceptance: No high‑severity findings.

@@ -58,7 +58,7 @@ The following document defines the concrete RESTful contracts for the Patient In
 | ERR_EXPORT_001 | 502 | PDF generation service unavailable. | Unable to generate PDF at this time. | Yes |
 
 ### Security Considerations 
-- **Authentication**: JWT issued by `/api/v1/auth/login` using HS256; includes sub, role, exp claims; rotated every 15 minutes. 
+- **Authentication**: JWT issued by `/api/v1/auth/login` using RS256; includes sub, role, exp claims; rotated every 15 minutes. 
 - **Transport Security**: All endpoints require HTTPS with TLS 1.3; mutual TLS optional for internal service‑to‑service calls. 
 - **Input Validation**: JSON schemas enforce type, format, length, pattern; invalid payloads return ERR_VALID_001. 
 - **Encryption at Rest**: Sensitive fields (ssN, address, insurance_policy, medical_history) encrypted with pgcrypto AES‑256‑GCM; keys stored in Vault. 
@@ -82,7 +82,7 @@ The following document defines the concrete RESTful contracts for the Patient In
   - date_of_birth DATE NOT NULL CHECK (date_of_birth < CURRENT_DATE) 
   - email TEXT NOT NULL UNIQUE CHECK (email ~* '^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$') 
   - phone_number TEXT 
-  - address BYTEA NOT NULL -- encrypted via pgp_sym_encrypt 
+  - address BYTEA NOT NULL -- encrypted via AES-256-GCM 
   - insurance_policy BYTEA NOT NULL -- encrypted 
   - medical_history BYTEA NOT NULL -- encrypted JSON blob 
   - created_at TIMESTAMPTZ NOT NULL DEFAULT now() 

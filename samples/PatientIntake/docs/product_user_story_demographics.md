@@ -29,7 +29,7 @@
 - Recommended libraries: OpenSSL‑JS (v3.0) or libsodium.js. Must support AES‑256‑GCM with per‑field keys derived from a session master key using HKDF.
 
 **PostgreSQL Column‑level Encryption**
-- Use pgcrypto's `pgp_sym_encrypt` for each PHI column. Keys are per‑field AES‑256 keys stored encrypted with a master key in HashiCorp Vault.
+- Use pgcrypto's `AES-256-GCM` for each PHI column. Keys are per‑field AES‑256 keys stored encrypted with a master key in HashiCorp Vault.
 
 **Row‑level Security (RLS) Policies**
 - Roles: `admin`, `clinician`, `front_desk`.

@@ -38,7 +38,7 @@ Out‑of‑scope items are any cloud‑based services, proprietary licensing com
 | KPI‑004 | PDF Export Watermark Accuracy | 100 % of exported PDFs contain timestamped watermark with user ID | Automated PDF inspection batch job |
 | KPI‑005 | Open‑Source License Compliance | 0 % prohibited licenses used | SPDX license scanner quarterly |
 
-### 7. Consolidated Risk Register
+### 6. Consolidated Risk Register
 | Risk ID | Description | Likelihood | Impact | Mitigation Actions |
 |--------|-------------|------------|--------|-------------------|
 | RISK‑001 | Unauthorized PHI access due to misconfigured RBAC | Medium | High | Implement automated role‑permission validation CI job; quarterly RBAC matrix audit; enforce least‑privilege defaults |
@@ -47,7 +47,7 @@ Out‑of‑scope items are any cloud‑based services, proprietary licensing com
 | RISK‑004 | Performance degradation under peak load affecting latency SLA | Medium | Medium | Conduct stress testing at 150 % expected load; auto‑scale Docker containers within air‑gap constraints; monitor response times in real time |
 | RISK‑005 | Open‑source component vulnerability introduced after release | Medium | Medium | Subscribe to vulnerability feeds; run weekly dependency scanner; patch within 7 days of CVE release; maintain a bill of materials |
 
-### 8. Acceptance Criteria per Functional Requirement
+### 7. Acceptance Criteria per Functional Requirement
 - **FR‑001**: System returns patient intake record within 200 ms (p95) for Clinician and Admin roles; measured over 1,000 random queries.
 - **FR‑002**: Role‑based access control enforces that Front‑Desk cannot view or export full records; verified by automated permission tests.
 - **FR‑003**: PDF export includes a visible watermark containing export timestamp and user ID; 100 % of exported PDFs pass automated watermark detection.

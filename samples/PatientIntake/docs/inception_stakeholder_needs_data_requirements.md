@@ -56,7 +56,7 @@ The PatientIntake system will provide a secure, open‑source platform that enab
  Operational Efficiency |
 |
 
-### 6. Success Criteria / KPIs
+### 5. Success Criteria / KPIs
 | KPI ID | Metric Name | Target Value | Measurement Method |
 |---|---|---|---|
 | KPI-001 |
@@ -81,7 +81,7 @@ The PatientIntake system will provide a secure, open‑source platform that enab
  ≥99.9 % monthly |
 |
 
-### 7. Risk Assessment and Mitigations
+### 6. Risk Assessment and Mitigations
 | ID |
  Risk Description |
  Likelihood |

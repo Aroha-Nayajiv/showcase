@@ -57,20 +57,20 @@ Performance KPI: PDF generation latency ≤2 s (KPI-001)
 ### 1. Overview
 The PDF summary export is a core compliance‑driven capability. Authorized staff (admin, clinician, front‑desk) must be able to generate a tamper‑evident PDF that includes a watermark with the exporting user ID, timestamp, and a unique document hash. The export respects role‑based access control (FR‑002) and is auditable per FR‑003 and FR‑008 (watermark). Encryption/decryption latency must not exceed 200 ms per record (KPI‑004).
 
-### 4. API Specification
+### 2. API Specification
 | Method | Path | Description | Success Code | Error Codes |
 |--------|------|-------------|--------------|-------------|
 | POST | /api/v1/patients/{patient_id}/export/pdf | Export patient record as PDF with watermark | 200 OK (application/pdf) | 400 Bad Request, 403 Forbidden, 404 Not Found, 500 Internal Server Error |
 All endpoints require authentication token and enforce RBAC per FR‑002. Error responses include JSON body with `error_code` and `message` fields.
 
-### 5. Design Needs
+### 3. Design Needs
 - **Watermark Engine** – Accepts dynamic fields (user ID, timestamp, hash) and embeds them without altering layout. Uses AES‑256‑GCM for field‑level encryption; keys rotated annually in HSM.
 - **RBAC Enforcement** – Middleware validates role against FR‑002 before PDF generation.
 - **Audit Log Schema** – Columns: event_type, user_id, patient_id, timestamp, document_hash, outcome, error_details (optional). Immutable storage for 7 years (FR‑003).
 - **Error Handling** – Uniform JSON error model; ensures no partial PDFs are persisted on failure.
 - **Performance Target** – PDF generation ≤2 seconds; encryption/decryption latency ≤200 ms per record (KPI‑004).
 
-### 6. Test Cases
+### 4. Test Cases
 - **TC-014** – Verify successful PDF export for Front‑Desk role (covers AC‑001).
 - **TC-015** – Verify clinician export with correct watermark (covers AC‑002).
 - **TC-016** – Validate watermark template update persists (covers AC‑003).
@@ -79,7 +79,7 @@ All endpoints require authentication token and enforce RBAC per FR‑002. Error 
 - **TC-019** – Simulate PDF generation failure (e.g., out‑of‑memory) and verify 500 error handling.
 - **TC-020** – Measure latency of export operation meets ≤2 seconds.
 
-### 7. Traceability Matrix
+### 5. Traceability Matrix
 | Requirement | User Story | Acceptance Criteria |
 |---------------|------------|----------------------|
 | FR‑001 | US‑001, US‑002 | AC‑001, AC‑002 |

@@ -20,7 +20,7 @@ Analysis: Applied thematic coding in NVivo, mapped themes to FR‑001‑FR‑010
 ### 4. Key Findings & Quantitative Targets
 - **Encryption**: All PHI fields must be encrypted using pgcrypto with AES‑256; encryption latency <15 ms per field.
 - **Audit Logging**: Log every read/write operation with user ID, timestamp, operation type; retention 7 years (FR‑003). Success defined as 100 % log completeness (KPI‑003).
-- **PDF Generation**: Use wkhtmltopdf with custom CSS watermark; watermark must embed clinician ID and ISO‑8601 timestamp; verification script must confirm watermark presence on 100 % of generated PDFs (KPI‑030).
+- **PDF Generation**: Use WeasyPrint with custom CSS watermark; watermark must embed clinician ID and ISO‑8601 timestamp; verification script must confirm watermark presence on 100 % of generated PDFs (KPI‑030).
 - **Performance**: PDF generation time ≤200 ms for average record size (~2 KB) on reference hardware (Intel i7, 16 GB RAM).
 - **Usability**: Form must meet WCAG 2.1 AA; error messages perceivable via screen readers.
 

@@ -8,7 +8,7 @@ The patient intake system is organized as a set of micro‑services deployed via
    |
    |---> [Auth Service] (JWT, OAuth2)
    |---> [Intake Service] (validation, field‑level encryption)
-   |---> [PDF Service] (PDFLib, watermarking)
+   |---> [PDF Service] (WeasyPrint, watermarking)
    `---> [PostgreSQL] (RLS, pgcrypto)
 The diagram is captured in `architecture/diagram.png` for reference.
 3. Security Controls
@@ -124,7 +124,7 @@ CREATE TABLE patient_intake.patient (
     last_name TEXT NOT NULL,
     date_of_birth DATE NOT NULL CHECK (date_of_birth < CURRENT_DATE),
     gender TEXT CHECK (gender IN ('Male','Female','Other','Prefer not to say')),
-    phone_encrypted BYTEA NOT NULL, -- encrypted via pgp_sym_encrypt
+    phone_encrypted BYTEA NOT NULL, -- encrypted via AES-256-GCM
     email_encrypted BYTEA NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -207,7 +207,7 @@ CREATE POLICY admin_policy ON patient_intake.patient USING (true);
 - **GET /api/v1/insurance/{insurance_id}** – Retrieve insurance data (encrypted fields returned as ciphertext for unauthorized roles). 
 - **POST /api/v1/medical_history** – Add medical history entry. 
 - **GET /api/v1/medical_history/{patient_id}** – List history entries. 
-- **GET /api/v1/export/pdf/{patient_id}** – Generate PDF summary. 
+- **POST /api/v1/patients/{patient_id}/export/pdf/{patient_id}** – Generate PDF summary. 
   - Response: `application/pdf` stream; on success an audit log entry with `watermark_hash` is created. Errors return `ErrorResponse`. 
 - **GET /api/v1/health** – Liveness/readiness probe. 
 All endpoints require a valid JWT; the gateway extracts `role` claim and sets `app.current_role` session variable for RLS enforcement.
@@ -264,7 +264,7 @@ services:
     image: registry.local/library/postgres:15-alpine
     environment:
       POSTGRES_USER: "app_user}
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"}
+      POSTGRES_PASSWORD_FILE: "/run/secrets/db_password"}
       POSTGRES_DB: "patient_intake}"}
     volumes:
       - pg_data:/var/lib/postgresql/data}

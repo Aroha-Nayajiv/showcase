@@ -2,7 +2,7 @@
 
 ## Personas
 
-### 1. PER-01 Front‑Desk Staff
+### 5. PER-01 Front‑Desk Staff
 Role: Administrative clerk who initiates the intake session when a patient arrives.
 Goals: Capture complete insurance details quickly, verify eligibility, and flag missing or malformed fields before the patient proceeds.
 Key Tasks:
@@ -31,7 +31,7 @@ Zero unauthorized access incidents (FR‑002).
 Pain Points: Delays if decryption fails; need for clear error messages when insurer data is incomplete.
 Compliance Touchpoints: Access must be logged with clinician ID, patient ID, and read operation (FR‑003). Data at rest remains encrypted (NFR‑001).
 
-### 3. PER-03 Patient
+### 6. PER-03 Patient
 Role: Individual providing personal and insurance information.
 Goals: Complete the insurance section accurately without exposing sensitive data to the browser or network.
 Key Tasks:
@@ -70,7 +70,7 @@ AC-009 | US-003 | Audit log retention policy enforcement | System retains audit_
 
 ## Design Needs
 
-**Field‑level Encryption Specification**: Algorithm AES‑256‑GCM with per‑field keys managed by a master key stored in HashiCorp Vault. Encryption performed client‑side using OpenPGP.js before transmission; server stores ciphertext using pgcrypto's `pgp_sym_encrypt`. Failure to encrypt triggers ENCRYPT_FAIL handling as defined in AC‑006.
+**Field‑level Encryption Specification**: Algorithm AES‑256‑GCM with per‑field keys managed by a master key stored in HashiCorp Vault. Encryption performed client‑side using OpenPGP.js before transmission; server stores ciphertext using pgcrypto's `AES-256-GCM`. Failure to encrypt triggers ENCRYPT_FAIL handling as defined in AC‑006.
 
 **Audit Log Schema**: Table `audit_log` columns: `event_id` UUID primary key, `user_id` VARCHAR, `action` VARCHAR (INSERT/UPDATE/SELECT/EXPORT), `entity` VARCHAR (insurance_info), `timestamp` TIMESTAMPTZ DEFAULT now(), `details_json` JSONB (includes error codes, field names). Retention policy: retain rows for 7 years on immutable WORM storage; archival script moves older rows to cold archive quarterly.
 
@@ -87,7 +87,7 @@ AC-009 | US-003 | Audit log retention policy enforcement | System retains audit_
 ## Prioritization Overview
 The Insurance Entry User Journey is a core component of the PatientIntake system. It captures payer information, validates coverage eligibility, and links the insurance record to the patient demographic profile. Because the system must satisfy HIPAA technical safeguards, role‑based access control, auditability, and TLS 1.3 enforcement, this journey is ranked highest in the MVP.
 
-### 1. User Stories
+### 5. User Stories
 | ID | Persona | Goal | Benefit | Priority |
 |----|---------|------|---------|----------|
 | US-001 | Front‑Desk Staff | Enter patient insurance details into a secure web form | The patient's coverage can be verified before clinical intake, reducing delays and ensuring correct billing | 1 |
@@ -96,20 +96,20 @@ The Insurance Entry User Journey is a core component of the PatientIntake system
 | US-004 | Front‑Desk Staff | Receive immediate validation feedback on insurance fields (e.g., policy number format) | Errors are corrected at entry time, keeping data quality high and audit log entries accurate | 2 |
 | US-005 | Auditor | Export an audit‑ready report of all insurance entry actions with timestamps and user IDs | I can demonstrate compliance with HIPAA audit requirements during inspections | 1 |
 
-### 3. Priority Ranking and Business Justification
+### 6. Priority Ranking and Business Justification
 | Rank | Stories | Rationale |
 |------|---------|----------|
 | 1 (Critical) | US-001, US-005 | Directly support HIPAA §164.312(a)(2)(iv) encryption and audit requirements; failure would constitute a compliance breach |
 | 2 (High) | US-002, US-004 | Enable clinicians to make billing decisions quickly and reduce front‑desk data‑entry errors, improving operational efficiency by an estimated 15 % |
 | 3 (Medium) | US-003 | Administrative configuration is essential for long‑term maintainability but can be deferred until post‑MVP release |
 
-### 5. Audit Log Retention Policy
+### 7. Audit Log Retention Policy
 All audit log entries are stored in an append‑only immutable bucket and retained for a minimum of seven (7) years in accordance with FR‑003 and regulatory requirements. Logs are periodically verified for integrity using SHA‑256 digests.
 
-### 6. PDF Export Limits
+### 8. PDF Export Limits
 The export service caps each PDF at 10 000 records. When the result set exceeds this limit, the service automatically splits the output into sequentially numbered PDFs (e.g., export_01.pdf, export_02.pdf) and creates a corresponding audit log entry for each part.
 
-### 7. Traceability Matrix
+### 9. Traceability Matrix
 | Artifact ID | Linked FR(s) | Linked KPI(s) |
 |-------------|--------------|---------------|
 | US-001 | FR-001, FR-006 | KPI-001 (response time), KPI-004 (form success rate) |

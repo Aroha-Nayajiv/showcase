@@ -35,13 +35,13 @@ US-001 | Front‑Desk Staff | Record each view, edit, and export of patient inta
 US-002 | Clinician | View audit entries for a patient's record | Verify who accessed the data and when | High
 US-003 | Administrator | Purge or archive audit logs older than 90 days | Storage costs stay within policy and logs remain immutable for required retention | Medium
 
-## 3. Priority Ranking & Business Justification
+## 2. Priority Ranking & Business Justification
 
 US-001 – High: Directly satisfies HIPAA §164.312(b) "Audit Controls" by ensuring every access and export is recorded.
 US-002 – High: Enables clinicians to perform forensic review, supporting compliance audits and incident response (HIPAA §164.308(a)(1)).
 US-003 – Medium: Addresses data retention policies (HIPAA §164.310(d)) while controlling storage cost; can be deferred to post‑MVP if needed.
 
-## 4. Design Needs (to be handed to Design)
+## 3. Design Needs (to be handed to Design)
 
 1. Log Format – JSON lines with fields: timestamp_utc, actor_id, actor_role, action, patient_id, resource_id (if applicable), outcome, hash (optional), encryption_kid, metadata (e.g., field_changes).
 2. Timestamp Source – System clock synchronized via NTP; all services must use UTC.
@@ -53,7 +53,7 @@ US-003 – Medium: Addresses data retention policies (HIPAA §164.310(d)) while 
 8. Encryption Key Management – KIDs are stored in a secure key vault; rotation occurs every 90 days per REQ‑001; each log entry records the KID used for encryption without exposing key material.
 9. Performance Monitoring – KPI‑002 measures write latency; alerts fire if 99th‑percentile >250 ms or average >100 ms over 5‑minute windows.
 
-## 5. Edge Cases & Failure Scenarios
+## 4. Edge Cases & Failure Scenarios
 
 Log Write Failure – If the database is unavailable, the application queues audit events in an in‑memory buffer persisted to local disk; retries occur every 30 seconds with exponential backoff up to five attempts; after five failures a critical alert is raised and a SECURITY_ALERT entry is logged.
 Clock Skew – If NTP sync fails, timestamps fall back to system time with a warning flag `clock_skew=true` in the log entry.

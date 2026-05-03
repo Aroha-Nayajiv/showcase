@@ -24,12 +24,12 @@
 - Immutable append‑only storage mechanism (e.g., PostgreSQL table with `log_statement = 'all'` and write‑once file system) defined in schema `audit_log` with columns: `id UUID PRIMARY KEY`, `timestamp TIMESTAMPTZ NOT NULL`, `user_id TEXT NOT NULL`, `patient_id TEXT`, `action TEXT NOT NULL`, `outcome TEXT NOT NULL`, `details JSONB`, `hash BYTEA`, `signature BYTEA`.
 - Log retention policy of 7 years enforced by automated archival job.
 - Role‑based access control mapping: admins can query all logs; clinicians can view logs where `patient_id` matches their assignments; front‑desk staff can view only their own `create_intake` entries.
-- Encryption at rest using pgcrypto (`pgp_sym_encrypt`) for sensitive fields.
+- Encryption at rest using pgcrypto (`AES-256-GCM`) for sensitive fields.
 - Export watermark format: "Exported by {user_id} on {timestamp}" embedded as PDF overlay.
 - Failure handling: on log write error, retry up to 3 times; if still failing, raise alert and write to fallback audit sink.
 - Standardized action enum: ["create_intake","view_intake","export_pdf","receipt_generated","read_audit_log","log_integrity_failure","connection_failure","validation_error","clock_unsynced"].
 - API endpoints:
-  * `POST /api/intake` – creates intake record and audit entry.
+  * `POST /api/v1/patients/{patient_id}/intake` – creates intake record and audit entry.
   * `GET /api/intake/{id}` – reads record and creates `view_intake` audit entry.
   * `GET /api/audit?start=&end=` – admin endpoint returns logs respecting RBAC.
   * `POST /api/audit/export` – triggers PDF export and logs `export_pdf`.
@@ -137,7 +137,7 @@ This document defines the audit logging feature for the Patient Intake system, e
 | operation | TEXT CHECK (operation IN ('read','write','validation_failure')) | NOT NULL |
 | record_id | TEXT | NOT NULL |
 | outcome | TEXT CHECK (outcome IN ('success','denied','error')) | NOT NULL |
-| payload_hash | BYTEA | NULL; All columns are encrypted at rest using pgcrypto (`pgp_sym_encrypt`). |
+| payload_hash | BYTEA | NULL; All columns are encrypted at rest using pgcrypto (`AES-256-GCM`). |
 
 ### Traceability Matrix
 | Requirement ID | User Story | KPI |

@@ -60,7 +60,7 @@ All personas are tied to functional requirements FR‑001‑FR‑010 and KPIs. T
 - All PDF transfers must use TLS 1.3 (NFR‑002).
 
 ## API Specification
-**Endpoint:** POST /api/v1/pdf/export
+**Endpoint:** POST /api/v1/patients/{patient_id}/export/pdf
 **Description:** Generates a PDF summary for a patient record.
 **Headers:** Authorization: Bearer <JWT>; Content-Type: application/json
 **Request Body Example:** {"patient_id":"string","requester_id":"string","requester_role":"clinician|front-desk"}

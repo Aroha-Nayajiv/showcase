@@ -89,7 +89,7 @@ d ...
 - Ensure client‑side field‑level encryption using approved library.
 - Implement row‑level security policies in PostgreSQL for roles front_desk, clinician, admin (FR-002).
 - Audit logging schema captures user ID, timestamp, operation type, record ID (FR-003).
-- PDF generation using wkhtmltopdf with watermark insertion; store files on immutable storage (FR-008).
+- PDF generation using WeasyPrint with watermark insertion; store files on immutable storage (FR-008).
 - Performance targets: form response ≤200 ms; clinician view ≤200 ms (KPI‑02).
 - Traceability: link all stories and ACs to FR‑001…FR‑010, KPI‑001…KPI‑010, REQ‑001.
 - Privacy notice compliance: ensure FR‑010 referenced in user onboarding flow.

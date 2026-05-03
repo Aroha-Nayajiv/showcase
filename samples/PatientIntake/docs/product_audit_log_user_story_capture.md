@@ -89,7 +89,7 @@ Run via cron nightly.
 - US-002: As a Clinician, I need audit logs to include user ID, timestamp, patient record ID, and action type, so that any unauthorized access can be quickly identified.
 - US-003: As an Administrator, I want the audit log system to retain entries for at least seven years and provide immutable storage, so that regulatory audits are satisfied.
 
-### 3. Security and Compliance Notes
+### 2. Security and Compliance Notes
 - All log entries are written using PostgreSQL `log_statement = 'all'` with `row_security = on` and encrypted at rest via pgcrypto.;
 - Timestamps are recorded in UTC ISO‑8601 format to satisfy NIST SP 800‑53 AU‑12.;
 - Watermark format for exported PDFs: "Exported by {user_id} on {timestamp}" using pdf-lib.;
@@ -110,17 +110,17 @@ Run via cron nightly.
   CREATE POLICY admin_full_access ON audit_log FOR SELECT USING (current_user = 'admin');
   CREATE POLICY staff_insert ON audit_log FOR INSERT WITH CHECK (current_user IN ('front_desk','clinician'));
 
-### 4. Metrics and Success Criteria
+### 3. Metrics and Success Criteria
 - Metric M-001: Audit log capture rate ≥ 99.9 % of all view/export actions.;
 - Metric M-002: Log retention compliance ≥ 100 % for the 7‑year window.;
 - Metric M-003: Maximum log queue latency ≤ 5 minutes during DB outage.;
 
-### 5. Dependencies and Assumptions
+### 4. Dependencies and Assumptions
 - PostgreSQL 14+ with pgaudit extension available in the Docker Compose stack.;
 - TLS enforced for all DB connections (covers FR‑001).;
 - MinIO container deployed in the same Docker Compose network for immutable storage.;
 
-### 6. Risks and Mitigations
+### 5. Risks and Mitigations
 - RISK-003 (audit log tampering): mitigated by immutable storage and digital signatures.;
 - RISK-001 (unauthorized access): mitigated by strict RBAC and row‑level security.;
 - RISK-005 (performance impact): mitigated by asynchronous logging and batch inserts.

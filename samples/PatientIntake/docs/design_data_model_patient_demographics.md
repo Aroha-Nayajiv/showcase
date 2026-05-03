@@ -1,6 +1,6 @@
 # Patient Demographics Schema (Overview)
 
-### 1. API Contracts
+### 6. API Contracts
 
 - **POST /api/v1/patients**
   - Description: Submit new patient intake record
@@ -35,7 +35,7 @@
   - Errors: 401 Unauthorized, 403 ERR-002-AUTHORIZATION, 500 Internal Server Error
   - Rate Limiting: 200 requests per minute per user
 
-### 2. Data Model
+### 7. Data Model
 
 | Entity | Column | Data Type | Required | Constraints / Description |
 |---|---|---|---|---|
@@ -58,7 +58,7 @@
 | PatientAuditLog | performed_by_role | enum["admin","clinician","front_desk"] | Yes | 
 | PatientAuditLog | timestamp_utc | timestamptz | Yes |
 
-### 3. Error Taxonomy (Unified)
+### 8. Error Taxonomy (Unified)
 
 | Error ID | HTTP Code | Title | Message | Retryable |
 |---|---|---|---|---|
@@ -74,12 +74,12 @@
 |---|---|---|---|---|
 | PatientIntakeService (SVC-001) | Validate, encrypt, and persist patient intake data | PostgreSQL (RLS enabled), pgcrypto, Logger | PatientCreatedEvent | None |
 | PatientReadService (SVC-002) | Authorize, decrypt fields and return patient demographics; log READ actions | PostgreSQL, pgcrypto, Logger | PatientReadEvent | None |
-| PdfExportService (SVC-003) | Render PDF via wkhtmltopdf, apply watermark with timestamp, store audit log entry | PatientReadService, AuditLogService | PdfGeneratedEvent | PatientReadEvent |
+| PdfExportService (SVC-003) | Render PDF via WeasyPrint, apply watermark with timestamp, store audit log entry | PatientReadService, AuditLogService | PdfGeneratedEvent | PatientReadEvent |
 | AuditLogService (SVC-004) | Record CREATE/READ/EXPORT actions in append‑only audit_log table; enforce immutability | PostgreSQL (append‑only table) | AuditLoggedEvent | None |
 
 ## Technical Design Specification
 
-### 7. Indexes and Performance
+### 5. Indexes and Performance
 Primary keys are UUIDs generated via pgcrypto. B‑tree indexes on `patient.last_name`, `insurance.provider_name`, and `audit_log.performed_at` enable fast lookup. A GIN index on `audit_log.details_jsonb` supports ad‑hoc forensic queries. Encrypted columns are stored as `bytea`; searches use non‑encrypted surrogate fields.
 
 #### 1. TLS Encryption in Transit
@@ -161,30 +161,30 @@ All endpoints now return one of the above codes consistently.
 
 ## Technical Design Document for Patient Intake System
 
-### 1. Architecture Overview
+### 6. Architecture Overview
 The system is composed of the following micro‑services deployed via Docker Compose in an air‑gap environment:
 - **API Service** – FastAPI application exposing REST endpoints, handling authentication, validation, and orchestration.
-- **PDF Generator Service** – wkhtmltopdf container generating PDF intake summaries with watermark (user ID + timestamp).
+- **PDF Generator Service** – WeasyPrint container generating PDF intake summaries with watermark (user ID + timestamp).
 - **Auth Service** – OAuth2 Resource Owner Password Credentials flow issuing RS256‑signed JWTs.
 - **Audit Service** – Records every read/write operation in an immutable PostgreSQL audit_log table.
 - **PostgreSQL Database** – Stores patient intake data, encrypted at rest using pgcrypto (AES‑256‑GCM).
 All services run with the `--read-only` flag where applicable and are isolated on a private Docker bridge network.
 
-### 2. Service Interaction Diagram
+### 7. Service Interaction Diagram
 
 Client -> Auth Service (token) -> API Service -> {DB, PDF Generator, Audit Service}
 
-### 3. API Specifications
+### 8. API Specifications
 All endpoints are versioned under `/api/v1` and conform to OpenAPI 3.0 schema. Errors follow a unified taxonomy defined in `error_codes.yaml`.
 
-#### 3.1 Authentication Endpoints
-- **POST /auth/token**
+#### 8.1 Authentication Endpoints
+- **POST /api/v1/auth/token**
   - Request: `application/x-www-form-urlencoded` with `grant_type=password`, `username`, `password`.
   - Response (200): `{ "access_token": "<jwt>", "token_type": "Bearer", "expires_in": 3600 }`
   - Errors: `ERR-001` (invalid credentials), `ERR-002` (account locked).
 
-#### 3.2 Patient Intake Endpoints
-- **POST /patients**
+#### 8.2 Patient Intake Endpoints
+- **POST /api/v1/patients**
   - Request Body (application/json):
     
     {
@@ -200,33 +200,33 @@ All endpoints are versioned under `/api/v1` and conform to OpenAPI 3.0 schema. E
   - **Security**: JWT required, role `frontdesk_role`.
   - **Audit**: Write operation logged with outcome.
 
-- **GET /patients/{patient_id}**
+- **GET /api/v1/patients/{patient_id}**
   - Response (200): Patient resource JSON.
   - Errors: `ERR-005` (not found), `ERR-006` (unauthorized access).
   - **Security**: JWT required, row‑level security ensures only clinicians assigned to the patient (`clinician_role`) can read.
   - **Audit**: Read operation logged.
 
-- **GET /patients** (list with pagination)
+- **GET /api/v1/patients** (list with pagination)
   - Query Params: `page`, `size` (default 20).
   - Response (200): `{ "items": [...], "page":1,"size":20,"total":123 }`
   - Errors: `ERR-007` (invalid pagination).
   - **Rate Limiting**: 100 requests per minute per user (enforced by API gateway).
 
-#### 3.3 PDF Export Endpoint
-- **POST /patients/{patient_id}/export**
+#### 8.3 PDF Export Endpoint
+- **POST /api/v1/patients/{patient_id}/export**
   - Request Body: `{ "format": "pdf" }`
   - Response (202): `{ "job_id": "uuid", "status": "queued" }`
   - Asynchronous worker in PDF Generator creates PDF, applies watermark `UserID_{user_id}_TS_{timestamp}` and stores in object store (`/var/pdf_output`).
   - Errors: `ERR-008` (generation failure), `ERR-009` (unsupported format).
   - **Audit**: Write operation logged when PDF is stored.
 
-#### 3.4 Audit Retrieval Endpoint (admin only)
-- **GET /audit/logs**
+#### 8.4 Audit Retrieval Endpoint (admin only)
+- **GET /api/v1/audit/logs**
   - Query Params: `start`, `end`, `user_id`, `operation`.
   - Response (200): List of audit records.
   - Security: Role `admin_role` only.
 
-#### 4.1 Patient Table (`patient`) 
+#### 4.5 Patient Table (`patient`) 
 | Column | Type | Constraints |
 |--------|------|--------------|
 | patient_id | UUID PK | |
@@ -240,9 +240,9 @@ All endpoints are versioned under `/api/v1` and conform to OpenAPI 3.0 schema. E
 | created_at | TIMESTAMPTZ | DEFAULT now() |
 | updated_at | TIMESTAMPTZ | |
 | owner_id | UUID | FK to clinician (RLS) |
-*All sensitive columns are encrypted at rest using pgcrypto (`pgp_sym_encrypt`).*
+*All sensitive columns are encrypted at rest using pgcrypto (`AES-256-GCM`).*
 
-#### 4.2 Audit Log Table (`audit_log`)
+#### 4.6 Audit Log Table (`audit_log`)
 | Column | Type | Constraints |
 |--------|------|--------------|
 | audit_id | BIGSERIAL PK |
@@ -254,7 +254,7 @@ All endpoints are versioned under `/api/v1` and conform to OpenAPI 3.0 schema. E
 | details | JSONB |
 *Table is immutable; rows are never deleted and retained for 7 years (FR‑003).*
 
-### 5. Docker Compose Deployment Contract (EP‑002)
+### 9. Docker Compose Deployment Contract (EP‑002)
 yaml
 version: "3.9"
 services:
@@ -263,7 +263,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: "patient_intake"
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_PASSWORD_FILE: "/run/secrets/db_password"
       POSTGRES_DB: "patient_intake_db"
     volumes:
       - db_data:/var/lib/postgresql/data
@@ -293,7 +293,7 @@ services:
       timeout: 5s
       retries: 3
   pdf_generator:
-    image: openlabs/wkhtmltopdf:latest
+    image: openlabs/WeasyPrint:latest
     restart: unless-stopped
     environment:
       MAX_CONCURRENT_JOBS: "4"
@@ -310,7 +310,7 @@ networks:
 
 All services run with the `--read-only` flag where applicable and outbound internet traffic is blocked by host firewall to satisfy air‑gap requirements.
 
-### 6. Security Considerations
+### 10. Security Considerations
 - **Authentication** – OAuth2 ROPC flow, RS256 JWTs validated by Auth Service.
 - **Authorization** – Role‑based access control (RBAC) enforced at API layer; row‑level security policies in PostgreSQL restrict clinicians to their patients.
 - **Transport Security** – All HTTP endpoints require TLS 1.2+.
@@ -319,6 +319,6 @@ All services run with the `--read-only` flag where applicable and outbound inter
 - **Rate Limiting & Pagination** – Implemented per‑user to prevent abuse; default page size 20, max 100.
 - **Container Hardening** – Containers run as non‑root where possible; `--read-only` flag applied; secrets injected via Docker secrets or `.env` file.
 
-### 8. Open Issues / Knowledge Gaps
+### 11. Open Issues / Knowledge Gaps
 - Exact HIPAA § 164.312(a)(2)(iv) technical safeguard requirements for encryption key management.
 - PostgreSQL row‑level security performance characteristics at >10 M audit log rows.

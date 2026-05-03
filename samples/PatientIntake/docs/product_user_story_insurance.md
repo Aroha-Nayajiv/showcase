@@ -20,7 +20,7 @@ Given valid data is entered, when the staff clicks Submit, then the data is encr
 4. **Audit Logging**
    Every read and write operation on PHI must generate an immutable log entry containing user ID, timestamp, operation type, and record identifier. Logs are written to a write‑once append‑only table with digital signatures (pgcrypto). Acceptance: Given any successful read, When the audit table is queried, Then an entry exists with a valid signature and the timestamp matches the operation time within ±1 second.
 5. **PDF Summary Export**
-   Authorized staff can export a patient's intake data as a PDF. The PDF includes a visible watermark containing the exporting user ID and export timestamp. The watermark is generated using wkhtmltopdf with a custom HTML overlay. Acceptance: Given a Clinician request to export, When the PDF is generated, Then the watermark text matches "Exported by {UserID} at {ISO‑timestamp}" and the file size does not exceed 500 KB. Error handling added for export failures returns HTTP 500 with error code PDF_EXPORT_FAIL.
+   Authorized staff can export a patient's intake data as a PDF. The PDF includes a visible watermark containing the exporting user ID and export timestamp. The watermark is generated using WeasyPrint with a custom HTML overlay. Acceptance: Given a Clinician request to export, When the PDF is generated, Then the watermark text matches "Exported by {UserID} at {ISO‑timestamp}" and the file size does not exceed 500 KB. Error handling added for export failures returns HTTP 500 with error code PDF_EXPORT_FAIL.
 6. **Automated Unit & Integration Tests**
    A pytest suite covers form validation (invalid email, missing required fields), encryption correctness (encrypted fields are not stored in plaintext), RBAC enforcement (role‑specific access attempts), PDF export watermark verification, TLS downgrade detection, and key‑rotation latency targets (decryption ≤300 ms). Tests run in CI on each commit and must achieve ≥90 % code coverage. Acceptance: Given a CI run, When the test suite completes, Then the coverage report shows ≥90 % and all tests pass.
 7. **Deployment & Air‑Gap Setup Guide**
@@ -101,7 +101,7 @@ All endpoints enforce RBAC checks and emit audit entries per operation.
 
 ## Test Coverage Enhancements (Added per Reviewer Feedback)
 
-- Added unit tests for PDF export error paths (e.g., wkhtmltopdf failure) verifying proper 500 response and logged error.
+- Added unit tests for PDF export error paths (e.g., WeasyPrint failure) verifying proper 500 response and logged error.
 - Added integration test verifying key rotation does not break decryption of existing records; simulates quarterly rotation using mock Vault keys.
 - Expanded test matrix to cover admin role actions including CRUD on patient records and audit log retrieval.
 - Included performance test asserting encryption/decryption latency ≤300 ms under load.

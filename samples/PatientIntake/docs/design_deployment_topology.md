@@ -1,7 +1,7 @@
 # Deployment Topology Specification (Overview)
 
 ### 1. Overview
-The PostgreSQL deployment for the PatientIntake system is provisioned on an air‑gapped host using Docker Compose with a dedicated network segment named `intake_net`. All data at rest is encrypted using pgcrypto's `pgp_sym_encrypt` with a master key stored in a Docker secret `pg_master_key`. The schema is version‑controlled via Flyway migrations, ensuring reproducible upgrades and rollbacks.
+The PostgreSQL deployment for the PatientIntake system is provisioned on an air‑gapped host using Docker Compose with a dedicated network segment named `intake_net`. All data at rest is encrypted using pgcrypto's `AES-256-GCM` with a master key stored in a Docker secret `pg_master_key`. The schema is version‑controlled via Flyway migrations, ensuring reproducible upgrades and rollbacks.
 
 ### 2. Core Entities
 | Entity | Description |
@@ -33,7 +33,7 @@ CREATE TABLE patient (
 
 -- Encryption helpers
 CREATE OR REPLACE FUNCTION encrypt_phone(p TEXT) RETURNS BYTEA AS $$
-    SELECT pgp_sym_encrypt(p, current_setting('pg_master_key'));
+    SELECT AES-256-GCM(p, current_setting('pg_master_key'));
 $$ LANGUAGE sql IMMUTABLE;
 CREATE OR REPLACE FUNCTION decrypt_phone(e BYTEA) RETURNS TEXT AS $$
     SELECT pgp_sym_decrypt(e, current_setting('pg_master_key'));
@@ -41,7 +41,7 @@ $$ LANGUAGE sql IMMUTABLE;
 
 -- Encrypt address field (new requirement)
 CREATE OR REPLACE FUNCTION encrypt_address(a TEXT) RETURNS BYTEA AS $$
-    SELECT pgp_sym_encrypt(a, current_setting('pg_master_key'));
+    SELECT AES-256-GCM(a, current_setting('pg_master_key'));
 $$ LANGUAGE sql IMMUTABLE;
 CREATE OR REPLACE FUNCTION decrypt_address(e BYTEA) RETURNS TEXT AS $$
     SELECT pgp_sym_decrypt(e, current_setting('pg_master_key'));
@@ -97,7 +97,7 @@ CREATE TABLE pdf_export (
 - Audit log indexes for traceability: `CREATE INDEX idx_audit_user ON audit_log(user_id);` and `CREATE INDEX idx_audit_patient ON audit_log(patient_id);` (built CONCURRENTLY).
 
 ### 5. Security Controls
-1. **Encryption at Rest** – Sensitive columns (`phone_encrypted`, `email_encrypted`, `address` encrypted via `encrypt_address`) are stored encrypted via `pgp_sym_encrypt`. The master key is supplied from a Docker secret at container start and never written to disk.
+1. **Encryption at Rest** – Sensitive columns (`phone_encrypted`, `email_encrypted`, `address` encrypted via `encrypt_address`) are stored encrypted via `AES-256-GCM`. The master key is supplied from a Docker secret at container start and never written to disk.
 2. **TLS in Transit** – PostgreSQL is configured with `ssl = on`, using server certificates mounted into the container; only services on the internal Docker network may connect, enforcing mutual TLS.
 3. **Row‑Level Security (RLS)** – Enforced on the `patient` table; policies reference the session variable `app.current_user_role` set by the API gateway after JWT validation.
 sql
@@ -202,7 +202,7 @@ networks:
 volumes:
   db_data:
 
-### 9. Operational Considerations
+### 8. Operational Considerations
 - **Backup Verification** – Weekly checksum validation of encrypted backups.
 - **Disaster Recovery Drill** – Quarterly restore test from latest backup.
 - **Monitoring** – Prometheus metrics for DB latency, RLS policy evaluation time, and audit log write latency (<100 ms).

@@ -2,10 +2,10 @@
 
 ## PDF Export API Contract – High-Level Architecture
 
-### 1. Purpose and Scope
+### 6. Purpose and Scope
 This document defines the high‑level system architecture and REST contract for the PDF Export API of the PatientIntake project. The API enables authorized staff (admin, clinician, front‑desk) to generate a PDF intake summary for a given patient record, embed a tamper‑evident watermark containing the exporting user ID and UTC timestamp, and stream the document to the client. All operations satisfy HIPAA technical safeguard requirements, enforce role‑based access control (RBAC), meet performance target FR-001 (p95 \u2264 2 s) and produce audit log entries per FR-003.
 
-### 2. Component Diagram Description
+### 7. Component Diagram Description
 The architecture consists of five logical layers, each deployed as a Docker container in the Docker‑Compose environment:
 - **Presentation Layer** – React UI served by Nginx (frontend). Communicates with the API Gateway over HTTPS.
 - **API Gateway** – Kong performs request routing, rate limiting (max 10 exports/min/user), JWT validation, and mutual TLS termination.
@@ -16,17 +16,17 @@ The architecture consists of five logical layers, each deployed as a Docker cont
 - **PDF Generation Engine** – WeasyPrint runs as a side‑car container invoked by `pdf-export-service`.
 All inter‑container traffic is confined to an internal Docker network and encrypted with mutual TLS.
 
-### 3. API Endpoint Specification
+### 8. API Endpoint Specification
 | Method | Path | Description | Auth | Request Schema | Response Schema |
 |--------|------|-------------|------|----------------|-----------------|
 | GET | /api/v1/patients/{patient_id}/export/pdf | Generate PDF summary for patient | Bearer token with role `clinician` or `admin` | N/A (path & optional query) | 200: `PdfExportSuccess`, 202: `PdfExportAccepted`, 4xx/5xx error objects |
 
-#### 3.1 Request Parameters
+#### 8.1 Request Parameters
 - **Path Parameter** `patient_id` (UUID, required): Identifier of the patient record.
 - **Query Parameter** `include_history` (boolean, optional): When true, the PDF also contains the medical history section.
 - **Header** `Authorization: Bearer <jwt>` – JWT must contain a `role` claim (`clinician` or `admin`) and be signed with the system RSA key.
 
-#### 3.2 Response Schemas
+#### 8.2 Response Schemas
 
 // 200 OK – synchronous generation
 {
@@ -48,7 +48,7 @@ All inter‑container traffic is confined to an internal Docker network and encr
   }
 }
 
-### 4. Error Handling Table
+### 9. Error Handling Table
 | HTTP Status | Error Code | Condition | Description |
 |-------------|------------|-----------|-------------|
 | 400 | ERR-PDF-400 | Missing or malformed request parameters | Bad request \u2013 validation failed |
@@ -58,7 +58,7 @@ All inter‑container traffic is confined to an internal Docker network and encr
 | 429 | ERR-PDF-429 | Rate limit exceeded ( >10 exports/min/user ) | Too many requests – throttled |
 | 500 | ERR-PDF-500 | Internal server error during PDF generation | Server error – investigate logs |
 
-### 5. PDF Content Requirements
+### 10. PDF Content Requirements
 1. Header with patient name, DOB, and record ID.
 2. Sections for demographics, insurance, and optional medical history.
 3. Watermark text: `Exported by {user_id} on {timestamp}` rendered semi‑transparent on each page.
@@ -68,24 +68,24 @@ All inter‑container traffic is confined to an internal Docker network and encr
 
 ## Technical Design – Patient Intake Audit Log Service
 
-### 1. Overview
+### 6. Overview
 The Audit Log Service records immutable audit events for all patient‑intake actions. It satisfies FR-003 (audit logging), FR-001 (performance), and related security requirements.
 
-### 2. Architecture
+### 7. Architecture
 - Containerized Go service.
 - Uses PostgreSQL (DB-001) with pgcrypto for at‑rest encryption.
 - Secrets managed by Vault.
 - Communicates with User Service (SVC-001) for identity and role data.
 - Emits metrics to Monitoring (MON-001).
 
-### 3. Service Interface Definition
+### 8. Service Interface Definition
 go
 type AuditLogService interface {
     CreateLog(ctx context.Context, req CreateLogRequest) (CreateLogResponse, error)
     GetLog(ctx context.Context, logID uuid.UUID) (AuditLogEntry, error)
 }
 
-### 4. Data Model
+### 9. Data Model
 Table **audit_logs**:
 - log_id UUID PRIMARY KEY
 - event_type TEXT NOT NULL
@@ -99,7 +99,7 @@ Table **audit_logs**:
 - CONSTRAINT immutability CHECK (created_at = timestamp)
 - BEFORE INSERT trigger sets `timestamp` and `created_at`.
 
-### 5. Security Considerations
+### 10. Security Considerations
 - **Authentication**: OAuth2 Bearer token validated against internal auth service (EP-001).
 - **Authorization**: RBAC enforced; only `admin` and `auditor` may POST, `clinician` may GET logs they are permitted to view.
 - **Transport Encryption**: TLS 1.2+ mandatory.
@@ -107,14 +107,14 @@ Table **audit_logs**:
 - **Immutability**: `timestamp` set once by trigger; updates prohibited.
 - **Retention**: Logs older than 7 years archived to immutable object storage per FR-003.
 
-### 6. Integration Points
+### 11. Integration Points
 - **User Service (SVC-001)** – provides `user_id` and role; returns 503 on failure.
 - **PostgreSQL (DB-001)** – connection pool errors map to `ERR-AUDIT-004`.
 - **Monitoring (MON-001)** – metric `audit_log_write_latency_ms`; alerts >100 ms.
 
-### 8. PDF Export API (Addressed Reviewer Gap)
+### 12. PDF Export API (Addressed Reviewer Gap)
 
-#### 8.1 Export Patient Intake Summary
+#### 12.1 Export Patient Intake Summary
 `GET /api/v1/patient/intake/{patient_id}/export/pdf`
 Query Params: `includeAudit=true|false`
 sResponse: `application/pdf` stream with watermark containing export timestamp and requesting user ID.
@@ -141,7 +141,7 @@ services:
       POSTGRES_HOST: db
       POSTGRES_DB: patient_intake
       POSTGRES_USER: app_user
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
       JWT_PUBLIC_KEY: /run/secrets/jwt_pub.key
     secrets:
       - jwt_pub.key

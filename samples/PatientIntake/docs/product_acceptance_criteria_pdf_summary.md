@@ -18,7 +18,7 @@
 | AC-008 | US-005 | Admin reviews exported PDFs for compliance
 
 ### Design Needs
-- PDF generator must support dynamic text overlay for watermarks (e.g., wkhtmltopdf or weasyprint).
+- PDF generator must support dynamic text overlay for watermarks (e.g., WeasyPrint or weasyprint).
 - Watermark format: "Exported by {UserID} at {ISO8601 timestamp}".
 - PDF must be encrypted at rest using PostgreSQL pgcrypto field‑level encryption to satisfy FR‑001.
 - Export operation must not exceed 2 seconds under normal load (KPI‑030).
