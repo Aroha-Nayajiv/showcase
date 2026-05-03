@@ -2,7 +2,7 @@
 
 ## PDF Summary Feature Specification: Primary User Personas
 
-### 2. Front‑Desk Staff (Role ID: ROLE-FRONTDESK)
+### 1. Front‑Desk Staff (Role ID: ROLE-FRONTDESK)
 **Primary Goal:** Initiate PDF generation for a patient after completing the intake form, then provide the document to the patient or clinician as required.
 **Key Needs:**
 - Simple UI button labeled "Generate Intake Summary".
@@ -12,7 +12,7 @@
 **Compliance Drivers:** Enforce RBAC so front‑desk staff cannot view PDFs for patients they are not assigned to (FR-002).
 **Success Metrics:** Export latency ≤ 2 seconds for 95 % of attempts; error rate < 1 % for failed watermark insertion.
 
-### 5. Patient (Role ID: ROLE-PATIENT)
+### 2. Patient (Role ID: ROLE-PATIENT)
 **Primary Goal:** Receive a copy of their own intake summary for personal records, if permitted by policy.
 **Key Needs:**
 - Ability to request a PDF via a secure portal link after form submission.
@@ -43,10 +43,10 @@ All roles share the requirement that every PDF export creates an immutable audit
 
 All user stories trace to FR‑001, FR‑002, FR‑003 and KPIs KPI‑001, KPI‑006.
 
-### 4. Overview
+### 3. Overview
 The PDF Summary feature enables authorized staff to export a patient\u2013intake summary as a tamper\u2013evident PDF. It satisfies HIPAA security and audit requirements by applying role\u2013based access control, AES\u201326 encryption at rest, TLS\u00a01.3 transport, and immutable watermarks.
 
-### 5. Detailed User Stories with Acceptance Criteria (BDD)
+### 4. Detailed User Stories with Acceptance Criteria (BDD)
 **US-001**
 
 Given a front\u2011desk staff member has completed a patient intake form
@@ -91,7 +91,7 @@ When they click "Download PDF"
 Then the system generates the same tamper\u2011evident PDF as staff
 And logs an export event with patient\u2011as\u2011user ID
 
-### 6. API Contract
+### 5. API Contract
 **Endpoint:** `POST /api/v1/patients/{patient_id}/export/pdf`
 **Headers:** "Authorization: Bearer <token>"; "Content-Type: application/json"
 **Request Body:** `{ "requester_id": "<user_id>", "purpose": "clinical_review" }`
@@ -101,7 +101,7 @@ And logs an export event with patient\u2011as\u2011user ID
 - `429 Too Many Requests` – rate limit exceeded.
 **Security:** TLS\u00a01.3 enforced; JWT signed with RSA\u201326; audit log entry created atomically.
 
-### 7. Error Handling
+### 6. Error Handling
 | Scenario | Expected Behavior |
 |---|---|
 | Watermark generation failure | Return `500 Internal Server Error` with message "Watermark service unavailable"; log error and trigger alert email to security officer |
@@ -109,7 +109,7 @@ And logs an export event with patient\u2011as\u2011user ID
 | PDF generation exceeds 2\u00a0seconds | Return `202 Accepted` with async status URL; notify user of delay and log performance metric |
 | Audit log write failure (immutability breach) | Abort operation, return `500`; create security alert; ensure original log entry remains unchanged |
 
-### 8. KPI Mapping
+### 7. KPI Mapping
 | KPI ID | Linked Requirement | Measurement |
 |---|---|---|
 | KPI-001 | FR-001 | % of PDFs generated ≤2 s (target ≥95%) |
@@ -118,7 +118,7 @@ And logs an export event with patient\u2011as\u2011user ID
 | KPI-004 | FR-004 | Form submission success rate (target ≥99%) |
 | KPI-005 | FR-008 | Watermark hash verification success (target 100%) |
 
-### 9. Traceability Matrix
+### 8. Traceability Matrix
 | Artifact | Requirement ID |
 |---|---|
 | US-001 | FR-001, FR-008 |

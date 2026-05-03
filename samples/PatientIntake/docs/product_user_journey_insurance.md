@@ -2,7 +2,7 @@
 
 ## Personas
 
-### 5. PER-01 Front‑Desk Staff
+### 1. PER-01 Front‑Desk Staff
 Role: Administrative clerk who initiates the intake session when a patient arrives.
 Goals: Capture complete insurance details quickly, verify eligibility, and flag missing or malformed fields before the patient proceeds.
 Key Tasks:
@@ -31,7 +31,7 @@ Zero unauthorized access incidents (FR‑002).
 Pain Points: Delays if decryption fails; need for clear error messages when insurer data is incomplete.
 Compliance Touchpoints: Access must be logged with clinician ID, patient ID, and read operation (FR‑003). Data at rest remains encrypted (NFR‑001).
 
-### 6. PER-03 Patient
+### 3. PER-03 Patient
 Role: Individual providing personal and insurance information.
 Goals: Complete the insurance section accurately without exposing sensitive data to the browser or network.
 Key Tasks:

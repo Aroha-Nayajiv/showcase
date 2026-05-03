@@ -2,10 +2,10 @@
 
 ## PDF Export API Contract – High-Level Architecture
 
-### 6. Purpose and Scope
+### 1. Purpose and Scope
 This document defines the high‑level system architecture and REST contract for the PDF Export API of the PatientIntake project. The API enables authorized staff (admin, clinician, front‑desk) to generate a PDF intake summary for a given patient record, embed a tamper‑evident watermark containing the exporting user ID and UTC timestamp, and stream the document to the client. All operations satisfy HIPAA technical safeguard requirements, enforce role‑based access control (RBAC), meet performance target FR-001 (p95 \u2264 2 s) and produce audit log entries per FR-003.
 
-### 7. Component Diagram Description
+### 2. Component Diagram Description
 The architecture consists of five logical layers, each deployed as a Docker container in the Docker‑Compose environment:
 - **Presentation Layer** – React UI served by Nginx (frontend). Communicates with the API Gateway over HTTPS.
 - **API Gateway** – Kong performs request routing, rate limiting (max 10 exports/min/user), JWT validation, and mutual TLS termination.
@@ -16,17 +16,17 @@ The architecture consists of five logical layers, each deployed as a Docker cont
 - **PDF Generation Engine** – WeasyPrint runs as a side‑car container invoked by `pdf-export-service`.
 All inter‑container traffic is confined to an internal Docker network and encrypted with mutual TLS.
 
-### 8. API Endpoint Specification
+### 3. API Endpoint Specification
 | Method | Path | Description | Auth | Request Schema | Response Schema |
 |--------|------|-------------|------|----------------|-----------------|
 | GET | /api/v1/patients/{patient_id}/export/pdf | Generate PDF summary for patient | Bearer token with role `clinician` or `admin` | N/A (path & optional query) | 200: `PdfExportSuccess`, 202: `PdfExportAccepted`, 4xx/5xx error objects |
 
-#### 8.1 Request Parameters
+#### 3.1 Request Parameters
 - **Path Parameter** `patient_id` (UUID, required): Identifier of the patient record.
 - **Query Parameter** `include_history` (boolean, optional): When true, the PDF also contains the medical history section.
 - **Header** `Authorization: Bearer <jwt>` – JWT must contain a `role` claim (`clinician` or `admin`) and be signed with the system RSA key.
 
-#### 8.2 Response Schemas
+#### 3.2 Response Schemas
 
 // 200 OK – synchronous generation
 {
@@ -48,7 +48,7 @@ All inter‑container traffic is confined to an internal Docker network and encr
   }
 }
 
-### 9. Error Handling Table
+### 4. Error Handling Table
 | HTTP Status | Error Code | Condition | Description |
 |-------------|------------|-----------|-------------|
 | 400 | ERR-PDF-400 | Missing or malformed request parameters | Bad request \u2013 validation failed |
@@ -58,7 +58,7 @@ All inter‑container traffic is confined to an internal Docker network and encr
 | 429 | ERR-PDF-429 | Rate limit exceeded ( >10 exports/min/user ) | Too many requests – throttled |
 | 500 | ERR-PDF-500 | Internal server error during PDF generation | Server error – investigate logs |
 
-### 10. PDF Content Requirements
+### 5. PDF Content Requirements
 1. Header with patient name, DOB, and record ID.
 2. Sections for demographics, insurance, and optional medical history.
 3. Watermark text: `Exported by {user_id} on {timestamp}` rendered semi‑transparent on each page.

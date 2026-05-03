@@ -81,12 +81,12 @@ Given a clinician or admin initiates PDF export of a patient summary, when the e
 - Master keys are rotated every 90 days using HashiCorp Vault's automatic rotation feature. Per‑field keys are re‑encrypted with the new master key and stored back to the database during off‑peak windows. Rotation events are logged with audit level "key_rotation".
 
 ## Test Cases (selected)
-- TC-001: Verify client‑side encryption headers are present in POST payload.
-- TC-002: Attempt unauthorized record access with a user lacking proper role; expect HTTP 403 and audit entry.
-- TC-003: Submit malformed form entries; ensure error messages appear inline and submission is blocked.
-- TC-004: Measure receipt page load time; must be ≤1 second for 95th percentile.
-- TC-005: Export PDF summary; parse PDF to confirm watermark includes correct timestamp and user ID.
-- TC-006: Simulate key rotation; verify existing records remain decryptable after re‑encryption with new master key.
+TC-001: Verify client‑side encryption headers are present in POST payload.
+TC-002: Attempt unauthorized record access with a user lacking proper role; expect HTTP 403 and audit entry.
+TC-003: Submit malformed form entries; ensure error messages appear inline and submission is blocked.
+TC-004: Measure receipt page load time; must be ≤1 second for 95th percentile.
+TC-005: Export PDF summary; parse PDF to confirm watermark includes correct timestamp and user ID.
+TC-006: Simulate key rotation; verify existing records remain decryptable after re‑encryption with new master key.
 
 ## Priority and Business Justification (unchanged)
 - US-001 P1: Satisfies HIPAA technical safeguard encryption requirement (45 CFR 164.312(a)(2)(iv)).

@@ -1,10 +1,10 @@
 # Stakeholder Analysis Scope Definition
 
-### 3. Overall System Boundary
+### 1. Overall System Boundary
 - In‑scope: web‑based patient intake form, field‑level encryption at rest and in transit, PostgreSQL database with row‑level security, immutable audit log retained 7 years, PDF summary generation with watermark and timestamp, role‑based access control for admin/clinician/front‑desk, automated unit and integration tests, Docker‑Compose deployment in an air‑gapped environment.
 - Out‑of‑scope: third‑party cloud services, mobile native applications, HL7/FHIR integration, advanced analytics dashboards.
 
-### 5. Architecture Vision
+### 2. Architecture Vision
 The solution uses an open‑source stack: vanilla HTML/CSS/JavaScript front‑end, Python Flask back‑end, PostgreSQL 15 for persistence, and HashiCorp Vault for key management. TLS 1.3 secures all network traffic; PHI fields are encrypted with AES‑256 at rest. RBAC is enforced via PostgreSQL row‑level security policies. Audit logs are written to append‑only WORM storage with digital signatures. PDF summaries are generated server‑side with WeasyPrint and include a visible watermark containing the exporting user ID and timestamp plus hidden metadata for forensic verification. All components are containerised and orchestrated with Docker‑Compose, requiring no external network access after initial image pull.
 
 ### 3. Secure Data Capture (FR-001)

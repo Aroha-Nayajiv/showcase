@@ -5,7 +5,7 @@ The system is decomposed into five bounded contexts that directly satisfy HIPAA 
 Presentation Layer (React SPA) → API Gateway (Traefik) → Service Layer (Go micro‑services) → Data Layer (PostgreSQL with pgcrypto & Row‑Level Security)
 PDF Generation Service (Node.js + PDFKit) → Encrypted Object Store. All containers are orchestrated via a single docker‑compose.yml without external registries.
 
-## 15. Presentation Layer
+## 2. Presentation Layer
 **Technology**: React 18, Vite, OpenSSL‑validated client certificates for mTLS.
 **Responsibilities**: Capture patient demographics, insurance, and medical history; perform client‑side field‑level encryption using the Web Crypto API (AES‑256‑GCM) before transmission.
 **Security Controls**:
@@ -14,7 +14,7 @@ PDF Generation Service (Node.js + PDFKit) → Encrypted Object Store. All contai
 - CSP nonce handling for dynamic scripts;
 - CSP header and Subresource Integrity for third‑party libraries.
 
-## 16. API Gateway
+## 3. API Gateway
 **Technology**: Traefik 2.10 (reverse proxy & TLS terminator).
 **Exposed Endpoints**:
 - `/api/v1/audit/` → Audit Log Service
@@ -24,7 +24,7 @@ PDF Generation Service (Node.js + PDFKit) → Encrypted Object Store. All contai
 **Rate Limiting**: 100 requests/second per client IP; burst of 200; HTTP 429 on exceed.
 **TLS**: TLS 1.3 enforced; client certificates required for mutual auth.
 
-## 17. Service Layer – Audit Log Service
+## 4. Service Layer – Audit Log Service
 **Language**: Go 1.22, Gin framework.
 **Core API Endpoints**:
 - `POST /api/v1/audit/logs` – Create immutable audit entry.
@@ -77,14 +77,14 @@ PDF Generation Service (Node.js + PDFKit) → Encrypted Object Store. All contai
 **Encryption**: Column‑level encryption using pgcrypto for PHI fields (`AES-256-GCM`). Disk‑level encryption via LUKS with TPM‑backed key storage.
 **Backup Strategy**: Daily encrypted base‑backup stored on air‑gapped external media; incremental WAL archiving retained 30 days (NFR‑009).
 
-## 14. PDF Generation Service
+## 6. PDF Generation Service
 **Technology**: Node.js 20, PDFKit, OpenSSL for TLS client auth.
 **Endpoint**: `POST /api/v1/patients/{patient_id}/export/pdf/{patient_id}` – Generates PDF, applies watermark containing `export_timestamp` and `user_id`, stores in encrypted object store (AES‑256‑GCM). Returns `{ "pdf_url": "https://storage/.../record_id.pdf", "export_audit_id": "uuid" }`.
 **Authorization**: JWT scope `pdf:export` required; service validates scope before processing.
 **Audit Integration**: After successful export, service calls `POST /api/v1/audit/logs` with action `EXPORT` and includes watermark metadata.
 **Performance Metric**: Median PDF generation time ≤ 500 ms for 1 KB input (KPI‑030).
 
-## 18. Deployment & Air‑Gap Considerations
+## 7. Deployment & Air‑Gap Considerations
 All services are defined in a single `docker-compose.yml`. Key points:
 - No external image registries; images built locally from vetted open‑source bases and signed with Notary v2.
 - Volume mounts map encrypted host directories (`/var/lib/postgres`, `/var/lib/pdfstore`).
@@ -92,20 +92,20 @@ All services are defined in a single `docker-compose.yml`. Key points:
 - Docker Compose version 2.x used; `depends_on` ensures correct start order.
 - Healthchecks enforce TLS handshake success and DB connectivity before service becomes ready.
 
-## 19. Traceability Matrix
+## 8. Traceability Matrix
 | Component | Requirement ID(s) | KPI(s) | NFR(s) |
 |---|---|---|---|
 | Audit Log Service | FR‑003 | KPI‑042 (log write latency <100 ms) | NFR‑009 (encrypted backups) |
 | PDF Generation Service | FR‑008 | KPI‑030 (watermark accuracy 100 %) | NFR‑011 (air‑gap compliance) |
 | Presentation Layer | FR‑001 (view latency ≤2 s), FR‑006 (receipt ≤1 s) | KPI‑042, KPI‑030 | NFR‑009 |
 
-## 20. Performance & Latency Requirements
+## 9. Performance & Latency Requirements
 - **View Latency (FR‑001)**: All UI read operations must render within 2 seconds p95 after form submission; measured from button click to data display. Backend read APIs (`GET /api/v1/patient/{id}`) must respond ≤150 ms under normal load (≤200 concurrent users).
 - **Receipt Latency (FR‑006)**: After successful form submission the UI must display a confirmation receipt within 1 second; backend must acknowledge (`201 Created`) within 500 ms. Healthcheck metrics are exported to Prometheus and visualized in Grafana dashboards.
 - **Audit Log Write Latency (KPI‑042)**: Log insertion must complete within 100 ms p95; achieved via INSERT‑only table and connection pooling.
 - **PDF Export Latency (KPI‑030)**: PDF generation and storage must complete within 500 ms median; watermarking adds ≤50 ms overhead. All latency metrics are instrumented via OpenTelemetry spans.
 
-## 18. Traceability to Project Requirements
+## 10. Traceability to Project Requirements
 FR-003 (full audit log) → audit_log entity and /api/v1/audit/logs endpoint.
 FR-006 (confirmation receipt) → export endpoint returns export_audit_id.
 NFR-009 (encrypted backups) → field‑level encryption description.
@@ -118,7 +118,7 @@ FR-006 (receipt latency ≤1 s) → added receipt endpoint latency spec.
 
 ## Audit Log API Contract – PostgreSQL Data Model
 
-### 15. Data Model
+### 11. Data Model
 | Entity | Field | Data Type | Required | Constraints |
 |--------|------|-----------|----------|-------------|
 | audit_log | log_id | UUID | Yes | Primary key, generated by pgcrypto `gen_random_uuid()` |
@@ -132,14 +132,14 @@ FR-006 (receipt latency ≤1 s) → added receipt endpoint latency spec.
 | patient   | patient_id   | UUID   	Yes   	Primary key   		\ t? |
 | patient   ... (remaining rows omitted for brevity); All PHI fields (e.g., details JSONB) use pgcrypto column‑level encryption and row_security policies restrict SELECT/UPDATE/DELETE to roles matching required permission (admin, clinician, front_desk). |
 
-### 16. API Endpoints
+### 12. API Endpoints
 | Endpoint               | Method | Purpose                                            | Request Schema                                            | Response Schema                                            | Auth                                          |
 |-----------------------|--------|----------------------------------------------------|-----------------------------------------------------------|-----------------------------------------------------------|-----------------------------------------------|
 | /api/v1/audit/logs    | POST   | Create a new audit entry after any protected operation   | {"patient_id":"uuid","action_type":"string","ip_address":"string","details":"object"}   | {"log_id":"uuid","status":"created"}               | Bearer JWT with scope `audit:write`            |
 | /api/v1/audit/logs/{log_id}   | GET    | Retrieve a specific audit entry (admin only)          | None (path param)                                          | {"log_id":"uuid","patient_id":"uuid","user_id":"uuid","action_type":"string","action_timestamp":"datetime","ip_address":"string","details":"object","details_hash":"string"}   | Bearer JWT with scope `audit:read`             |
 | /api/v1/audit/logs?patient_id=...&action_type=...&start_time=...&end_time=...   | GET    | Query audit entries for reporting and compliance checks   | Query parameters as shown; { "logs": [ { ... }, { ... } ] }                         |; Bearer JWT with scope `audit:read`            |; All request and response bodies conform to JSON Schema SCH-001. |
 
-### 17. Error Taxonomy
+### 13. Error Taxonomy
 | Error Code            | HTTP Status | Description                                            | User Message                                            | Retryable? |
 |----------------------|-------------|--------------------------------------------------------|--------------------------------------------------------|-----------|
 | ERR-001-VALIDATION   | 400         | Request payload fails JSON schema validation           | "Invalid request format; please correct the highlighted fields." |

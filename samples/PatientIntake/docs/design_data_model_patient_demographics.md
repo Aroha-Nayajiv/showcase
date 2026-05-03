@@ -1,6 +1,6 @@
 # Patient Demographics Schema (Overview)
 
-### 6. API Contracts
+### 1. API Contracts
 
 - **POST /api/v1/patients**
   - Description: Submit new patient intake record
@@ -35,7 +35,7 @@
   - Errors: 401 Unauthorized, 403 ERR-002-AUTHORIZATION, 500 Internal Server Error
   - Rate Limiting: 200 requests per minute per user
 
-### 7. Data Model
+### 2. Data Model
 
 | Entity | Column | Data Type | Required | Constraints / Description |
 |---|---|---|---|---|
@@ -58,7 +58,7 @@
 | PatientAuditLog | performed_by_role | enum["admin","clinician","front_desk"] | Yes | 
 | PatientAuditLog | timestamp_utc | timestamptz | Yes |
 
-### 8. Error Taxonomy (Unified)
+### 3. Error Taxonomy (Unified)
 
 | Error ID | HTTP Code | Title | Message | Retryable |
 |---|---|---|---|---|
@@ -226,7 +226,7 @@ All endpoints are versioned under `/api/v1` and conform to OpenAPI 3.0 schema. E
   - Response (200): List of audit records.
   - Security: Role `admin_role` only.
 
-#### 4.5 Patient Table (`patient`) 
+#### 8.5 Patient Table (`patient`) 
 | Column | Type | Constraints |
 |--------|------|--------------|
 | patient_id | UUID PK | |
@@ -242,7 +242,7 @@ All endpoints are versioned under `/api/v1` and conform to OpenAPI 3.0 schema. E
 | owner_id | UUID | FK to clinician (RLS) |
 *All sensitive columns are encrypted at rest using pgcrypto (`AES-256-GCM`).*
 
-#### 4.6 Audit Log Table (`audit_log`)
+#### 8.6 Audit Log Table (`audit_log`)
 | Column | Type | Constraints |
 |--------|------|--------------|
 | audit_id | BIGSERIAL PK |

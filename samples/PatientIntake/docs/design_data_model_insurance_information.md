@@ -1,5 +1,5 @@
 # Insurance Information Schema (Overview)
-
+                
 ## Insurance Service Design
 
 ### API Endpoints
@@ -45,7 +45,7 @@
 - **Authentication**: JWT signed with RS256; public keys stored in secure vault; token validated by Auth Service.
 - **Authorization**: PostgreSQL Row‑Level Security (RLS) policies enforce FR‑002; clinicians can access only records of patients they are assigned to; admin role has full access.
 - **Transport**: All endpoints require HTTPS enforced by reverse proxy (TLS 1.2+).
-- **Encryption at Rest**: Sensitive fields stored in `encrypted_data` column encrypted with pgcrypto `aes256gcm` using per‑patient master key stored as Docker secret.
+- **Encryption at Rest**: Sensitive fields stored in `encrypted_data` column encrypted with pgcrypto `AES-256-GCM` using per‑patient master key stored as Docker secret.
 - **Input Validation**: JSON schema validation for all request bodies; dates must be ISO‑8601.
 - **Audit Logging**: Every read/write operation triggers an audit event; KPI‑042 target <100 ms write latency.
 
@@ -60,11 +60,11 @@
 |---|---|
 | TC-001 | Submit valid POST request; expect 201 Created and encrypted data stored. |
 | TC-002 | Submit POST with duplicate policy number for same patient; expect 409 Conflict. |
-|- TC-003 |- GET with valid JWT of clinician assigned to patient; expect 200 and correct data. |
-|- TC-004 |- GET with JWT of clinician not assigned; expect 403 Authorization failure and audit log entry. |
-|- TC-005 |- DELETE record; verify audit event `insurance.deleted` emitted and row removed. |
-|- TC-006 |- Simulate encryption service failure; expect 500 Internal Server Error and retryable flag true. |
-|- TC-007 |- List endpoint pagination: request page=2&page_size=20; verify correct subset and total count. |
+| TC-003 | GET with valid JWT of clinician assigned to patient; expect 200 and correct data. |
+| TC-004 | GET with JWT of clinician not assigned; expect 403 Authorization failure and audit log entry. |
+| TC-005 | DELETE record; verify audit event `insurance.deleted` emitted and row soft-deleted (status updated to 'deleted'). |
+| TC-006 | Simulate encryption service failure; expect 500 Internal Server Error and retryable flag true. |
+| TC-007 | List endpoint pagination: request page=2&page_size=20; verify correct subset and total count. |
 
 ### Requirements Addressed
 - REQ-001: WCAG compliance for UI (not directly applicable to API design).
