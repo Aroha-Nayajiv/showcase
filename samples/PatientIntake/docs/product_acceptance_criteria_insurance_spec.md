@@ -4,11 +4,11 @@
 
 1. Clinician (PER-01)
  - Role: Licensed healthcare provider who reviews patient intake data to make diagnostic and treatment decisions.
- - Primary Goals: Access complete, accurate demographics, insurance, and medical history within 2 seconds of submission (FR-001) to avoid care delays; verify insurance eligibility; document clinical notes linked to the intake record.
+ - Primary Goals: Access complete, accurate demographics, insurance, and medical history within <200ms of submission (FR-001) to avoid care delays; verify insurance eligibility; document clinical notes linked to the intake record.
  - HIPAA Considerations: Must view only records of patients assigned to them (FR-002) [HIPAA]; all read actions are logged with user ID, timestamp, and record ID (FR-003) [HIPAA]; logs retained 7 years immutable (KPI-003).
  - Success Metrics: 95% of records accessed within response time threshold; zero unauthorized read events; audit‑log completeness ≥99.9% (KPI-003).
  - Pain Points: Slow UI response, missing insurance verification, accidental exposure of unrelated patient data.
- - Acceptance Criteria: Given a clinician logged in with role "clinician", when they request a patient record they are assigned to, then the system returns the full intake data within 2 seconds and creates an audit entry. Edge cases include attempts to access unassigned records (must be denied and logged) and session timeout (must force re‑authentication).
+ - Acceptance Criteria: Given a clinician logged in with role "clinician", when they request a patient record they are assigned to, then the system returns the full intake data within <200ms and creates an audit entry. Edge cases include attempts to access unassigned records (must be denied and logged) and session timeout (must force re‑authentication).
 
 2. Front‑Desk Staff (PER-02)
  - Role: Administrative personnel responsible for entering new patient information at the point of care.
@@ -35,7 +35,7 @@
 
 ## Acceptance Criteria
 
-- AC-001 | US-001 | Front Desk is authenticated and has role "front_desk" | Submits intake form with all required fields correctly filled | System stores encrypted PHI, returns success message within 2 seconds, and logs a CREATE event with user ID, timestamp, patient ID (KPI-004) | If required field missing, system shows inline validation error and does not create a log entry.
+- AC-001 | US-001 | Front Desk is authenticated and has role "front_desk" | Submits intake form with all required fields correctly filled | System stores encrypted PHI, returns success message within <200ms, and logs a CREATE event with user ID, timestamp, patient ID (KPI-004) | If required field missing, system shows inline validation error and does not create a log entry.
 - AC-002 | US-001 | Front Desk is authenticated | Submits form with invalid insurance number format | System rejects submission, displays error, logs FAILED_CREATE event with error code, and does not store any PHI.
 - AC-003 | US-002 | Clinician is authenticated with role "clinician" and has read permission for patient X | Opens patient X's intake record | System decrypts data at rest, displays record, and logs READ event with clinician ID, timestamp, patient ID (KPI-003) | If clinician attempts to access unauthorized patient Y, system returns 403 and logs UNAUTHORIZED_READ event.
 - AC-004 | US-003 | Admin is authenticated with role "admin" and has export permission | Requests PDF export for patient X | System generates PDF, embeds watermark "Confidential – Exported by {admin_id} at {timestamp}", stores PDF securely, and logs EXPORT event with admin ID, timestamp, patient ID (KPI-030) | If PDF generation fails, system returns error, does not create file, and logs EXPORT_FAILURE.
@@ -51,7 +51,7 @@
 ### US-001 Front‑Desk Staff – Secure Intake Submission
 **Given** a logged‑in Front‑Desk user with role `front_desk` and the intake form loaded.
 **When** the user submits a completed form.
-**Then** the system encrypts each field using AES‑256‑GCM, stores the record in PostgreSQL, creates an immutable audit log entry (action="create_intake") with user_id, role, patient_id, timestamp (UTC), and a SHA‑256 hash of the submitted data, and returns a confirmation within 200 ms (p95) as measured by KPI‑001. **Edge Cases**: If encryption fails, the submission is rejected with error `E_ENCRYPT_FAIL` and an audit entry is recorded; if the database connection fails, an error is shown and no partial log entry is created.
+**Then** the system encrypts each field using AES‑256‑GCM, stores the record in PostgreSQL, creates an immutable audit log entry (action="create_intake") with user_id, role, patient_id, timestamp (UTC), and a SHA‑256 hash of the submitted data, and returns a confirmation within <200ms as measured by KPI‑001. **Edge Cases**: If encryption fails, the submission is rejected with error `E_ENCRYPT_FAIL` and an audit entry is recorded; if the database connection fails, an error is shown and no partial log entry is created.
 
 ### US-002 Clinician – Role‑Based Access Control
 **Given** a Clinician authenticated with role `clinician` and read permission on patient_id X.
@@ -96,7 +96,7 @@ The refined specification resolves reviewer feedback by adding explicit KPI refe
 ### Overview
 The audit‑log feature provides traceability, compliance, and performance monitoring for patient intake records. It satisfies functional requirements FR-001 through FR-003, KPI‑003 and KPI‑017, and HIPAA technical safeguards §164.312(a)(2)(iv) and §164.308(a)(1).
 
-#### US-001: Generate Traceability Matrix CSV
+#### US-007: Generate Traceability Matrix CSV
 *As a compliance analyst, I need a CSV export that lists each user story with its linked functional requirement IDs, KPI IDs, and risk mitigation IDs so that I can verify complete traceability.*
 **Acceptance Criteria**
 - **Given** the audit‑log backlog contains at least eight user stories,
@@ -106,7 +106,7 @@ The audit‑log feature provides traceability, compliance, and performance monit
 - **And** the total row count equals the number of audit‑log stories.
 - **And** a validation script reports 100 % pass.
 
-#### US-002: Include KPI References in Acceptance Criteria
+#### US-008: Include KPI References in Acceptance Criteria
 *As a product manager, I want every audit‑log story to reference KPI‑003 (log completeness ≥ 99 %) or KPI‑017 (write latency ≤ 100 ms) so that performance targets are explicit.*
 **Acceptance Criteria**
 - **Given** an audit‑log user story,
@@ -114,7 +114,7 @@ The audit‑log feature provides traceability, compliance, and performance monit
 - **Then** it contains at least one reference to KPI‑003 or KPI‑017.
 - **And** no story references a KPI outside the approved list.
 
-#### US-003: Add HIPAA Compliance Tag
+#### US-009: Add HIPAA Compliance Tag
 *As a compliance officer, I need each audit‑log story to carry a tag indicating the specific HIPAA clause it satisfies.*
 **Acceptance Criteria**
 - **Given** an audit‑log story,
@@ -122,7 +122,7 @@ The audit‑log feature provides traceability, compliance, and performance monit
 - **Then** it includes a tag formatted as "HIPAA‑§164.xxx" matching either §164.312(a)(2)(iv) for encryption or §164.308(a)(1) for audit controls.
 - **And** an automated compliance‑mapping tool reports zero unmapped stories.
 
-#### US-004: Prioritize and Plan Release
+#### US-010: Prioritize and Plan Release
 *As a release manager, I need priority values (1‑Must‑have, 2‑Should‑have, 3‑Could‑have) with business impact justification so that sprint planning respects critical audit‑log capabilities.*
 **Acceptance Criteria**
 - **Given** the backlog is prioritized,
