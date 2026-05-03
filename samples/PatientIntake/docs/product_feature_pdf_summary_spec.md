@@ -112,21 +112,21 @@ And logs an export event with patient\u2011as\u2011user ID
 ### 6. KPI Mapping
 | KPI ID | Linked Requirement | Measurement |
 |---|---|---|
-| KPI-001 | FR-001 | % of PDFs generated ≤2 s (target ≥95%) 
-| KPI-002 | FR-002 | % of export attempts correctly authorized (target 100%) 
-| KPI-003 | FR-003 | Audit log completeness rate (target 100%) 
-| KPI-004 | FR-004 | Form submission success rate (target ≥99%) 
-| KPI-005 | FR-008 | Watermark hash verification success (target 100%)
+| KPI-001 | FR-001 | % of PDFs generated ≤2 s (target ≥95%) |
+| KPI-002 | FR-002 | % of export attempts correctly authorized (target 100%) |
+| KPI-003 | FR-003 | Audit log completeness rate (target 100%) |
+| KPI-004 | FR-004 | Form submission success rate (target ≥99%) |
+| KPI-005 | FR-008 | Watermark hash verification success (target 100%) |
 
 ### 7. Traceability Matrix
 | Artifact | Requirement ID |
 |---|---|
-| US-001 | FR-001, FR-008 
-| US-002 | FR-001, FR-008 
-| US-003 | FR-002 
-| US-004 | FR-001 
-| US-005 | FR-003, FR-008 
-| US-006 | FR-001, FR-004 
+| US-001 | FR-001, FR-008 |
+| US-002 | FR-001, FR-008 |
+| US-003 | FR-002 |
+| US-004 | FR-001 |
+| US-005 | FR-003, FR-008 |
+| US-006 | FR-001, FR-004 |
 
 ---
 *All reviewer feedback has been addressed: duplicate story removed, missing patient export story added, detailed BDD criteria supplied, error handling scenarios defined, KPI references standardized.*

@@ -31,41 +31,16 @@ Patient \u2192 FR\u2011010, FR\u2011011, FR\u2011005, KPI\u2011001
 |---|---|---|---|---|---|
 | AC-001 | US-001 | The front\u2011desk staff is authenticated with role 'front_desk' and the intake form is loaded over TLS 1.3 | They submit valid demographic, insurance, and medical history fields | The data is encrypted field\u2011level in transit and at rest, a record is created in PostgreSQL, and an audit log entry is written with timestamp and user ID | If any required field is missing, the form shows inline validation error and prevents submission |
 | AC-002 | US-001 | Same as AC-001 but with an invalid insurance number format | They attempt to submit the form | The system rejects the entry, displays a specific error message, and does not create a record or log entry | Ensure error does not expose sensitive data |
-| AC-003 | US-002 | Clinician is authenticated with role 'clinician' and has read permission on patient records 
-They request to view a specific patient's intake record 
-The system decrypts the fields, displays the data, and writes an audit log entry indicating read access with timestamp and user ID 
-If the clinician attempts to view a record they are not assigned to, access is denied and an audit log entry records the denied attempt 
-| AC-004 | US-003 
-Administrator is authenticated with role 'admin' 
-They modify role permissions for front\u2011desk or clinician users 
-The system updates PostgreSQL role grants, logs the change with before/after values, and confirms via UI notification 
-If the admin attempts to remove their own admin rights, the system prevents the action and logs the attempt 
-| AC-005 
-US-001 
-All network traffic uses TLS 1.3 and field\u2011level encryption keys are managed by a HSM compatible vault 
-Data is transmitted from browser to server 
-The server stores encrypted payloads; decryption occurs only in memory for authorized reads; audit log records both encryption and decryption events 
-If TLS handshake fails, the form does not load and an error page is shown without revealing PHI 
-| AC-006 
-US-001 
-PDF generation service is invoked after successful record creation 
-PDF generation fails due to rendering error 
-System returns HTTP 500 with error code PDF_GEN_ERR, logs failure with details, and notifies front\u2011desk staff with a retry option 
-If retry also fails, escalation ticket is created automatically 
-| AC-007 
-US-002 
-Clinician accesses PDF via /api/v1/pdf/export endpoint 
-PDF watermark missing or hash mismatch detected 
-System returns HTTP 400 with error code WATERMARK_MISMATCH, logs incident, and alerts security monitoring 
-| AC-008 
-US-001 
-Audit log write operation encounters database error 
-System attempts to write log entry 
-System retries up to three times; if still failing, writes fallback log to local file and raises alert; front\u2011desk staff sees non critical warning but submission proceeds
+| AC-003 | US-002 | Clinician is authenticated with role 'clinician' and has read permission on patient records | They request to view a specific patient's intake record | The system decrypts the fields, displays the data, and writes an audit log entry indicating read access with timestamp and user ID | If the clinician attempts to view a record they are not assigned to, access is denied and an audit log entry records the denied attempt |
+| AC-004 | US-003 | Administrator is authenticated with role 'admin' | They modify role permissions for front\u2011desk or clinician users | The system updates PostgreSQL role grants, logs the change with before/after values, and confirms via UI notification | If the admin attempts to remove their own admin rights, the system prevents the action and logs the attempt |
+| AC-005 | US-001 | All network traffic uses TLS 1.3 and field\u2011level encryption keys are managed by a HSM compatible vault | Data is transmitted from browser to server | The server stores encrypted payloads; decryption occurs only in memory for authorized reads; audit log records both encryption and decryption events | If TLS handshake fails, the form does not load and an error page is shown without revealing PHI |
+| AC-006 | US-001 | PDF generation service is invoked after successful record creation | PDF generation fails due to rendering error | System returns HTTP 500 with error code PDF_GEN_ERR, logs failure with details, and notifies front\u2011desk staff with a retry option | If retry also fails, escalation ticket is created automatically |
+| AC-007 | US-002 | Clinician accesses PDF via POST /api/v1/patients/{patient_id}/export/pdf endpoint | PDF watermark missing or hash mismatch detected | System returns HTTP 400 with error code WATERMARK_MISMATCH, logs incident, and alerts security monitoring | — |
+| AC-008 | US-001 | Audit log write operation encounters database error | System attempts to write log entry | System retries up to three times; if still failing, writes fallback log to local file and raises alert; front\u2011desk staff sees non‑critical warning but submission proceeds | — |
 
 ### PDF Export Endpoint
 
-Path: /api/v1/pdf/export
+Path: /api/v1/patients/{patient_id}/export/pdf
 Method: POST
 Authentication: Bearer token with role clinician or front_desk
 Request Body: {"patient_id":"string","requester_id":"string"}
@@ -73,7 +48,7 @@ Responses:
 200 OK: {"pdf_url":"https://.../file.pdf","watermark_hash":"sha256..."}
 400 Bad Request (WATERMARK_MISMATCH): {"error":"Watermark verification failed"}
 500 Internal Server Error (PDF_GEN_ERR): {"error":"PDF generation failed"}
-Performance KPI: PDF generation latency ≤150 ms (KPI-PDF_LATENCY)
+Performance KPI: PDF generation latency ≤2 s (KPI-001)
 
 ## Insurance Capture Acceptance Criteria
 
@@ -85,7 +60,7 @@ The PDF summary export is a core compliance‑driven capability. Authorized staf
 ### 4. API Specification
 | Method | Path | Description | Success Code | Error Codes |
 |--------|------|-------------|--------------|-------------|
-| GET | /api/v1/patients/{patient_id}/export-pdf | Export patient record as PDF with watermark | 200 OK (application/pdf) | 400 Bad Request, 403 Forbidden, 404 Not Found, 500 Internal Server Error |
+| POST | /api/v1/patients/{patient_id}/export/pdf | Export patient record as PDF with watermark | 200 OK (application/pdf) | 400 Bad Request, 403 Forbidden, 404 Not Found, 500 Internal Server Error |
 All endpoints require authentication token and enforce RBAC per FR‑002. Error responses include JSON body with `error_code` and `message` fields.
 
 ### 5. Design Needs

@@ -35,15 +35,15 @@
 
 ### API Endpoints
 
-- `GET /api/v1/patients/{patient_id}/export-pdf`
-  - Description: Returns a PDF summary of the specified patient.
+- `POST /api/v1/patients/{patient_id}/export/pdf`
+  - Description: Export a PDF summary of the specified patient.
   - Permissions: Requires role‑based access (clinician can access assigned patients; front‑desk staff can access patients they registered).
   - Responses:
     - `200 OK` – PDF binary with `Content-Type: application/pdf` and `Content-Disposition: attachment; filename="patient_{patient_id}_summary.pdf"`.
     - `403 Forbidden` – Access denied; audit log entry created.
     - `404 Not Found` – Patient record not found.
     - `500 Internal Server Error` – Export service unavailable.
-- `POST /api/v1/patients/{patient_id}/receipt-pdf`
+- `POST /api/v1/patients/{patient_id}/receipt/pdf`
   - Description: Generates a receipt PDF after form submission.
   - Permissions: Front‑desk staff only.
   - Responses similar to above with appropriate operation codes.
@@ -72,11 +72,11 @@
 |---|---|---|---|---|---|
 | AC-001 | US-001 | Clinician authenticated with role "clinician" and has view permission for the patient record | Clinician clicks "Export PDF" button on the patient record page | PDF generated with watermark (user ID, ISO8601 timestamp, export ID), download starts, audit log entry created (action=export, actor=clinician, patient_id, timestamp) | If record missing → error "Record not found"; if lacking permission → "Access denied"; if system clock out of sync >5min → "System time out of sync, contact IT" |
 | AC-002 | US-002 | Front desk staff completed a patient intake form that passed validation | Staff clicks "Generate PDF" after submission | PDF generated with same watermark requirements, download starts, audit log records action=export, actor=front_desk, patient_id | If validation fails → specific field error messages; if database unavailable → "Service temporarily unavailable" |
-| AC-003 | US-003 | Administrator accesses export audit page with admin role | Admin filters logs for "export" actions within last 24h | System displays list of export events with user ID, patient ID, timestamp, PDF checksum; logs immutable and tamper‑evident |  
-| AC-004 | US-004 | Clinician has view permission and selects "Export History" for a patient | Clinician opens export history view | Table of export events with timestamps, user IDs, checksum appears; entries retained for 7 years (KPI‑003) |  
-| AC-005 | US-005 | Front‑Desk staff has completed form data | Staff clicks "Preview PDF" | System renders read‑only PDF in‑browser with same watermark; option to proceed to final export |  
-| AC-006 | US-006 | Administrator configured nightly job schedule (cron at 02:00 UTC) | Scheduler triggers export for all new records | PDFs generated, encrypted, stored in archive, audit log entry created; if archive full → job aborts and alerts admin |  
-| AC-007 | US-007 | Patient has verified portal account and requests PDF download | Patient selects "Download My Intake PDF" | System serves watermarked PDF over TLS 1.3, access logged; if permission missing → "Access denied" |
+| AC-003 | US-003 | Administrator accesses export audit page with admin role | Admin filters logs for "export" actions within last 24h | System displays list of export events with user ID, patient ID, timestamp, PDF checksum; logs immutable and tamper‑evident | — |
+| AC-004 | US-004 | Clinician has view permission and selects "Export History" for a patient | Clinician opens export history view | Table of export events with timestamps, user IDs, checksum appears; entries retained for 7 years (KPI‑003) | — |
+| AC-005 | US-005 | Front‑Desk staff has completed form data | Staff clicks "Preview PDF" | System renders read‑only PDF in‑browser with same watermark; option to proceed to final export | — |
+| AC-006 | US-006 | Administrator configured nightly job schedule (cron at 02:00 UTC) | Scheduler triggers export for all new records | PDFs generated, encrypted, stored in archive, audit log entry created; if archive full → job aborts and alerts admin | — |
+| AC-007 | US-007 | Patient has verified portal account and requests PDF download | Patient selects "Download My Intake PDF" | System serves watermarked PDF over TLS 1.3, access logged; if permission missing → "Access denied" | — |
 
 ### Design Details
 - **Watermark format**: "Exported by {user_id} on {ISO8601_timestamp} – ExportID:{uuid}" embedded on each page.
