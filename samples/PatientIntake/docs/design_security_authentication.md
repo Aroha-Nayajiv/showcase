@@ -9,14 +9,14 @@ This document defines the technical architecture, API contracts, data models, se
 | Endpoint | Method | Purpose | Request Schema | Response Schema | Auth |
 |---|---|---|---|---|---|
 | /api/v1/auth/login | POST | Authenticate user and issue JWT | {"email":"string","password":"string"} | {"token":"string","expires_at":"datetime","user":{"id":"uuid","role":"string"}} | None |
-| /api/v1/auth/logout | POST | Revoke JWT (client‑side) | {} | {"message":"Logged out"} | Bearer Token |
+| /api/v1/auth/logout | POST | Revoke JWT (server-side blacklist) | {} | {"message":"Logged out"} | Bearer Token |
 | /api/v1/users | GET | List users (admin only) | {} | {"users":[{"id":"uuid","email":"string","role":"string"}]} | Bearer Token |
 | /api/v1/audit/logs | GET | Retrieve audit logs (admin) | {"page":"int","size":"int"} | {"logs":[{"id":"uuid","user_id":"uuid","action":"string","resource":"string","timestamp":"datetime","details":"jsonb"}],"total":"int"} | Bearer Token |
 
 **Request/Response Details**:
 - **Login Request** must include both `email` and `password` fields; missing fields result in `ERR-001`.
 - **Login Response** includes a signed JWT (`token`) with RS256, an expiration timestamp, and minimal user info (`id`, `role`).
-- **Logout** simply returns a confirmation message; token revocation is handled client‑side but can be extended to a token blacklist service.
+- **Logout** returns a confirmation message; token revocation is enforced via a server-side blacklist (or 15-minute short expiry + refresh token pattern) to mitigate stolen device risks per HIPAA.
 - **User List** is restricted to admin role; unauthorized attempts return `ERR-003`.
 - **Audit Log Retrieval** supports pagination (`page`, `size`) with maximum `size` of 100; out‑of‑range values trigger `ERR-001`.
 
@@ -25,7 +25,7 @@ This document defines the technical architecture, API contracts, data models, se
 |---|---|---|---|---|
 | User | id | uuid | Yes | Primary key |
 | User | email | varchar(255) | Yes | Unique, validated email format |
-| User | password_hash | varchar(255) | Yes | BCrypt hash, stored encrypted at rest (AES‑256‑GCM) |
+| User | password_hash | varchar(255) | Yes | BCrypt hash, encrypted at rest (AES-256-GCM). *Note: Double encryption of a one-way hash is redundant overhead, but retained here for strict compliance.* |
 | User | role | enum('admin','clinician','front_desk') | Yes | Role‑based access control (RBAC) |
 | User | created_at | timestamptz | Yes | Auto‑generated on insert |
 | PatientRecord | id | uuid | Yes | Primary key |
@@ -58,11 +58,11 @@ This document defines the technical architecture, API contracts, data models, se
 
 ### Security Considerations
 - **Transport Security**: All endpoints require TLS 1.2+; HTTP Strict Transport Security (HSTS) enabled.
-- **Authentication**: JWTs signed with RS256 using a 2048‑bit RSA key pair stored as Docker secrets; public key exposed via well‑known endpoint for service verification.
+- **Authentication**: JWTs signed with RS256 using a 2048-bit RSA key pair stored as Docker secrets; public key exposed via an internal-only well-known endpoint (not publicly routable, supporting air-gapped deployments).
 - **Authorization**: Role‑based access enforced via PostgreSQL Row‑Level Security (RLS) policies on `User` and `AuditLog` tables. Admin role bypasses RLS for audit queries.
 - **Encryption at Rest**: Sensitive columns (`password_hash`, `patient_data_encrypted`, `AuditLog.details`) encrypted with PostgreSQL `pgcrypto` AES‑256‑GCM. Key rotation procedures defined in operational playbook.
 - **Input Validation**: JSON schema validation library (e.g., AJV) applied to all inbound payloads; violations return `ERR-001`.
-- **Audit Log Integrity**: Insert‑only policy (`INSERT ONLY`) ensures immutability; triggers prevent UPDATE/DELETE. Logs are retained for 7 years per FR-003.
+- **Audit Log Integrity**: Insert-only policy (`INSERT ONLY`) ensures immutability; triggers explicitly block UPDATE, DELETE, and TRUNCATE. Logs are retained for 7 years per FR-003.
 - **Rate Limiting**: API Gateway enforces per‑IP and per‑user limits; excess requests receive `ERR-006`.
 
 ### Traceability Matrix
@@ -89,6 +89,9 @@ This document defines the technical architecture, API contracts, data models, se
 8. **Retrieve Logs Unauthorized** – non‑admin JWT returns `ERR-003`.
 9. **Pagination Bounds** – request size >100 returns `ERR-001`.
 10. **Immutable Log Entry** – attempt to UPDATE an AuditLog entry via API (if exposed) must be rejected at DB layer (error).
+11. **Immutable Log Entry (DELETE)** – attempt to DELETE an AuditLog entry must be rejected at DB layer.
+12. **Immutable Log Entry (TRUNCATE)** – attempt to TRUNCATE AuditLog table must be rejected.
+13. **Audit Log Insertion** – valid system actions correctly trigger insertion of new audit records.
 
 #### Error Handling Tests
 14. **Malformed JSON** – send invalid JSON body returns `ERR-001`.
