@@ -72,9 +72,9 @@ Given any CRUD operation occurs, when the operation completes, then an immutable
 Given a clinician or admin initiates PDF export of a patient summary, when the export completes, then the PDF contains a watermark with current timestamp and exporting user ID; a test case validates watermark presence and correctness using PDF parsing library.
 
 ## API Endpoint Definitions (added)
-- `POST /api/intake` – Accepts encrypted JSON payload; returns receipt ID. Handles fallback to server‑side encryption if client lacks Web Crypto.
-- `GET /api/patient/{id}` – Returns decrypted patient demographics; enforces RLS based on authenticated user role.
-- `POST /api/patient/{id}/export` – Generates PDF export with watermark; returns download URL. Audit log entry created.
+- `POST /api/v1/patients/{patient_id}/intake` – Accepts encrypted JSON payload; returns receipt ID. Handles fallback to server‑side encryption if client lacks Web Crypto.
+- `GET /api/v1/patients/{patient_id}` – Returns decrypted patient demographics; enforces RLS based on authenticated user role.
+- `POST /api/v1/patients/{patient_id}/export/pdf` – Generates PDF export with watermark; returns download URL. Audit log entry created.
 - `GET /api/audit/logs?since=...` – Admin endpoint to retrieve audit logs; supports pagination and immutable view only.
 
 ## Key Rotation Policy (added)
