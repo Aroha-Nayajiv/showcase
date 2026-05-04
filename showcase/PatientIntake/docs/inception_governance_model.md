@@ -81,36 +81,18 @@ The inception artifacts collectively define the decision‑making structure, own
 | KPI-001 | Form Completion Rate | ≥ 92 % of patients complete the intake form without abandonment | Web analytics tracking of form start vs submit events over a 4‑week period | OBJ-001: High‑quality data capture |
 | KPI-002 | Encryption Compliance Rate | 100 % of PHI fields encrypted at rest | Automated compliance scan of database columns nightly | OBJ-002: Regulatory compliance |
 | KPI-003 | Audit Log Availability | 99.9 % uptime of audit‑log service | Prometheus uptime metric aggregated monthly |
-| KPI-004 | PDF Export Accuracy | 100 % of exported PDFs contain correct watermark and timestamp; Random sampling of exported PDFs with checksum verification against audit log |; OBJ-004: Secure information sharing | |
-| KPI-005; Deployment Success Rate (air‑gap) |; ≥ 98 % first‑time deployment without manual re‑configuration |; Post‑deployment checklist completion count / total deployments |; OBJ-005: Reliable on‑premise rollout | |
+| KPI-004 | PDF Export Accuracy | 100 % of exported PDFs contain correct watermark and timestamp | Random sampling of exported PDFs with checksum verification against audit log | OBJ-004: Secure information sharing |
+| KPI-005 | Deployment Success Rate (air‑gap) | ≥ 98 % first‑time deployment without manual re‑configuration | Post‑deployment checklist completion count / total deployments | OBJ-005: Reliable on‑premise rollout |
 
 ## Risks and Mitigations
 | Risk ID | Description | Owner | Mitigation Action |
 |---------|-------------|-------|-------------------|
-| RISK-001 | Quarterly penetration testing has no assigned owner.; Security Lead (WG) |; Assign responsibility to Security Lead; schedule automated quarterly testing and document results. | |
-| RISK-002; Missing concrete implementation detail for digital signature in audit‑log integrity verification. |
-; Compliance Officer (WG) | |
-Define HMAC‑SHA256 signing process using HashiCorp Vault keys; include key rotation policy. |
-| RISK-003 |
-Incomplete coverage of audit‑log generation for delete operations.
-|
-Architecture Lead (PGB) |
-Extend logging middleware to capture DELETE actions; add test cases in automated suite. |
-| RISK-004 |
-Lack of assigned owner for risk mitigation actions leads to accountability gaps.
-|
-Project Manager (PGB) |
-Create risk register with explicit owners and due dates; review in each Governance Board meeting. |
-| RISK-005 |
-Performance impact on transaction latency due to audit‑log write overhead.
-|
-DevOps Engineer (Operations WG) |
-Benchmark log write latency; implement batch writes if latency exceeds 150 ms; monitor via Prometheus alerts. |
-| RISK-006 |
-Air‑gap deployment may miss required network isolation steps.
-|
-Operations Lead (PGB) |
-Include network isolation checklist in deployment guide; perform peer review before release. |
+| RISK-001 | Quarterly penetration testing has no assigned owner. | Security Lead (WG) | Assign responsibility to Security Lead; schedule automated quarterly testing and document results. |
+| RISK-002 | Missing concrete implementation detail for digital signature in audit‑log integrity verification. | Compliance Officer (WG) | Define HMAC‑SHA256 signing process using HashiCorp Vault keys; include key rotation policy. |
+| RISK-003 | Incomplete coverage of audit‑log generation for delete operations. | Architecture Lead (PGB) | Extend logging middleware to capture DELETE actions; add test cases in automated suite. |
+| RISK-004 | Lack of assigned owner for risk mitigation actions leads to accountability gaps. | Project Manager (PGB) | Create risk register with explicit owners and due dates; review in each Governance Board meeting. |
+| RISK-005 | Performance impact on transaction latency due to audit‑log write overhead. | DevOps Engineer (Operations WG) | Benchmark log write latency; implement batch writes if latency exceeds 150 ms; monitor via Prometheus alerts. |
+| RISK-006 | Air‑gap deployment may miss required network isolation steps. | Operations Lead (PGB) | Include network isolation checklist in deployment guide; perform peer review before release. |
 
 ### Decision‑Making Hierarchy
 1. **Executive Steering Committee (ESC)** – Sets strategic direction, approves budget, resolves escalated issues.
@@ -121,11 +103,11 @@ Include network isolation checklist in deployment guide; perform peer review bef
 ### Ownership Matrix
 | Artifact / Decision | ESC Owner | PGB Owner | Clinical WG Owner | Security WG Owner | Operations WG Owner |
 |--------------------|-----------|----------|-----------------|------------------|----------------------|
-| Business Vision & Scope; CIO |; PM |; – |; – |; – | |
-| Risk Register Updates; – |; PM |; – |; Security Officer |; Ops Lead | |
-| KPI Definition & Acceptance Criteria; – |; PM |; Clinical Lead |; Security Lead |; Ops Lead | |
-| Audit‑Log Policy; – |; Security Lead |; – |; Security Lead |; – | |
-| Deployment Guide Approval; – |; Ops Lead |; – |; – |; Ops Lead | |
+| Business Vision & Scope | CIO | PM | – | – | – |
+| Risk Register Updates | – | PM | – | Security Officer | Ops Lead |
+| KPI Definition & Acceptance Criteria | – | PM | Clinical Lead | Security Lead | Ops Lead |
+| Audit‑Log Policy | – | Security Lead | – | Security Lead | – |
+| Deployment Guide Approval | – | Ops Lead | – | – | Ops Lead |
 
 ## Audit & Compliance Policy
 * **Audit Log Scope** – Every read, write, update, and delete operation on PHI must generate an immutable log entry stored in append‑only storage for a minimum of 7 years.
@@ -136,18 +118,10 @@ Include network isolation checklist in deployment guide; perform peer review bef
 ## Scope Definition
 | Area | In‑Scope | Out‑Of‑Scope |
 |------|----------|--------------|
-| Data Collection; Web‑form capture of demographics, insurance, medical history; field‑level encryption at rest & in transit. |
-; Paper‑based intake forms. |
-|
-| Access Control; Role‑based access (admin, clinician, front‑desk) enforced via RBAC in PostgreSQL. |
-; External third‑party integrations not approved by compliance. |
-|
-| PDF Generation; Authorized export with watermark and timestamp per HIPAA audit log. |
-; Custom branding beyond watermark. |
-|
-| Deployment; Docker‑Compose on‑premise, air‑gap ready. |
-; Cloud‑hosted SaaS platforms. |
-|
+| Data Collection | Web‑form capture of demographics, insurance, medical history; field‑level encryption at rest & in transit. | Paper‑based intake forms. |
+| Access Control | Role‑based access (admin, clinician, front‑desk) enforced via RBAC in PostgreSQL. | External third‑party integrations not approved by compliance. |
+| PDF Generation | Authorized export with watermark and timestamp per HIPAA audit log. | Custom branding beyond watermark. |
+| Deployment | Docker‑Compose on‑premise, air‑gap ready. | Cloud‑hosted SaaS platforms. |
 
 ## Review & Amendment Process
 1. **Quarterly Governance Review** – PGB reviews all governance artefacts, updates scope, KPIs, and risk register.
