@@ -1,6 +1,6 @@
 # Governance Model (Overview)
 
-### 2. Strategic Objectives
+### 1. Strategic Objectives
 | Objective ID | Description | Metric |
 |---|---|---|
 | OBJ‑001 | Achieve 100 % encryption of PHI at rest and in transit using AES‑256 and TLS 1.3. | Encryption coverage ≥ 100 % (KPI‑001) |
@@ -9,7 +9,7 @@
 | OBJ‑004 | Deliver a PDF summary generator that stamps a visible watermark and timestamp on every export, accessible only to authorized staff. | PDF watermark presence = 100 % (KPI‑003) |
 | OBJ‑005 | Provide an automated test suite that validates form encryption, access‑control enforcement, audit‑log generation, and PDF watermarking. | Test coverage ≥ 90 % of functional requirements (KPI‑005) |
 
-### 3. Stakeholder Analysis
+### 2. Stakeholder Analysis
 | Stakeholder | Need / Goal | Primary Concern | Role / Access Level | Aligned Objective |
 |---|---|---|---|---|
 | Patient | Secure submission of personal health information and receipt confirmation. | Fear of data breach or unauthorized viewing. | Read‑Only (self‑service – can create a submission and view own record only). | OBJ‑001 |
@@ -18,7 +18,7 @@
 | Administrator | Ensure reliable deployment, configuration control, and ongoing system maintenance. | Complexity of multi‑vendor setups and auditability. | Full admin rights including audit‑log management. | OBJ‑003 |
 | Compliance Officer | Provide auditable evidence of HIPAA controls and maintain compliance posture. | Lack of immutable logs and traceability of changes. | Oversight only; can view audit logs and policy documents. | OBJ‑002 |
 
-### 5. Traceability Matrix
+### 3. Traceability Matrix
 | Requirement ID | Source Section | Owner |
 |---|---|---|
 | FR‑001 | Business Vision → Functional Requirements | Compliance Officer |
@@ -31,15 +31,15 @@
 
 # Inception Artifact – PatientIntake Project
 
-## 6. Business Vision
+## 4. Business Vision
 The PatientIntake system will provide a fully HIPAA‑compliant, open‑source platform for capturing patient demographics, insurance details, and medical history at the point of entry. All data will be encrypted at rest and in transit, stored in a locally‑hosted PostgreSQL instance with immutable audit logging, and presented to clinicians via secure PDF summaries that carry visible watermarks and export timestamps. The solution will be containerised with Docker‑Compose to enable rapid, air‑gapped deployment in on‑prem environments.
 
-## 8. Review Cycle
+## 5. Review Cycle
 - **Monthly** – Risk Committee reviews new findings, updates the risk register, and tracks KPI trends.
 - **Quarterly** – Independent SOC 2 auditor conducts compliance audit of audit‑log integrity and RBAC enforcement.
 - **Annually** – Full HIPAA compliance audit performed by internal compliance team; board receives risk report and KPI dashboard.
 
-## 9. Governance Model Summary
+## 6. Governance Model Summary
 The inception artifacts collectively define the decision‑making structure, ownership, and oversight for the PatientIntake project. Every functional requirement is traceable to a stakeholder objective, each risk includes a concrete mitigation owner, and success is measured against explicit KPIs. This foundation enables downstream design and implementation phases to proceed with clear accountability and regulatory alignment.
 
 ## Business Requirements
