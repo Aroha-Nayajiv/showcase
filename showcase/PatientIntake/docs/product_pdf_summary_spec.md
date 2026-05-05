@@ -107,10 +107,10 @@ and the logs are immutable (append‑only) and retained for ≥7 years.
 ---
 
 ### US‑002 – Key Rotation without Downtime
-**As** a *System Administrator* **I want** encryption keys rotated every 30 days so that key compromise risk is limited.
+**As** a *System Administrator* **I want** encryption keys rotated every 90 days so that key compromise risk is limited.
 
 **Acceptance Criteria**
-- **Given** a master key has been in use for 30 days
+- **Given** a master key has been in use for 90 days
 - **When** the rotation job runs (cron or systemd timer)
 - **Then** a new master key is generated, existing per‑file keys are re‑wrapped, and all PDFs remain accessible using the new key (FR‑002)
 - **And** no service interruption occurs

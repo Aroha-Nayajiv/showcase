@@ -22,7 +22,7 @@ The system is organized as a set of four containerized micro‑services orchestr
 5. On successful write, the gateway returns HTTP 201 with the generated patient UUID.
 
 ### 4. Security Controls
-- **Transport Security**: All inbound/outbound traffic uses mTLS with certificates rotated every 30 days (mitigates *RISK-001*).
+- **Transport Security**: All inbound/outbound traffic uses mTLS with certificates rotated every 90 days (mitigates *RISK-001*).
 - **At‑Rest Encryption**: Sensitive columns (`ssn`, `address`, `medical_history`) are encrypted via PostgreSQL's `pgcrypto` extension; keys are never exposed to application code.
 - **RBAC**: Roles (`admin`, `clinician`, `front_desk`) are enforced in **auth** and propagated as JWT claims (FR‑001).
 - **Audit Logging**: Every CRUD operation triggers an immutable log entry (`operation`, `actor`, `timestamp`, `resource_id`). Logs are append‑only, retained for 7 years (*KPI‑02*).
@@ -41,8 +41,8 @@ Each micro‑service can be scaled horizontally via Docker Compose’s `scale` c
 All design decisions reference asset IDs:
 - Functional Requirements: **FR-001**, **FR-002**, **FR-003**, **FR-005**
 - Non‑Functional Requirements: **NFR-001**, **NFR-002**, **NFR-003**, **NFR-006**
-- KPIs: **KPI-01**, **KPI-02**
-- Risks: **RISK-001**, **RISK-003**, **RISK-01**
+- KPIs: **KPI-001**, **KPI-02**
+- Risks: **RISK-001**, **RISK-003**
 This ensures full traceability from requirement to implementation artifact.
 
 ---
