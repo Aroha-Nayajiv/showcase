@@ -110,7 +110,55 @@ openapi: 3.0.3
 info:
   title: Audit Service API
   version: 1.0.0
-paths:  /audit/events:    get:      summary: Retrieve audit events for a resource      security:        - bearerAuth: []      parameters:        - name: resource_id          in: query          required: true          schema:            type: string      responses:        '200':          description: List of audit events          content:            application/json:              schema:                type: array                items:                  $ref: '#/components/schemas/AuditEvent'        '401':          description: Unauthorized        '403':          description: Forbidden – only admin role may query all events; clinicians may query their own patients (**FR‑010**) components:  securitySchemes:    bearerAuth:      type: http      scheme: bearer      bearerFormat: JWT  schemas:    AuditEvent:      type: object      properties:        event_id:          type: string        timestamp:          type: string          format: date-time        user_id:          type: string        action:          type: string        resource_id:          type: string        payload_hash:          type: string 
+paths:
+  /audit/events:
+    get:
+      summary: Retrieve audit events for a resource
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: resource_id
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of audit events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditEvent'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden – only admin role may query all events; clinicians may query their own patients (**FR‑010**) 
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    AuditEvent:
+      type: object
+      properties:
+        event_id:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        user_id:
+          type: string
+        action:
+          type: string
+        resource_id:
+          type: string
+        payload_hash:
+          type: string
+ 
 *Acceptance Criteria for NFR‑003*: All events must be immutable; attempts to modify must return HTTP 409.
 
 ## Traceability Matrix (selected)

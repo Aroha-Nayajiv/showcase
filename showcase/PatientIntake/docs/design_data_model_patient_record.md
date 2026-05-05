@@ -144,7 +144,7 @@ schema ErrorResponse:$ref defined under components.​
 ## Reconciliation of Reviewer Feedback
 The reviewer highlighted three critical gaps:
 a) Missing concrete OpenAPI request/response schemas and error handling definitions – addressed by fully fleshed out OpenAPI sections above.
-b) Inconsistent key rotation schedule between TLS certificates (30 days) and Vault master key rotation (90 days) – harmonised both to a unified 90‑day rotation policy and documented it in Section 5.
+b) Inconsistent key rotation schedule between TLS certificates (30 days) and Vault master key rotation (90 days) – Corrected to: master key rotates every 90 days, per-field keys (DEKs) rotate every 30 days.
 c) Undefined asset IDs for new API endpoints – added explicit references to existing IDs (**FR-001**, **FR-002**, **FR-003**, **FR-005**) and introduced new placeholder IDs where needed (**API-INTAKE-001**, **API-AUDIT-001**) which are reflected in the asset registry updates section below.​
 ---
 h2 Asset Registry Updates (new IDs)

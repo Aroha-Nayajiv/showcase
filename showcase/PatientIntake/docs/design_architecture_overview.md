@@ -143,28 +143,44 @@ alter table audit_log add constraint immutable_check check (true);
 1. All external traffic between the browser and the API Gateway must use TLS 1.3 with forward secrecy (ECDHE).
 2. Internal service‑to‑service communication (API Gateway → micro‑services) also enforces TLS 1.3 via mutual TLS (mTLS) using certificates issued by an internal HashiCorp Vault PKI.
 3. Cipher suites are limited to `TLS_AES_256_GCM_SHA384` and `TLS_CHACHA20_POLY1305_SHA256`.
-4. Certificate rotation occurs every 30 days; automation is defined in the Docker Compose overlay (see vault service).
+4. Certificate rotation occurs every 90 days; automation is defined in the Docker Compose overlay (see vault service).
 5. Non‑TLS endpoints are disabled; HTTP listeners return `301` redirects to HTTPS.
 
 ### 4.5 Role‑Based Access Control (RBAC)
 The system defines three roles with least‑privilege permissions:
 
 - **admin** – Full system administrator – Create/Read/Update/Delete any patient record, manage users, view audit logs, generate PDFs.
-- **clinician** – Clinical staff providing care – Create/Read/Update patient records, generate PDFs, view audit logs for own patients.
+- **clinician** – Clinical staff providing care – Create/Read/Update patient records, generate PDFs, view audit logs for own patients.
+
 - **front_desk** – Reception staff handling intake – Create/Read patient records, generate PDFs (read‑only), view limited audit logs.
 
 Permissions are enforced by the API Gateway using JWT claims (`role`) validated against an Open Policy Agent (OPA) policy bundle (`policy.rego`). Example OPA rule for creating a patient record:
 rego
-action_allowed {\   input.method == "POST"\   input.path == ["api","v1","intake"]\   input.jwt.payload.role == "admin" or input.jwt.payload.role == "clinician" or input.jwt.payload.role == "front_desk"\}
+action_allowed {
+\   input.method == "POST"
+\   input.path == ["api","v1","intake"]
+\   input.jwt.payload.role == "admin" or input.jwt.payload.role == "clinician" or input.jwt.payload.role == "front_desk"
+\}
 
 ### 4.6 Immutable Audit Logging
 1. Every CRUD operation on patient data triggers an Audit Service event (`/audit/events`).
 2. Audit entries are stored in an append‑only PostgreSQL table (`audit_log`) with a `CHECK (operation IN ('CREATE','READ','UPDATE','DELETE','EXPORT'))` constraint.
-3. Each entry includes:   - `event_id` (UUID v4)   - `timestamp` (ISO 8601 with millisecond precision)   - `actor_id` (hashed user identifier)   - `action` (enum)   - `resource_id` (patient UUID)   - `before_state_hash` / `after_state_hash`   - `signature` (HMAC‑SHA256 using a vault‑managed signing key)4. Retention policy: retain logs for **7 years**; after retention they are archived to encrypted tarballs on an air‑gapped backup volume.5. Log integrity is verified nightly by a cron job that recomputes HMACs and alerts on mismatches.
+3. Each entry includes:
+   - `event_id` (UUID v4)
+   - `timestamp` (ISO 8601 with millisecond precision)
+   - `actor_id` (hashed user identifier)
+   - `action` (enum)
+   - `resource_id` (patient UUID)
+   - `before_state_hash` / `after_state_hash`
+   - `signature` (HMAC‑SHA256 using a vault‑managed signing key)
+4. Retention policy: retain logs for **7 years**; after retention they are archived to encrypted tarballs on an air‑gapped backup volume.
+5. Log integrity is verified nightly by a cron job that recomputes HMACs and alerts on mismatches.
 
 ### 4.7 Key Management & Secrets Handling
 Vault is the single source of truth for all cryptographic material.
-- Application containers obtain short‑lived tokens via the AppRole login flow; tokens expire after **15 minutes**.-	DEKs are wrapped with a master key that rotates quarterly; re‑wrap is performed via Vault's `transit/rewrap` endpoint.-	All services retrieve keys at startup and cache them in memory only.
+- Application containers obtain short‑lived tokens via the AppRole login flow; tokens expire after **15 minutes**.
+-	Per-field keys (DEKs) rotate every 30 days, wrapped with a master key that rotates quarterly (90 days); re‑wrap is performed via Vault's `transit/rewrap` endpoint.
+-	All services retrieve keys at startup and cache them in memory only.
 
 ## 5. Acceptance Criteria & Traceability Matrix
 | Requirement ID | Description | Acceptance Test |
@@ -173,7 +189,63 @@ Vault is the single source of truth for all cryptographic material.
 | FR-002 | Insurance verification integration with LDAP/AD groups | Authenticate as clinician → JWT contains role claim; gateway permits access to intake endpoint |
 | FR-003 | Medical history storage with field‑level encryption | Retrieve record via PDF service → decrypted fields match original input; verify no plaintext in DB dump |
 | FR-004 | Automated unit and integration tests covering form validation, encryption handling, and access control | CI pipeline runs ≥80% test coverage; all tests pass on fresh container build |
-| FR-005 | PDF Intake Summary Generation with watermark & timestamp | Request PDF → file contains dynamic watermark containing requestor ID and timestamp |>>>>>>>>>>>>>>>> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> ​> |
+| FR-005 | PDF Intake Summary Generation with watermark & timestamp | Request PDF → file contains dynamic watermark containing requestor ID and timestamp |
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> ​
+> |
 
 # Architecture Overview: OpenAPI Contracts
 
@@ -288,7 +360,7 @@ All traffic is encrypted in transit using **TLS 1.3**. Services retrieve encry
 | FR-004 |	Automated unit & integration tests for form validation & encryption handling |	Test plan (not shown) |
 | FR-005 |	PDF Intake Summary Generation with watermark & timestamp |	PDF Generation Service |
 | FR-006 |	PDF generation compliance (AES‑256)                |	PDF Generation Service |
-| FR-007 |	Watermark & Timestamp requirement                    |	PDF Generation Service | s| FR-008 |	Containerized deployment isolation (Docker Compose)   |	Docker‑compose.yml (`secrets:` block) | s| FR-009 |	Docker Compose deployment orchestration               |	Docker‑compose.yml | s| FR-010 |	Comprehensive Audit Logging (new)                    |	Audit Service | s| NFR-001|	Response time <200 ms for form submissions (KPI‑01)   |	API Gateway latency budget | s| NFR-002|	System uptime ≥99.9 % (KPI‑02)                     |	Deployment redundancy | s| NFR-003|	Mandatory audit logging of every read/write operation (KPI‑03)|	Audit Service | s| KPI‑03|	Successful audit log generation for every submission verified by integration tests | | s| RISK-001|	Unauthorized data exposure mitigated by TLS 1.3 and field‑level encryption | | s| RISK-03|	Deployment misconfiguration mitigated by Docker Compose network isolation and explicit secret handling | s## 6 Security Controls Summary |
+| FR-007 |	Watermark & Timestamp requirement                    |	PDF Generation Service | s| FR-008 |	Containerized deployment isolation (Docker Compose)   |	Docker‑compose.yml (`secrets:` block) | s| FR-009 |	Docker Compose deployment orchestration               |	Docker‑compose.yml | s| FR-010 |	Comprehensive Audit Logging (new)                    |	Audit Service | s| NFR-001|	Response time <200 ms for form submissions (KPI‑01)   |	API Gateway latency budget | s| NFR-002|	System uptime ≥99.9 % (KPI‑02)                     |	Deployment redundancy | s| NFR-003|	Mandatory audit logging of every read/write operation (KPI‑03)|	Audit Service | s| KPI‑03|	Successful audit log generation for every submission verified by integration tests | | s| RISK-001|	Unauthorized data exposure mitigated by TLS 1.3 and field‑level encryption | | s| RISK-003|	Deployment misconfiguration mitigated by Docker Compose network isolation and explicit secret handling | s## 6 Security Controls Summary |
 * **Zero Trust Network** – All inter‑service calls require mutual TLS.
 s* **Defense in Depth** – Secrets stored in Vault; environment variables injected via Docker Compose `secrets:`; no secret in code repository.
 s* **Circuit Breaker & Retry** – Configured per failure scenario above.
