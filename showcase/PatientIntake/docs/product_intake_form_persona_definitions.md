@@ -76,3 +76,64 @@ The following personas capture the primary human actors who will interact with t
 ---
 
 *All functional references map to existing asset IDs:* FR‑001 (Secure demographic capture), FR‑002 (Insurance verification), FR‑003 (Immutable audit logging), FR‑005 (PDF generation with watermark), NFR‑001 (Encryption at rest & transit), NFR‑003 (Audit log integrity), KPI-001 (Form submission response time <200 ms), KPI-004 (Data entry error rate <1 %).
+
+# Patient Intake System – Feature Specification (Refined)
+
+## Overview
+This document defines the user‑value artefacts for the **Patient Intake** SaaS product. It captures personas, user stories, acceptance criteria, and priority rationale that are directly traceable to the functional requirements (FR‑001 – FR‑004) and compliance obligations (HIPAA, SOC 2). All artefacts are written for a multi‑tenant cloud deployment.
+
+### US‑001 – Expired Encryption Key Handling
+**Requirement ID:** FR‑001
+**Description:** When a field‑level encryption key reaches its rotation date, decryption attempts must fail with a clear error and trigger admin notification.
+
+**Acceptance Criteria**
+- **Given** a patient form contains data encrypted with a key whose rotation date has passed,
+- **When** the system attempts to decrypt the field,
+- **Then** the operation returns a `KeyRotationRequired` error,
+- **And** an email/notification is sent to the system administrator with details of the affected key and instructions to rotate it,
+- **And** new submissions are rejected until the key is rotated.
+
+### US‑002 – Data Validation on Expired Key
+**Requirement ID:** FR‑002
+**Description:** Prevent submission of records that would be encrypted with an expired key.
+
+**Acceptance Criteria**
+- **Given** a user fills out the intake form,
+- **When** they attempt to submit and the underlying encryption key is expired,
+- **Then** the UI displays an inline validation message "Encryption key expired – contact admin",
+- **And** the submission is blocked.
+
+### US‑003 – Concurrent Edit Conflict Detection
+**Requirement ID:** FR‑003
+**Description:** Detect simultaneous edits of the same patient record and present a conflict resolution dialog.
+
+**Acceptance Criteria**
+- **Given** two front‑desk users load the same patient record version `v1`,
+- **When** User A saves changes creating version `v2` and User B subsequently attempts to save their edits based on `v1`,
+- **Then** optimistic locking detects the version mismatch,
+- **And** a conflict dialog shows both versions side‑by‑side,
+- **And** the user can choose to merge or overwrite.
+
+### US‑004 – PDF Export Access Control
+**Requirement ID:** FR‑004
+**Description:** Restrict PDF export functionality to authorized roles and log unauthorized attempts.
+
+**Acceptance Criteria**
+- **Given** a front‑desk user with role `staff` views a patient record,
+- **When** they click the "Export PDF" button,
+- **Then** the button is disabled (grayed out) per RBAC policy,
+- **And** any attempt to invoke the export endpoint results in an `UnauthorizedAccess` audit event recorded with timestamp, user ID, and patient ID.
+
+## Priority Rationale
+| Priority | User Story(s) | Rationale |
+|----------|----------------|----------|
+| **High (1)** | US‑001, US‑003, US‑004 | Directly enforce HIPAA technical safeguards (encryption key management, audit logging, access control). Mandatory for compliance certification. |
+| **Medium (2)** | US‑002 | Improves data quality and operational efficiency but does not affect core security posture. |
+
+## Traceability Matrix
+| User Story | Functional Requirement | KPI | Risk Mitigated |
+|-------------|--------------------------|-----|----------------|
+| US‑001 | FR‑001 | KPI-004 (PDF export security compliance) | RISK-001 (Unauthorized data exposure) |
+| US‑002 | FR‑002 | KPI-005 (Test coverage targets) | RISK-002 (Open‑source component vulnerabilities) |
+| US‑003 | FR‑003 | KPI-003 (Successful audit log generation) | RISK-003 (Deployment misconfiguration) |
+| US‑004 | FR‑004 | KPI-002 (System availability) | RISK-001 (Unauthorized data exposure) |
