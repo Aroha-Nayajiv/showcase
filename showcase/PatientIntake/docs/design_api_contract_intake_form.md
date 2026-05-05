@@ -1,5 +1,5 @@
 # API Contract Intake Form
-
+                
 ## Architecture Overview: Microservices Design for PatientIntake System
 
 ### 1. System Context and Goals
@@ -17,7 +17,7 @@ The PatientIntake system must satisfy HIPAA technical safeguards (45 CFR 164.3
 ### 3. API Gateway & Security Controls
 * **TLS** – All external traffic terminates at Envoy with TLS 1.3 (`tls_version` = "TLS 1.3").
 * **JWT** – Tokens signed with RS256; payload includes `sub`, `role`, `exp`.
-* **Rate Limiting** – 100 req/s per client satisfies **KPI‑01**.
+* **Rate Limiting** – 100 req/s per client satisfies **KPI-001**.
 * **RBAC Enforcement** – Envoy forwards the token; downstream services perform additional checks against the matrix defined in **FR‑001**.
 
 ### 4. Data Persistence & Encryption
@@ -102,7 +102,7 @@ components:
         message:
           type: string
  
-*Acceptance Criteria for FR‑001*: The endpoint must return **201** within **150 ms** for valid payloads under load of 100 concurrent requests (**KPI‑01**).
+*Acceptance Criteria for FR‑001*: The endpoint must return **201** within **150 ms** for valid payloads under load of 100 concurrent requests (**KPI-001**).
 
 ### 6.2 Audit Service API (`/audit/events`)
 yaml
@@ -171,4 +171,75 @@ components:
 | FR-005 | PDF generation with watermark | PDF Generation Service (`/pdf/{patient_id}`) |
 | FR-006 | Automated unit & integration tests (not part of design) – noted for downstream phases |
 | NFR-001 | Response time <200 ms | Envoy rate limiting & service scaling |
-| NFR-002 | Availability 99.9 % uptime | Docker Compose health checks & redundant containers ||| NFR-003 | Mandatory audit logging | Audit Service design ||| NFR-006 | Data retention 7 years | Elasticsearch rollover policy ||| KPI-001 | Response time compliance | Measured via load test on `/intake` ||| KPI-03 | Successful audit log generation | Health check querying `/audit/events` ||| PDF-001 | Watermark & timestamp requirement | PDF Generation Service ||---## Acceptance Criteria Summary* **FR‑001 / FR‑002** – POST `/intake` returns **201** within **150 ms** under load of 100 concurrent requests.* **FR‑003** – RBAC checks enforced at both gateway and service layers; unauthorized attempts receive **403**.* **FR‑004** – Audit entries are immutable; attempts to modify return **409**.* **FR‑005** – PDFs contain watermark with staff name and UTC timestamp; validated by automated PDF inspection test.* **NFR‑001** – End‑to‑end latency measured <200 ms for all public APIs.* **NFR‑002** – System demonstrates ≥99.9 % uptime in simulated failure scenarios.* **NFR‑003** – Every read/write operation generates an audit event persisted in Elasticsearch and PostgreSQL.* **NFR‑006** – Retention policy automatically rolls over indices after 7 years.* **KPI‑01** – Load testing confirms rate limit of 100 req/s per client without degradation.* **KPI‑03** – Health check confirms at least one audit event per minute per active tenant.---## Operational Runbooks (excerpt)### Incident Response for Audit Service Failure1. Detect missing heartbeat via Prometheus alert.2. Verify Kafka connectivity; if broken, restart Kafka broker.3. If Elasticsearch unreachable, switch to PostgreSQL fallback mode (already implemented).4. After restoration, run reconciliation job to backfill missed events into Elasticsearch.### Disaster Recovery Procedure1. Retrieve latest encrypted snapshot of PostgreSQL and Elasticsearch from offline media.2. Restore volumes into new Docker Compose deployment.3. Verify integrity using stored SHA‑256 hashes from audit entries.---## Security Patterns Applied* **Defense in Depth** – TLS termination at Envoy, mTLS between services, field‑level encryption, vault‑managed keys.* **Principle of Least Privilege** – RBAC matrix restricts each role to minimum required actions.* **Zero Trust Networking** – No implicit trust; every request authenticated and authorized at gateway and service level.---## Monitoring & Alerting| Metric | Threshold | Alert Destination ||---|---|---|| API latency >200 ms avg over 5 min | PagerDuty || Audit write failures >5/min | Slack #alerts || Disk usage >80% on encrypted volumes | Email ops team |---## Change Impact NotesNo breaking changes were introduced; all added specifications are additive and backward compatible with existing contracts.---*(End of Document)* |
+| NFR-002 | Availability 99.9 % uptime | Docker Compose health checks & redundant containers |
+|
+| NFR-003 | Mandatory audit logging | Audit Service design |
+|
+| NFR-006 | Data retention 7 years | Elasticsearch rollover policy |
+|
+| KPI-001 | Response time compliance | Measured via load test on `/intake` |
+|
+| KPI-003 | Successful audit log generation | Health check querying `/audit/events` |
+|
+| PDF-001 | Watermark & timestamp requirement | PDF Generation Service |
+|
+
+---
+
+## Acceptance Criteria Summary
+
+* **FR‑001 / FR‑002** – POST `/intake` returns **201** within **150 ms** under load of 100 concurrent requests.
+* **FR‑003** – RBAC checks enforced at both gateway and service layers; unauthorized attempts receive **403**.
+* **FR‑004** – Audit entries are immutable; attempts to modify return **409**.
+* **FR‑005** – PDFs contain watermark with staff name and UTC timestamp; validated by automated PDF inspection test.
+* **NFR‑001** – End‑to‑end latency measured <200 ms for all public APIs.
+* **NFR‑002** – System demonstrates ≥99.9 % uptime in simulated failure scenarios.
+* **NFR‑003** – Every read/write operation generates an audit event persisted in Elasticsearch and PostgreSQL.
+* **NFR‑006** – Retention policy automatically rolls over indices after 7 years.
+* **KPI-001** – Load testing confirms rate limit of 100 req/s per client without degradation.
+* **KPI-003** – Health check confirms at least one audit event per minute per active tenant.
+
+---
+
+## Operational Runbooks (excerpt)
+
+### Incident Response for Audit Service Failure
+
+1. Detect missing heartbeat via Prometheus alert.
+2. Verify Kafka connectivity; if broken, restart Kafka broker.
+3. If Elasticsearch unreachable, switch to PostgreSQL fallback mode (already implemented).
+4. After restoration, run reconciliation job to backfill missed events into Elasticsearch.
+
+### Disaster Recovery Procedure
+
+1. Retrieve latest encrypted snapshot of PostgreSQL and Elasticsearch from offline media.
+2. Restore volumes into new Docker Compose deployment.
+3. Verify integrity using stored SHA‑256 hashes from audit entries.
+
+---
+
+## Security Patterns Applied
+
+* **Defense in Depth** – TLS termination at Envoy, mTLS between services, field‑level encryption, vault‑managed keys.
+* **Principle of Least Privilege** – RBAC matrix restricts each role to minimum required actions.
+* **Zero Trust Networking** – No implicit trust; every request authenticated and authorized at gateway and service level.
+
+---
+
+## Monitoring & Alerting
+
+| Metric | Threshold | Alert Destination |
+|---|---|---|
+| API latency >200 ms avg over 5 min | PagerDuty |
+| Audit write failures >5/min | Slack #alerts |
+| Disk usage >80% on encrypted volumes | Email ops team |
+
+---
+
+## Change Impact Notes
+
+No breaking changes were introduced; all added specifications are additive and backward compatible with existing contracts.
+
+---
+
+*(End of Document)* |

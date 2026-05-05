@@ -250,54 +250,5 @@ CREATE POLICY clinician_access ON patient USING (current_setting('app.current_ro
 *Roles are derived from JWT claims validated by the Auth & RBAC Service.*
 
 ## Audit Log Insertion Trigger (Universal)
-and the same trigger is attached to each audited table.
-and the trigger records the hash chain for tamper evidence.
-and ensures immutability.
-and provides cryptographic linkage.
-and supports forensic analysis.
-and meets NFR‑003.
-and complies with SOC 2 logging requirements.
-and is idempotent.
-and runs AFTER INSERT/UPDATE/DELETE.
-and captures the user via `current_setting('app.current_user')`.
-and stores SHA‑256 of previous entry.
-and aborts on any failure.
-and logs to `audit_log`.
-and returns NEW row for further processing.
-and is written in PL/pgSQL.
-and uses `gen_random_uuid()` for log IDs.
-and respects transaction boundaries.
-and is lightweight (<1 ms per operation).
-and can be scaled horizontally.
-and is covered by unit tests in the test suite.
-and documented in the design artifact.
-and referenced in the traceability matrix.
-and satisfies FR‑001–FR‑003 compliance.
-and aligns with NFR‑001 response time target.
-and is part of the security defense‑in‑depth strategy.
-and will be monitored via Prometheus metrics.
-and can be disabled per environment via feature flag.
-and is versioned in the repository.
-and follows best practices for audit logging.
-and includes a hash chain column for integrity verification.
-and ensures append‑only semantics via a BEFORE INSERT rule that rejects UPDATE/DELETE on audit_log.
-and is part of the overall compliance package.
-and will be reviewed during security audits.
-and is compatible with PostgreSQL 13+.
-and uses built‑in cryptographic functions.
-and does not require external services.
-and therefore reduces attack surface.
-and meets the requirement for immutable audit trails.
-and supports forensic investigations.
-and satisfies regulatory requirements for medical data handling.
-and is documented in the operational runbook.
-and will be part of the CI/CD pipeline checks.
-and has been validated against performance benchmarks.
-and meets the <200 ms latency target for audit logging under load (NFR‑001).
-and is included in the system's SLA documentation.
-and will be part of the disaster recovery plan.
-and can be restored from backups without loss of integrity due to hash chain verification.
-and integrates with the event bus for downstream consumers.
-and publishes `EVENT_AUDIT_WRITTEN` after each successful insert.\and finally ensures compliance with HIPAA and GDPR audit requirements.
 
-{'status': 'error', 'error': 'All micro-goals failed', 'failed_micro_goals': [{'status': 'error', 'error': "Refiner specialized logic failed: Template rendering failed due to undefined variable: 'patient_id' is undefined. This indicates a system error where required context variables were not set. Available context keys: ['artifact_name', 'artifact_description', 'artifact_id', 'dbs_id', 'artifact_type', 'role', 'agent_role', 'phase_name', 'artifact_dependencies', 'forward_dependents', 'project_requirement_text', 'project_requirement_full', 'requirement_text', 'context_summary', 'project_id', 'goal', 'total_micro_goals', 'micro_goal_index', 'acceptance_criteria', 'binding_manifest', 'micro_goal', 'micro_goal_axis', 'micro_goal_level', 'micro_goal_parent_id', 'reasoning_summary', 'artifact_definition', 'dbs_item', 'cipher_context', 'episodic_patterns', 'software_dna_context', 'existing_artifacts', 'existing_artifacts_summary', 'sibling_artifacts', 'decomposer_artifact_ids_so_far', 'decomposer_cot_commitment', 'previous_phase_artifacts', 'jigsaw_map', 'coordinated_insights', 'coordination_available', 'domain_knowledge_context', 'research_context', 'vp_feedback', 'vp_primary_gaps', 'task_context', 'multi_turn_instruction', 'content_to_refine', 'reviewer_feedback', 'executor_output', 'original_output', 'peer_reviews', 'refinement_context_mode', 'refinement_segment_index', 'refinement_segment_total', 'current_agent_role', 'templates', 'contracts', 'technology_stack', 'chain_of_thought_context', 'reasoning_for_current_goal', 'decomposition_reasoning_context', 'executor_reasoning_digest', 'executor_self_critique', '_stage_context', 'previous_phase_learnings', 'previous_phase_context', 'pipeline_conductor_context', 'pipeline_conductor_hint', 'pipeline_conductor_focus_artifacts', 'pipeline_conductor_metadata', 'decomposition_retry_delta_block', 'generated_content', 'artifact_content', 'content', 'previous_output', 'content_to_review', 'reviewer_feedback_markdown', 'refined_outputs_markdown', 'executor_inputs_markdown', 'micro_goal_context', 'dna_insights', 'previous_phase_dna', 'dna_domain_concepts', 'consolidation_manifest', 'completed_sections', 'sections_already_produced', 'project_grounding_facts', 'project_grounding_summary', 'context_tier', 'include_methodology_deep', 'stage_name', 'jigsaw_universal_contract', '_cbr_reference_metadata', 'phase_prompt_preamble', 'artifact_prompt_delta', 'phase_prompt_scope_id', 'content_to_approve', 'episodic_patterns_summary', 'pass_name', 'reflection_critique_summary', 'task_description', 'focus_area', 'research_reasoning', 'research_results', 'results_count', 'results_used', 'existing_knowledge_summary', 'project_context', 'project_description', 'project_domain', 'artifact_summary', 'tech_stack', 'query_analysis', 'query_type', 'level_1_relevance', 'level_1_results_count', 'level_2_relevance', 'level_2_results_count', 'next_level', 'purpose', 'requirement', 'sequence_number', 'source', 'total_goals', 'context', 'phase', 'context_keys', 'phase_key', 'quality_criteria', 'quality_score', 'execution_content', 'dependencies', 'success_criteria', 'phase_blueprint', 'description_one_line', 'goal_id', 'micro_goal_description', 'role_specific_field', 'role_specific_field_description', 'required_item_fields', 'output_content', 'content_size', 'context_ref_id', 'ref_id', 'ref_type', 'relevance_score', 'summary', 'codebase_content', 'codebase_chunk', 'codebase_sample', 'entities_to_analyze', 'extracted_dna', 'relational_context', 'structural_context', 'behavioral_context', 'architectural_context', 'filename', 'document_type', 'document_path', 'content_preview', 'diagram_type', 'flow_type', 'new_content', 'old_content', 'extraction_results', 'ingested_documents', 'content_to_classify', 'artifacts', 'reasoning_scaffold']. This should trigger self-correction to retry with proper context.. No code fallback.", 'goal_index': 0}]}
+A universal database trigger is attached to each audited table. This PL/pgSQL trigger records the hash chain for tamper evidence, ensures immutability by rejecting UPDATE/DELETE operations, and publishes `EVENT_AUDIT_WRITTEN` to the event bus after each successful insert. This guarantees compliance with HIPAA and GDPR audit requirements.

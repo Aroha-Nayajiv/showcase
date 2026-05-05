@@ -143,7 +143,7 @@ alter table audit_log add constraint immutable_check check (true);
 1. All external traffic between the browser and the API Gateway must use TLS 1.3 with forward secrecy (ECDHE).
 2. Internal service‑to‑service communication (API Gateway → micro‑services) also enforces TLS 1.3 via mutual TLS (mTLS) using certificates issued by an internal HashiCorp Vault PKI.
 3. Cipher suites are limited to `TLS_AES_256_GCM_SHA384` and `TLS_CHACHA20_POLY1305_SHA256`.
-4. Certificate rotation occurs every 90 days; automation is defined in the Docker Compose overlay (see vault service).
+4. Certificate rotation occurs every 30 days; automation is defined in the Docker Compose overlay (see vault service).
 5. Non‑TLS endpoints are disabled; HTTP listeners return `301` redirects to HTTPS.
 
 ### 4.5 Role‑Based Access Control (RBAC)
