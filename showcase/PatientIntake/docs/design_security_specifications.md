@@ -1,0 +1,340 @@
+# Deliverable scope for design security specifications; detailed specification in Executor phase.
+
+## Design Specification: System Architecture and Technical Contracts
+
+### 1. Architecture Overview
+The PatientIntake system is organized into four logical layers that together satisfy the HIPAA‑compliant requirements described in the project brief.
+
+1. **Presentation Layer** – A React single‑page application served over TLS 1.3 (global `tls_version`). The UI renders a structured web form that captures patient demographics, insurance information, and medical history. Each field is encrypted client‑side using **libsodium** (AES‑256‑GCM) before transmission.
+2. **API Gateway** – A Node.js/Express service exposing the OpenAPI v3 contract **EP-001**. It terminates TLS, validates JWT bearer tokens, and forwards validated payloads to the Service Layer.
+3. **Service Layer** – Two micro‑services written in Python FastAPI:
+   - **Intake Service (SVC-001)** – Handles form submission, invokes the Encryption Service, persists encrypted records, and emits audit events.
+   - **PDF Generation Service (SVC-002)** – Retrieves encrypted patient data, decrypts it, renders an HTML template, and produces a PDF via **wkhtmltopdf**. The PDF is water‑marked with the staff identifier and an access timestamp.
+4. **Data Layer** – A PostgreSQL 13+ container with the `pgcrypto` extension. All PHI columns are stored as `bytea` ciphertext; row‑level security (RLS) enforces role‑based access control (admin, clinician, front‑desk) defined in **FR-001**‑**FR-003**.
+
+All write operations trigger the **Audit Log Service (SVC-003)** which writes immutable JSON log entries to a separate `audit_log` table using PostgreSQL's `pg_audit` extension. The log includes user ID, operation type, timestamp, and hash of the affected row.
+
+### 2. Component Interaction Description
+1. **User submits form** → Web UI sends a `POST /api/v1/intake/submissions` request over TLS 1.3.
+2. **API Gateway** validates JWT, checks RBAC, validates payload against **SCH-001**, encrypts each PHI field using the service‑side key manager, then forwards the encrypted payload to **Data Service**.
+3. **Data Service** writes encrypted columns to `patient_intake` table, creates an audit entry in `audit_log`, and publishes an `IntakeSubmitted` event on the internal message bus (**NATS**).
+4. **PDF Service** consumes the event, retrieves the encrypted record via a service‑to‑service call (`GET /api/v1/intake/{id}`), decrypts fields using the same key manager, renders HTML → PDF via `wkhtmltopdf`, adds watermark & timestamp, stores the PDF in a read‑only volume (`/pdfs`), and returns a URL.
+5. **Web UI** fetches the PDF URL via `GET /api/v1/intake/{id}/pdf` for authorized staff.
+
+All inter‑service traffic occurs on a private Docker network (`intake_internal`) with no external internet access, satisfying the air‑gap requirement (**FR-009**). TLS 1.3 is enforced globally via the reverse proxy (**nginx**) that terminates inbound HTTPS connections.
+
+### 3. API Contract Suite
+| Method | Path | Description | Request Schema | Response Schema | Required Role |
+|--------|------|-------------|----------------|----------------|---------------|
+| POST | `/api/v1/auth/login` | Authenticate user and issue JWT | `{ "email": "string", "password": "string" }` | `{ "token": "string", "expires_at": "date-time", "user": { "id": "uuid", "role": "enum(admin,clinician,front_desk)" } }` | Public |
+| POST | `/api/v1/intake/submissions` | Create new patient intake record (HIPAA‑compliant) | **SCH-001 – IntakeSubmissionRequest** (see Section 4) | `{ "submission_id": "uuid", "created_at": "date-time", "status": "enum(pending,processed)" }` | `front_desk`, `clinician` |
+| GET | `/api/v1/intake/{submission_id}` | Retrieve encrypted intake data for authorized roles | – | **SCH-002 – IntakeSubmissionResponse** (see Section 4) | `admin`, `clinician` |
+| GET | `/api/v1/intake/{submission_id}/pdf` | Generate or fetch PDF summary; adds watermark & timestamp | – | `{ "pdf_url": "string", "generated_at": "date-time" }` | `admin`, `clinician` |
+| GET | `/api/v1/audit/logs` | Query audit log entries with filters | `{ "start": "date-time", "end": "date-time", "action": "enum(create,read,update,delete)" }` | `{ "entries": [ { "id": "uuid", "action": "string", "user_id": "uuid", "timestamp": "date-time", "details": "string" } ] }` | `admin` |
+
+### 4. JSON Schemas
+
+#### SCH-001 – IntakeSubmissionRequest
+
+{
+  "patient_id": "uuid",
+  "demographics": {
+    "first_name": "string",
+    "last_name": "string",
+    "dob": "date",
+    "ssn_encrypted": "string" // AES‑256‑GCM ciphertext base64
+  },
+  "insurance": {
+    "provider": "string",
+    "policy_number_encrypted": "string"
+  },
+  "medical_history": {
+    "conditions_encrypted": "string",
+    "medications_encrypted": "string",
+    "allergies_encrypted": "string"
+  }
+}
+
+All fields marked `*_encrypted` must be supplied as base64‑encoded ciphertext generated by the client‑side encryption library.
+
+### 5. Error Taxonomy
+| Code | HTTP Status | Description | Message | Retryable |
+|------|-------------|-------------|---------|-----------|
+| ERR-001 | 400 | Payload validation failed – missing required field or malformed JSON. | "The submitted data is incomplete or incorrectly formatted." | No |
+| ERR-002 | 401 | Authentication failed – invalid credentials or expired token. | "Your session has expired; please log in again." | Yes |
+| ERR-003 | 403 | Authorization failure – user role does not have permission for the requested operation. | "You are not authorized to perform this action." | No |
+| ERR-004 | 404 | Resource not found – e.g., unknown `submission_id`. | "The requested intake record does not exist." | No |
+| ERR-005 | 503 | Service unavailable – e.g., Audit Log Service down and retry limit exceeded. | "The system is temporarily unable to process your request; please try again later." | Yes |
+
+### 6. Security Considerations
+* **Authentication** – OAuth2 Resource Owner Password Credentials flow issuing JWTs signed with RSA‑256 (`auth_key`). Scopes map directly to required API permissions.
+* **Authorization** – PostgreSQL Row‑Level Security policies enforce admin, clinician, and front‑desk roles per **FR-001–FR-003**.
+* **Transport Encryption** – All external traffic terminates at Nginx with TLS 1.3 (`tls_version` from globals).
+* **At‑Rest Encryption** – Field‑level encryption performed client‑side; server stores only ciphertexts.
+* **Key Management** – Keys are stored in HashiCorp Vault and rotated quarterly (`project_globals_updates`). Rotation procedures follow NIST SP 800‑57 guidelines.
+* **Audit Logging** – Every read/write triggers an immutable log entry; logs are write‑once and retained for 7 years per HIPAA retention guidance.
+* **Failure Handling** – If the Audit Log Service is down, the Intake Service buffers events in an in‑memory queue and retries every 30 seconds; after three consecutive failures it returns **ERR-005** to the caller.
+* **Rate Limiting & DDoS Protection** – Nginx rate limits at 200 requests/second per IP; excess traffic receives **429 Too Many Requests**.
+* **Monitoring & Alerting** – Prometheus scrapes service metrics; alerts fire on latency >200 ms (NFR‑001) or audit log backlog >1000 entries.
+
+---
+*All specifications reference existing asset IDs (FR‑001…FR‑010, NFR‑001, NFR‑003, FR‑009). No new IDs were introduced.*
+
+{'status': 'error', 'error': 'All micro-goals failed', 'failed_micro_goals': [{'status': 'error', 'error': "Refiner specialized logic failed: Template rendering failed due to undefined variable: 'staff_name' is undefined. This indicates a system error where required context variables were not set. Available context keys: ['artifact_name', 'artifact_description', 'artifact_id', 'dbs_id', 'artifact_type', 'role', 'agent_role', 'phase_name', 'artifact_dependencies', 'forward_dependents', 'project_requirement_text', 'project_requirement_full', 'requirement_text', 'context_summary', 'project_id', 'goal', 'total_micro_goals', 'micro_goal_index', 'acceptance_criteria', 'binding_manifest', 'micro_goal', 'micro_goal_axis', 'micro_goal_level', 'micro_goal_parent_id', 'reasoning_summary', 'artifact_definition', 'dbs_item', 'cipher_context', 'episodic_patterns', 'software_dna_context', 'existing_artifacts', 'existing_artifacts_summary', 'sibling_artifacts', 'decomposer_artifact_ids_so_far', 'decomposer_cot_commitment', 'previous_phase_artifacts', 'jigsaw_map', 'coordinated_insights', 'coordination_available', 'domain_knowledge_context', 'research_context', 'vp_feedback', 'vp_primary_gaps', 'task_context', 'multi_turn_instruction', 'content_to_refine', 'reviewer_feedback', 'executor_output', 'original_output', 'peer_reviews', 'refinement_context_mode', 'refinement_segment_index', 'refinement_segment_total', 'current_agent_role', 'templates', 'contracts', 'technology_stack', 'chain_of_thought_context', 'reasoning_for_current_goal', 'decomposition_reasoning_context', 'executor_reasoning_digest', 'executor_self_critique', '_stage_context', 'previous_phase_learnings', 'previous_phase_context', 'pipeline_conductor_context', 'pipeline_conductor_hint', 'pipeline_conductor_focus_artifacts', 'pipeline_conductor_metadata', 'decomposition_retry_delta_block', 'generated_content', 'artifact_content', 'content', 'previous_output', 'content_to_review', 'reviewer_feedback_markdown', 'refined_outputs_markdown', 'executor_inputs_markdown', 'micro_goal_context', 'dna_insights', 'previous_phase_dna', 'dna_domain_concepts', 'consolidation_manifest', 'completed_sections', 'sections_already_produced', 'project_grounding_facts', 'project_grounding_summary', 'context_tier', 'include_methodology_deep', 'stage_name', 'jigsaw_universal_contract', '_cbr_reference_metadata', 'phase_prompt_preamble', 'artifact_prompt_delta', 'phase_prompt_scope_id', 'content_to_approve', 'episodic_patterns_summary', 'pass_name', 'reflection_critique_summary', 'task_description', 'focus_area', 'research_reasoning', 'research_results', 'results_count', 'results_used', 'existing_knowledge_summary', 'project_context', 'project_description', 'project_domain', 'artifact_summary', 'tech_stack', 'query_analysis', 'query_type', 'level_1_relevance', 'level_1_results_count', 'level_2_relevance', 'level_2_results_count', 'next_level', 'purpose', 'requirement', 'sequence_number', 'source', 'total_goals', 'context', 'phase', 'context_keys', 'phase_key', 'quality_criteria', 'quality_score', 'execution_content', 'dependencies', 'success_criteria', 'phase_blueprint', 'description_one_line', 'goal_id', 'micro_goal_description', 'role_specific_field', 'role_specific_field_description', 'required_item_fields', 'output_content', 'content_size', 'context_ref_id', 'ref_id', 'ref_type', 'relevance_score', 'summary', 'codebase_content', 'codebase_chunk', 'codebase_sample', 'entities_to_analyze', 'extracted_dna', 'relational_context', 'structural_context', 'behavioral_context', 'architectural_context', 'filename', 'document_type', 'document_path', 'content_preview', 'diagram_type', 'flow_type', 'new_content', 'old_content', 'extraction_results', 'ingested_documents', 'content_to_classify', 'artifacts', 'reasoning_scaffold']. This should trigger self-correction to retry with proper context.. No code fallback.", 'goal_index': 0}]}
+
+## System Architecture Diagram and Integration Patterns
+
+### 7. Service Components
+| Component | Image / Runtime | Responsibility | Port |
+|-----------|-------------------|----------------|------|
+| frontend | `node:20-alpine` (React SPA) | Renders the intake form, performs client‑side field encryption using the public key from `key‑service` | 3000 |
+| api-gateway | `kong:3.4-alpine` | Terminates TLS, routes to intake‑service, enforces rate limiting | 8443 |
+| intake‑service | `python:3.11-slim` (FastAPI) | Validates request schemas, orchestrates DB writes, emits audit events, calls PDF service | 8000 |
+| pdf‑service | `ghcr.io/wkhtmltopdf/wkhtmltopdf:0.12.6` | Generates PDF from HTML template, applies watermark & timestamp, stores in object store volume | 9000 |
+| postgres | `postgres:15-alpine` | Stores encrypted patient records, role‑based access via RLS, audit log table | 5432 |
+
+### 8. Integration Patterns
+1. **API Gateway → Service** – Synchronous HTTP/REST over TLS 1.3.
+2. **Service → Database** – Direct PostgreSQL driver with prepared statements; row‑level security (RLS) enforces role permissions (admin, clinician, front‑desk).
+3. **Service → PDF Service** – Internal HTTP POST with HTML payload; PDF service returns binary PDF stream.
+4. **Audit Logging** – Every write/read triggers an `INSERT` into `audit_log` table; the service also publishes an `audit.event` to the internal message bus (future NATS integration).
+5. **Failure Handling** – Each integration defines a fallback row in the Error Taxonomy table; retries use exponential back‑off up to three attempts before returning a deterministic error to the caller.
+
+### 9. Data Model
+
+#### Patient Intake Table
+| Column | Type | PK / FK | Nullable | Description |
+|--------|------|---------|----------|-------------|
+| submission_id | UUID | PK | No | Primary key, generated by service |
+| patient_id | UUID | FK → patient master | No | Foreign key to patient master record |
+| demographics_encrypted | BYTEA | – | No | JSON of demographics encrypted with AES‑256‑GCM |
+| insurance_encrypted | BYTEA | – | No | Encrypted insurance details |
+| medical_history_encrypted | BYTEA | – | No | Field‑level encrypted medical history blob |
+| created_at | TIMESTAMP WITH TIME ZONE | – | No | Auto‑filled on insert |
+
+#### Audit Log Table
+| Column | Type | Description |
+|--------|------|-------------|
+| log_id | BIGSERIAL (PK) | Auto increment identifier |
+| entity_type | TEXT | e.g., `patient_intake` |
+| entity_id | UUID | Identifier of the entity being logged |
+| operation_type | TEXT CHECK (operation_type IN ('CREATE','READ','UPDATE','DELETE')) | Type of operation |
+| performed_by_role | TEXT CHECK (performed_by_role IN ('admin','clinician','front_desk')) | Role that performed the operation |
+| timestamp_utc | TIMESTAMP WITH TIME ZONE | When the operation occurred |
+
+### 11. Error Handling Strategy
+All services return a standardized JSON envelope for errors.
+
+{
+  "error": {
+    "code": "ERR-001",
+    "message": "The submitted data is invalid or incomplete.",
+    "details": {"field": "demographics", "reason": "validation_failed"},
+    "timestamp": "2026-05-05T12:34:56Z"
+  }
+}
+
+**Error Code Catalog** (traces to functional requirement FR‑001 and risk RISK‑01):
+| Error Code | HTTP Status | Description | User Message | Retryable? |
+|-----------|------------|-------------|--------------|------------|
+| ERR-001 | 400 | Invalid input – schema validation failed or required encrypted field missing. | The submitted data is invalid or incomplete. | false |
+| ERR-002 | 401 | Unauthorized – missing or expired Bearer token, or role lacks required permission. | Authentication required or insufficient privileges. | false |
+| ERR-003 | 500 | Internal server error – unexpected exception after input validation passed. | An unexpected error occurred. Please try again later. | true |
+
+All FastAPI route handlers declare a `responses` mapping referencing the above schema (`#/components/schemas/ErrorResponse`). A global exception handler converts `RequestValidationError`, `HTTPException`, and generic `Exception` into this envelope.
+
+### 12. Docker Compose Configuration
+yaml
+version: '3.9'
+networks:
+  intake_net:
+    driver: bridge
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: intake_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: intake_db
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - intake_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U intake_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api-gateway:
+    image: kong:3.4-alpine
+    environment:
+      KONG_DATABASE: off
+      KONG_DECLARATIVE_CONFIG: /usr/local/kong/kong.yml
+    ports:
+      - "8443:8443"
+    volumes:
+      - ./kong/kong.yml:/usr/local/kong/kong.yml:ro
+    networks:
+      - intake_net
+    depends_on:
+      - intake-service
+
+  intake-service:
+    build: ./intake-service
+    environment:
+      DATABASE_URL: postgresql://intake_user:${POSTGRES_PASSWORD}@postgres:5432/intake_db
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "8000:8000"
+    networks:
+      - intake_net
+    depends_on:
+      - postgres
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      retries: 3
+
+  pdf-service:
+    image: ghcr.io/wkhtmltopdf/wkhtmltopdf:0.12.6
+    command: ["--disable-smart-shrinking"]
+    ports:
+      - "9000:9000"
+    networks:
+      - intake_net
+    depends_on:
+      - intake-service
+    volumes:
+      - pdf_output:/app/output
+volumes:
+  pg_data:
+  pdf_output:
+
+---
+
+## Cross‑cutting Concerns
+- **Security** – All traffic uses TLS 1.3; client‑side encryption of PII; database column encryption via pgcrypto; row‑level security enforces least‑privilege access.
+- **Compliance** – Design satisfies HIPAA technical safeguards (encryption at rest & in transit), aligns with NFR‑001 (<200 ms response time) and NFR‑003 (mandatory audit logging). Risk mitigations for RISK‑01 are addressed via standardized error handling and audit trails.
+- **Scalability & Multi‑Tenancy** – Services are containerised; horizontal scaling can be achieved by adding replicas behind the Kong gateway; PostgreSQL can be sharded or scaled read‑replicas for high load.
+- **Observability** – Each service emits structured logs and publishes audit events to a message bus for centralized monitoring.
+---
+
+## Traceability Matrix (selected)
+| Requirement ID | Artifact Reference |
+|-----------------|-------------------|
+| FR-001          | Secure demographic capture – implemented in frontend encryption & intake API schema |
+| FR-002          | Insurance details encryption – stored in `insurance_encrypted` column |
+| FR-003          | Medical history storage – stored in `medical_history_encrypted` column |
+| NFR-001        | Response time <200 ms – enforced by fastpath API design and connection pooling |
+| NFR-003        | Mandatory audit logging – `audit_log` table and event publishing |
+| RISK-01        | Unauthorized data exposure – mitigated by TLS, encryption, RBAC, audit logging s |
+
+## Service Layer Details
+| Service | Responsibility | Primary Endpoints |
+|---|---|---|
+| API Gateway | Request validation, auth enforcement, rate limiting | `POST /intake`, `GET /intake/{id}` |
+| Intake Service | Business logic for patient intake, persistence to PostgreSQL | `POST /intake`, `GET /intake/{id}` |
+| Audit Service | Immutable audit logging of errors and critical actions | Internal only (writes via service calls) |
+| PDF Generation Service | Render PDF summaries, apply watermark & timestamp (FR‑007) | `POST /pdf/generate` |
+| Auth Service | Token issuance, refresh flow (ERR‑002 handling) | `POST /api/v1/auth/token`, `POST /api/v1/auth/refresh` |
+
+### POST /intake
+**Purpose:** Capture a new patient intake record.
+**Request Schema:**
+
+{
+  "patient_id": "string",
+  "demographics": {
+    "first_name": "string",
+    "last_name": "string",
+    "date_of_birth": "string",
+    "gender": "string"
+  },
+  "insurance_info": {
+    "provider": "string",
+    "policy_number": "string",
+    "group_number": "string"
+  }
+}
+
+**Response Schema (201):**
+
+{
+  "intake_id": "string",
+  "status": "created",
+  "created_at": "2026-05-05T12:34:56Z"
+}
+
+**Error Response Schema (applies to all endpoints):**
+
+{
+  "error": {
+    "code": "ERR-001|ERR-002|ERR-003",
+    "message": "Human readable description",
+    "timestamp": "2026-05-05T12:34:56Z",
+    "details": {
+      "service": "intake" ,
+      "field_errors": ["field1", "field2"]
+    }
+  }
+}
+
+*All error responses are wrapped in the project‑wide format and are logged to the immutable audit log (FR‑003).*
+
+### GET /intake/{intake_id}
+**Purpose:** Retrieve an existing intake record.
+**Response Schema (200):**
+
+{
+  "intake_id": "string",
+  "patient_id": "string",
+  "demographics": { /* same as request */ },
+  "insurance_info": { /* same as request */ },
+  "status": "completed",
+  "created_at": "2026-05-05T12:34:56Z"
+}
+
+**Error handling follows the same schema as above.**
+
+### audit_log Table (FR‑003)
+| Column | Type | Description |
+|---|---|---|
+| id | UUID PRIMARY KEY | Unique log entry identifier |
+| request_id | UUID | Correlates to the originating API request |
+| user_id | UUID | Identifier of the authenticated user |
+| error_code | VARCHAR(20) | One of `ERR-001`, `ERR-002`, `ERR-003` |
+| timestamp | TIMESTAMPTZ NOT NULL DEFAULT now() | Event time in UTC |
+| stack_trace | TEXT | Masked stack trace for debugging (PII removed) |
+
+**Row‑Level Security (RLS):** Only roles `admin_audit` may SELECT from this table; all other roles receive `ERROR` on access attempts. This satisfies NFR‑003 audit‑log retention ≥ 1 year.
+
+## Logging and Auditing (FR‑003 & NFR‑003)
+* Every error response triggers an INSERT into `audit_log`.
+* The audit log is immutable; UPDATE/DELETE are prohibited by database permissions.
+* Access is limited to admin roles via RLS.
+* Retention policy enforced via a nightly job:
+sql
+DELETE FROM audit_log WHERE timestamp < now() - interval '365 days';
+
+## Retry and Failure Propagation (Section 6)
+| Failure Type | Retryable? | Client Action |
+|---|---|---|
+| Validation (`ERR-001`) | No | Fix payload and resend |
+| Authentication (`ERR-002`) | No – trigger token refresh flow; if refresh fails, re‑authenticate |
+| Transient Server (`ERR-003`) | Yes – exponential backoff with jitter, max 3 attempts |
+| Downstream Service Failure (`ERR-003` with `details.service`) | Yes – same backoff strategy |
+
+The client library implements:
+python
+def call_with_retry(fn, *args, **kwargs):
+    max_attempts = 3
+    backoff = 0.5
+    for attempt in range(1, max_attempts + 1):
+        try:\        	response = fn(*args, **kwargs)
+            if response.status_code < 500:	return response
+        except TransientError:	    # map to ERR‑003
+            if attempt == max_attempts:	raise
+            time.sleep(backoff * (2 ** (attempt - 1)) + random.random())
+
+and propagates the original error code in the JSON payload.
