@@ -1,5 +1,5 @@
 # PDF Intake Summary Specification
-
+                
 ### 1. Front Desk Clerk (ST‑01)
 - **Primary Goal:** Capture patient demographic, insurance, and medical‑history data quickly and accurately at the point of entry.
 - **Key Tasks:**
@@ -248,7 +248,7 @@ The system shall generate a secure, auditable PDF intake summary for each patien
 
 *Traceability*: FR‑003, NFR‑003, RISK‑01
 
-## 6. Detailed Schema Definitions
+## 7. Detailed Schema Definitions
 
 ### PDF Metadata Schema (stored alongside each PDF)
 
@@ -262,7 +262,7 @@ The system shall generate a secure, auditable PDF intake summary for each patien
 
 *Traceability*: maps to FR‑007 (watermark), NFR‑001 (encryption), NFR‑003 (audit).
 
-## 7. Dependencies & Integration Points
+## 8. Dependencies & Integration Points
 | ID    | Dependency                | Description                                 |
 |-------|----------------------------|---------------------------------------------|
 | FR-001| Secure demographic capture | Provides source data for PDF content.       |
@@ -271,14 +271,14 @@ The system shall generate a secure, auditable PDF intake summary for each patien
 | NFR-001| Encryption at rest       | Governs file storage method.               |
 | NFR-003| Immutable audit log       | Dictates log persistence design.          |
 
-## 8. Edge Cases & Failure Handling Summary
+## 9. Edge Cases & Failure Handling Summary
 1. **Incomplete Record** – Export blocked; UI shows explicit missing fields list.
 2. **Insufficient Storage** – Export aborted; system logs AU‑002 with reason code `STORAGE_LOW`.
 3. **Key Management Failure** – Export unavailable; alert sent to Ops team; audit entry records failure reason `KEY_UNAVAILABLE`.
 4. **Unauthorized Role Attempt** – Immediate denial; audit entry records attempted access with status `DENIED`.
 5. **Tampered PDF Detection** – On subsequent verification, mismatch triggers `RISK‑01` escalation workflow.
 
-## 9. Testable Acceptance Criteria (Gherkin)
+## 10. Testable Acceptance Criteria (Gherkin)
 gherkin
 Feature: PDF Intake Summary Generation
 
@@ -298,6 +298,6 @@ Scenario: Export blocked due to missing mandatory fields
   Then the system displays an error listing missing fields
     And no PDF is generated
 
-## 10. KPI & Risk Alignment
+## 11. KPI & Risk Alignment
 *KPIs*: KPI‑01 (response time <200 ms for export), KPI‑03 (audit log generation for every submission), KPI‑04 (PDF export security compliance).
 *Risks*: RISK‑01 (unauthorized data exposure), RISK‑02 (open‑source component vulnerabilities) – mitigated by encryption at rest and immutable logging.

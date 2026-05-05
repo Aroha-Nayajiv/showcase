@@ -1,5 +1,5 @@
 # Access Control User Stories
-
+                
 # Personas
 ## Admin (ST-01)
 System administrator responsible for managing user accounts, configuring role permissions, and reviewing audit logs.

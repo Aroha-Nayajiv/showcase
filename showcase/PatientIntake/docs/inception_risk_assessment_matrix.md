@@ -1,5 +1,5 @@
 # Risk Assessment Matrix
-
+                
 ## Success Criteria Definition – PatientIntake System
 
 ### 1. Scope Statement
@@ -10,7 +10,25 @@ The PatientIntake system will provide a HIPAA‑compliant web‑based intake wor
 - **Operational Efficiency** – Reduce manual data entry time by 80 % compared with paper forms.
 - **Security Posture** – Achieve zero unauthorized‑access incidents in the first 12 months of production.
 
-### 3. Scope Definition
+### 3. Stakeholder Analysis
+| Stakeholder ID | Role / Concern | Primary Need | Risk if Unmet |
+|----------------|----------------|--------------|----------------|
+| **ST‑01** | Clinician | Immediate access to accurate patient history | Delayed treatment decisions |
+| **ST‑02** | Patient | Secure submission of personal health information | Data breach leading to loss of trust |
+| **ST‑03** | Administrator | Manage user permissions and system health | Misconfiguration causing downtime |
+| **ST‑04** | Front‑Desk Staff | Fast intake processing without re‑keying data | Inefficient workflow increasing wait times |
+| **ST‑05** | Compliance Officer | Verify auditability and HIPAA adherence | Non‑compliance penalties |
+
+### 6. Risk Assessment
+| Risk ID | Description | Likelihood | Impact | Concrete Mitigation Actions |
+|---------|-------------|------------|--------|------------------------------|
+| **RISK‑001** | Unauthorized data exposure during transmission or storage | Medium (M) | High (H) | Implement field‑level AES‑256 encryption; enforce TLS 1.3 for all network traffic; quarterly penetration testing; rotate encryption keys every 90 days. |
+| **RISK‑002** | Open‑source component vulnerabilities leading to exploitability | Medium (M) | Medium (M) | Generate Software Bill of Materials (SBOM) for all dependencies; run weekly vulnerability scans with OWASP Dependency‑Check; apply patches within 48 hours of release; maintain a hardened baseline Docker image. |
+| **RISK‑003** | Deployment misconfiguration in air‑gapped environment causing service outage or data leakage | Low (L) | High (H) | Use immutable Docker images signed with Notary; enforce host OS hardening checklist; conduct pre‑deployment configuration review sign‑off; maintain disaster‑recovery runbooks stored offline. |
+| **RISK‑004** | Compliance audit gaps (missing logs or incomplete encryption evidence) | Medium (M) | High (H) | Automate audit log integrity verification nightly; retain cryptographic proof of encryption key management; schedule internal HIPAA audit quarterly with documented findings. |
+| **RISK‑005** | Resource exhaustion under peak load affecting response time SLA | Low (L) | Medium (M) | Implement auto‑scaling of stateless front‑end containers within the air‑gap using Docker Swarm mode; provision database connection pool sizing based on load test results; monitor latency thresholds and trigger alerts at >180 ms. |
+
+### 7. Scope Definition
 
 #### In‑Scope
 - Web front‑end for structured intake forms.

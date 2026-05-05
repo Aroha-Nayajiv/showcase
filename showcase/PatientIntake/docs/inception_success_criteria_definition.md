@@ -1,5 +1,5 @@
 # Success Criteria Definition
-
+                
 ## Success Criteria Definition – PatientIntake System
 
 ### 1. Scope Statement

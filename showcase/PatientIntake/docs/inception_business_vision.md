@@ -1,5 +1,5 @@
 # Business Vision (Overview)
-
+                
 ## Business Vision and High-Level Objectives
 
 **Vision**

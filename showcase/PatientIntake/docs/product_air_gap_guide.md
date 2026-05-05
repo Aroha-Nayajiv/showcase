@@ -318,38 +318,56 @@ save as `/opt/patientintake/docker-compose.yml`.
 and note that all network traffic stays within the internal bridge; no external ports are exposed beyond HTTPS (443) and HTTP (80) on the host firewall.
 
 ### 7. Harden Host Firewall (Air‑Gap Enforcement)
-and block all outbound connections:
-and ensure DNS is internal only.
-and verify no external traffic can leave.
-and document steps as shown above.
-and confirm compliance with ACs.
-and test with `tcpdump`.
-and ensure logs show zero outbound packets after startup.
-and confirm firewall rules are persisted across reboots.
-and document any exceptions for internal monitoring only.
-and keep them minimal.
-and review regularly.
-and update as needed.
-and maintain audit trail of firewall changes.
-and ensure change management process is followed.
-and involve ST-04 for approvals.
-and record in change log repository.
-and keep evidence for audits.
-and retain logs per policy.
-and archive after retention period as required by KPI-03.
-and ensure encryption at rest for logs.
-and rotate keys periodically per security policy.
-and document rotation schedule.
-and test restoration from backups quarterly.
-and verify integrity of archived logs using hash verification.
-and store backups in encrypted offline media as described in section 10.
-and maintain inventory of backup media locations.
-and enforce strict access controls on backup storage devices.
-and log all backup retrieval actions.
-and retain logs for audit period defined by compliance requirements.
-and destroy expired media securely according to data disposal policy.
-and update asset registry with backup media IDs if needed.
-and ensure compliance with RISK-01 mitigation strategies throughout this process.
+
+Apply the following checklist to lock down the host and enforce air‑gap isolation.
+
+#### 7.1 Block Outbound Connections
+1. Reset firewall to deny‑all default:
+   ```bash
+   sudo ufw default deny outgoing
+   sudo ufw default deny incoming
+   ```
+2. Allow only inbound HTTPS and HTTP on the host:
+   ```bash
+   sudo ufw allow in 443/tcp
+   sudo ufw allow in 80/tcp
+   ```
+3. Allow loopback and inter‑container traffic on the Docker bridge:
+   ```bash
+   sudo ufw allow in on docker0
+   ```
+4. Enable the firewall:
+   ```bash
+   sudo ufw enable
+   ```
+
+#### 7.2 Lock Down DNS
+5. Configure `/etc/resolv.conf` to point only to an internal DNS server (e.g., `nameserver 10.0.0.1`). Remove any public resolvers (`8.8.8.8`, `1.1.1.1`).
+6. Verify resolution of external domains fails from within each container:
+   ```bash
+   docker exec patientintake_web nslookup google.com && echo "FAIL: external DNS resolves" || echo "PASS"
+   docker exec patientintake_db  nslookup google.com && echo "FAIL: external DNS resolves" || echo "PASS"
+   ```
+
+#### 7.3 Verify Zero Outbound Traffic
+7. Run a 60‑second packet capture after all containers are started:
+   ```bash
+   sudo tcpdump -i eth0 -c 100 'dst port 80 or dst port 443' -w /tmp/airgap_verify.pcap
+   ```
+8. Confirm the capture file contains **zero packets**. Any outbound traffic constitutes a violation and must be investigated before proceeding.
+
+#### 7.4 Persist and Document
+9. Ensure firewall rules survive reboot: `sudo ufw enable` writes persistent rules to `/etc/ufw/`.
+10. Document any exceptions required for internal monitoring (e.g., health‑check endpoints on `10.x.x.x`). Keep exceptions minimal and approved by the System Administrator (ST‑04).
+11. Record all firewall changes in the project change log repository. Every change must follow the change management process and include ST‑04 approval.
+
+#### 7.5 Log Retention and Backup
+12. Retain firewall and audit logs per compliance policy (minimum 7 years per KPI‑03).
+13. Encrypt logs at rest using AES‑256; rotate encryption keys per the documented security schedule.
+14. Test restoration from log backups quarterly and verify integrity using SHA‑256 hash verification.
+15. Store backups on encrypted offline media; maintain an inventory of backup media locations with strict access controls.
+16. Log all backup retrieval actions. Destroy expired media securely per the data disposal policy.
+17. Ensure all steps comply with RISK‑01 mitigation strategies throughout this process.
 
 ## Patient Intake Feature Specification
 

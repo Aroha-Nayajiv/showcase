@@ -1,5 +1,5 @@
 # Business Requirements
-
+                
 # 1. Business Vision
 The PatientIntake system will enable healthcare providers to capture patient demographics, insurance information, and comprehensive medical history through a secure web form while fully complying with HIPAA § 164.312(a)(2)(iv) encryption safeguards. By leveraging only open‑source components, the solution avoids vendor lock‑in and reduces total cost of ownership, supporting on‑premise deployment in air‑gapped environments. Success will be measured by regulatory compliance, operational efficiency gains, and measurable improvements in data integrity and auditability.
 

@@ -1,5 +1,5 @@
 # Deliverable scope for inception compliance requirements; detailed specification in Executor phase.
-
+                
 ### 1. Business Objective
 The PatientIntake project will deliver a HIPAA‑compliant, open‑source patient intake system that captures demographics, insurance information, and medical history via a structured web form. The solution must enable authorized staff (admin, clinician, front‑desk) to store encrypted records in a local PostgreSQL instance, generate auditable PDF summaries, and operate entirely within an air‑gapped on‑prem environment using Docker Compose.
 
@@ -37,7 +37,7 @@ The PatientIntake project will deliver a HIPAA‑compliant, open‑source patien
 ### 5. Governance & Approval Process
 All artifacts produced in this inception phase will be reviewed by the Project Sponsor, Compliance Officer, and Technical Lead before sign‑off. The sign‑off checklist includes verification of each functional requirement against its acceptance criteria, confirmation that all KPI targets are measurable, and validation that identified risks have concrete mitigation actions. A RACI matrix (artifact ID RACI-001) defines responsibility for each deliverable.
 
-### 6. Open Issues
+### 8. Open Issues
 * Detailed data model definitions will be produced in the Design phase.
 * API contract specifications are deferred to the Detailed Design artifact.
 
@@ -47,10 +47,10 @@ All artifacts produced in this inception phase will be reviewed by the Project S
 
 # Inception Phase – Business Vision, Stakeholder Needs, Requirements, and Risks
 
-## 7. Business Vision & Scope
+## 9. Business Vision & Scope
 The Patient Intake initiative delivers a HIPAA‑compliant, open‑source patient intake system that captures demographics, insurance data, and medical history through a secure web form. Submissions are encrypted at rest and in transit, stored in a locally hosted PostgreSQL database with role‑based access control (admin, clinician, front‑desk). Authorized staff can generate a PDF summary that includes a watermark and export timestamp. The solution is containerised with Docker Compose for on‑prem deployment and includes automated unit and integration tests.
 
-## 8. Stakeholder Matrix
+## 10. Stakeholder Matrix
 | Stakeholder | Primary Need | Pain Point / Concern | System Role | Objective |
 |---|---|---|---|---|
 | Patient (ST-02) | Secure, frictionless intake experience that protects PHI | Fear of data exposure; forms perceived as time‑consuming | View‑only (no write) | OBJ‑001: Ensure HIPAA‑compliant data capture and encryption at rest/in transit |
@@ -59,7 +59,15 @@ The Patient Intake initiative delivers a HIPAA‑compliant, open‑source patien
 | Administrator (ST-04) | Governance over configuration, user provisioning, and audit log retention | Need centralized control without exposing PHI | Full system privileges; manage roles and audit logs | OBJ‑004: Maintain immutable audit log for seven years meeting HIPAA §164.312(b) |
 | Compliance Officer (ST-05) | Assurance that processes meet regulatory mandates | Requires evidence of encryption key management and audit trail completeness | Read‑only access to logs and configuration reports | OBJ‑005: Achieve quarterly compliance audit pass rate ≥ 95% |
 
-## 9. RACI Assignment for Core Activities
+## 12. Key Performance Indicators
+| ID | Target |
+|---|---|
+| KPI-01 | Form submission response time <200 ms average |
+| KPI-02 | System availability ≥99.9 % monthly |
+| KPI-03 | Audit log generated for 100 % of submissions |
+| KPI-04 | PDF export includes watermark and timestamp; unauthorized export attempts ≤0 |
+
+## 13. RACI Assignment for Core Activities
 | Activity | Responsible (R) | Accountable (A) | Consulted (C) | Informed (I) |
 |---|---|---|---|---|
 | Define functional requirements (FR‑001 … FR‑005) | Front‑Desk Staff | Administrator | Clinician, Compliance Officer, Patient Representative |
@@ -68,7 +76,7 @@ The Patient Intake initiative delivers a HIPAA‑compliant, open‑source patien
 | Validate workflow timings and usability thresholds (KPI‑01) | Clinician & Front‑Desk Staff | Administrator |
 | Approve final scope and sign‑off package | Administrator | Executive Sponsor |
 
-## 10. Narrative Justification
+## 14. Narrative Justification
 The Patient Intake initiative is anchored in two non‑negotiable constraints: HIPAA compliance and exclusive use of open‑source tooling. Patients require that every field they submit be encrypted both at rest and in transit; the system therefore adopts field‑level AES‑256 encryption and TLS 1.3 transport security, directly satisfying HIPAA §164.312(a)(2)(iv). Their role is limited to view‑only access so they never see other patients’ records.
 
 Front‑Desk staff are the primary data capture engine. Their objective is to complete an intake in under two minutes per patient (OBJ‑002). By granting them create/edit privileges while logging every action, we provide the auditability required by §164.308(a)(1)(ii). The immutable seven‑year audit log addresses both compliance and risk management.
@@ -83,7 +91,7 @@ The RACI matrix clarifies decision authority and communication flow, preventing 
 
 Overall, this analysis delivers a clear, auditable blueprint that aligns stakeholder expectations with regulatory mandates while respecting the open‑source constraint.
 
-## 11. Risk Register
+## 15. Risk Register
 | ID | Description | Likelihood (L/M/H) | Impact (L/M/H) | Mitigation Actions |
 |---|---|---|---|---|
 | RISK-01 | Unauthorized disclosure of PHI during transmission or storage due to inadequate encryption controls. | M | H | Implement field‑level AES‑256 encryption for all form fields at rest; enforce TLS 1.3 for in‑flight data; rotate keys every 90 days using open‑source Vault alternative; log every key retrieval. |
@@ -91,34 +99,41 @@ Overall, this analysis delivers a clear, auditable blueprint that aligns stakeho
 | RISK-03 = Misconfiguration of Docker Compose or host OS leading to accidental exposure of PostgreSQL port or audit logs. | L | H Implement CIS Docker Benchmarks hardening; disable external network interfaces on database container; enforce host firewall rules; conduct quarterly configuration audits using Lynis. |
 | RISK-04 = Incomplete audit logging or log tampering that would prevent compliance verification during a HIPAA audit. | M | H Design immutable append‑only audit log stored on WORM storage; retain logs for seven years; verify log integrity daily with SHA‑256 hash chaining; restrict log write permissions to system service account only. |
 
-## 12. Detailed Mitigation Plans
+## 16. Detailed Mitigation Plans
 
-### 12.1 Encryption & Key Management (RISK-01)
+### 16.1 Encryption & Key Management (RISK-01)
 * Use OWASP‑vetted field‑level encryption libraries written in Go/Python.
 * Each form field is encrypted client‑side before transmission; server stores ciphertext only.
 * TLS 1.3 termination performed by Caddy reverse proxy configured with strong cipher suites.
 * Keys reside in HashiCorp Vault OSS replica; access limited to application service account; every retrieval logged.
 * Quarterly key rotation exercises are scheduled and documented in change management logs.
 
-### 12.2 Dependency Hardening (RISK-02)
+### 16.2 Dependency Hardening (RISK-02)
 * Generate SBOM with CycloneDX on each CI run.
 * OWASP Dependency‑Check scans for CVE ≥7; build fails on detection.
 * Security champion reviews new third‑party packages before merge.
 * Monthly security bulletin disseminated to development team.
 
-### 12.3 Container & Host Hardening (RISK-03)
+### 16.3 Container & Host Hardening (RISK-03)
 * Apply CIS Docker Benchmarks during image build.
 * Use Docker Compose version pinning; set `restart: unless-stopped`.
 * Disable external exposure of PostgreSQL port via `ports: []` inside compose file; rely on internal network only.
 * Host firewall (`ufw`) blocks inbound traffic except from trusted LAN subnet.
 * Quarterly audits executed with Lynis report reviewed by Infrastructure Lead.
 
-### 12.4 Immutable Audit Logging (RISK-04)
+### 16.4 Immutable Audit Logging (RISK-04)
 * Configure PostgreSQL logical replication to write audit events to separate WORM volume.
 * Each log entry includes SHA‑256 hash chained to previous entry.
 * Daily cron job verifies hash chain integrity; alerts on mismatch.
 * Retention policy enforced via filesystem immutable attribute (`chattr +i`).
 * Access to logs limited to Administrator role; read operations logged as well.
+
+## Stakeholder Identification and Needs
+| Stakeholder ID | Role | Primary Need |
+|---|---|---|
+| ST-01 | Clinical staff | Quick access to accurate patient demographics and medical history during care delivery |
+| ST-02 | Patients | Assurance that personal health information is collected and stored confidentially |
+| ST-03 | Compliance officers | Verifiable audit trails and encryption evidence for regulatory inspections |
 
 ## Compliance Alignment
 The above controls map directly to HIPAA Security Rule:

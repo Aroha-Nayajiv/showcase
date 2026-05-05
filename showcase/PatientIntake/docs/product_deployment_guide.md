@@ -4,7 +4,7 @@
 
 The following personas capture the core human actors who will interact with the HIPAA‑compliant patient intake system during deployment and daily operation. Each persona is described with role responsibilities, HIPAA‑related security concerns, and concrete workflow interactions that must be supported by the system.
 
-### 1. Front Desk Clerk (Role ID: PER-001)
+### 1. Front Desk Clerk (Role ID: PER-01)
 **Primary Goal:** Capture accurate patient demographics, insurance information, and initial medical history at the point of entry.
 **HIPAA Concerns:** Must ensure that all entered data is encrypted at rest and in transit (refer to FR‑001 and NFR‑001). The clerk should never see unencrypted protected health information (PHI) beyond what is displayed in the secure web form.
 **Workflow Interactions:**
@@ -15,7 +15,7 @@ The following personas capture the core human actors who will interact with the 
 5. **Confirmation** – Clerk receives a non‑PHI confirmation number to give to the patient.
 **Security Controls:** Role‑based access control (RBAC) limits the clerk to create operations only; they cannot read or modify existing records.
 
-### 2. Clinician (Role ID: PER-002)
+### 2. Clinician (Role ID: PER-02)
 **Primary Goal:** Review patient‑submitted medical history and update clinical notes securely.
 **HIPAA Concerns:** Must have read‑only access to PHI unless explicitly granted edit rights; all access must be logged (FR‑003) and immutable per audit requirements.
 **Workflow Interactions:**
@@ -26,7 +26,7 @@ The following personas capture the core human actors who will interact with the 
 5. **Logout** – Session termination triggers audit log entry.
 **Security Controls:** RBAC grants read and append permissions; any attempt to edit original intake fields is denied and logged as a security event.
 
-### 3. Patient (Role ID: PER-003)
+### 3. Patient (Role ID: PER-03)
 **Primary Goal:** Provide personal and medical information securely and receive a copy of the intake summary for personal records.
 **HIPAA Concerns:** Must be assured that their PHI is never exposed in transit or at rest without encryption; they have no direct access to the database but can retrieve a watermarked PDF via a secure link.
 **Workflow Interactions:**
@@ -38,9 +38,9 @@ The following personas capture the core human actors who will interact with the 
 ### Summary Table
 | Persona | ID | Primary Flow | Security Controls |
 |---|---|---|---|
-| Front Desk Clerk | PER-001 | Login → Open Form → Submit → Receive Confirmation | MFA, field‑level AES‑256 encryption, write‑only RBAC |
-| Clinician | PER-002 | Login → Search → View PDF → Append Notes → Logout | Read‑only RBAC, immutable audit log, watermarked PDFs |
-| Patient | PER-003 | Access portal via token → Download PDF → Verify | One‑time token, encrypted download link, audit logging |
+| Front Desk Clerk | PER-01 | Login → Open Form → Submit → Receive Confirmation | MFA, field‑level AES‑256 encryption, write‑only RBAC |
+| Clinician | PER-02 | Login → Search → View PDF → Append Notes → Logout | Read‑only RBAC, immutable audit log, watermarked PDFs |
+| Patient | PER-03 | Access portal via token → Download PDF → Verify | One‑time token, encrypted download link, audit logging |
 
 These personas provide the necessary context for designers to define UI flows, security controls, and deployment configurations that satisfy FR‑001 through FR‑009, NFR‑001 through NFR‑003, and associated KPIs (KPI‑01 to KPI‑04).
 

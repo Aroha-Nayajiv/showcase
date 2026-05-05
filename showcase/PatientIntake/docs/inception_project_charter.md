@@ -1,5 +1,5 @@
 # Project Charter
-
+                
 ## Vision & Scope – HIPAA‑Aligned Patient Intake System
 
 ### 1. Vision Statement
@@ -80,6 +80,15 @@ The PatientIntake project will deliver a HIPAA‑compliant patient intake system
 * PDF exports must contain a visible watermark that includes the patient identifier and the exact export datetime.
 * Docker images must be signed with Notary and verified before deployment.
 
+## Key Performance Indicators (KPI)
+| KPI ID | Metric |
+|---|---|
+| KPI‑01 | Form submission response time < 200 ms under normal load |
+| KPI‑02 | System availability 99.9 % monthly uptime |
+| KPI‑03 | Successful audit log generation for 100 % of read/write events |
+| KPI‑04 | PDF export compliance – watermark present on 100 % of PDFs and timestamp accuracy within 1 second |
+| KPI‑05 | Test coverage ≥ 80 % for unit tests and ≥ 70 % for integration tests |
+
 ## Risk Identification and Prioritization
 | Risk ID | Description | Likelihood | Impact | Mitigation Action |
 |---|---|---|---|---|
@@ -106,4 +115,4 @@ The PatientIntake project will deliver a HIPAA‑compliant patient intake system
 | Activity | Owner(s) | Approver(s) |
 |---|---|---|
 | Approve stakeholder matrix and RACI model | Front Desk Manager, Compliance Officer | Executive Sponsor |
-| Sign‑off on charter document including vision, objectives, KPIs and risk register | Executive Sponsor (not listed) | Executive Sponsor |
+| Sign‑off on charter document including vision, objectives, KPIs and risk register | Project Manager, Security Lead | Executive Sponsor |

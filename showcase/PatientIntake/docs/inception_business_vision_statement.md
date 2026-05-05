@@ -1,3 +1,46 @@
+# Business Vision Statement
+                
+### 1. Scope Definition
+The **PatientIntake** system is limited to four core capabilities:
+1. **Secure capture** of patient demographics, insurance information, and medical history via a web‑based form that encrypts each field at rest and in transit.
+2. **Persistent storage** of the encrypted submissions in a locally hosted PostgreSQL instance protected by role‑based access control (admin, clinician, front‑desk).
+3. **PDF intake summary generation** that applies a dynamic watermark containing the staff member’s name and a timestamp; the PDF is encrypted at rest and can be downloaded only by authorized roles.
+4. **Automated testing** that provides unit and integration coverage for form validation, encryption handling, and access‑control edge cases.
+All components are packaged as Docker containers and deployed with Docker Compose on an air‑gapped on‑premises environment. No external cloud services or proprietary libraries are used.
+
+### 2. Architecture Vision
+The solution follows a modular, container‑based architecture built exclusively from open‑source technologies:
+- **Front‑end**: A single‑page application served over TLS 1.3 that performs client‑side validation before transmitting data.
+- **Back‑end service layer**: Stateless microservice that applies AES‑256 field‑level encryption, writes encrypted rows to PostgreSQL, and records every read/write operation in an immutable audit log stored on write‑once storage.
+- **PDF generator**: Isolated container that consumes encrypted records, creates a PDF, adds a watermark and timestamp, encrypts the file, and streams it to the requester.
+- **Infrastructure**: Docker Compose orchestrates the containers; each container runs with the principle of least privilege and is hardened for air‑gap deployment.
+
+### 3. Functional Acceptance Criteria
+| ID | Description | Measurable Acceptance |
+|----|-------------|-----------------------|
+| FR-001 | Secure collection of patient demographics, insurance information, and medical history via web form | 100 % of submitted forms are encrypted at rest and in transit; form validation error rate < 2 % under load test |
+| FR-002 | Role‑based access control for admin, clinician, front‑desk | Access matrix matches defined RBAC tiers; unauthorized attempts are logged and blocked |
+| FR-003 | Immutable audit log for every read/write operation | Log entries created for 100 % of transactions; retention period 7 years verified quarterly |
+| FR-004 | PDF intake summary generation with watermark and timestamp | PDF generated for every completed record; watermark includes staff name; timestamp within ±1 s of system clock |
+| FR-005 | Automated unit and integration tests covering validation, encryption, and access control | Test suite achieves ≥ 90 % code coverage; all tests pass in CI pipeline |
+
+### 5. Key Performance Indicators
+| KPI ID | Metric Description | Target |
+|--------|----------------------|--------|
+| KPI-01 | Form Completion Rate – % of sessions resulting in successful submission within 2 min | ≥ 95 % |
+| KPI-02 | Audit Log Completeness – % of transactions logged | 100 % |
+| KPI-03 | PDF Export Accuracy – % of PDFs containing correct watermark and timestamp | 100 % |
+| KPI-04 | Test Coverage Ratio – Automated test coverage percentage | ≥ 90 % |
+
+### 7. Out‑of‑Scope Statement
+The project does **not** include:
+* Integration with external electronic health record (EHR) systems.
+* Development of native mobile applications.
+* Cloud‑based analytics platforms or data warehouses.
+* Any functionality beyond the defined web form capture, PDF generation, immutable audit logging, automated testing, and Docker Compose deployment.
+
+---
+
 ## Business Vision Statement and Success Criteria for PatientIntake
 The **PatientIntake** system will enable health‑care organizations to capture patient demographic, insurance, and medical‑history data in a fully HIPAA‑compliant manner while leveraging only open‑source technologies. By enforcing field‑level encryption, role‑based access control, immutable audit logging, and secure PDF export, the solution delivers a trustworthy intake experience that reduces manual errors, accelerates clinician workflow, and satisfies regulatory auditors.
 
@@ -64,6 +107,13 @@ These alignments ensure that every functional component directly supports a meas
 | KPI-04 | PDF export security compliance (watermark present, timestamp recorded) | 100 % compliance |
 | KPI-05 | Test coverage for critical paths (form validation, encryption handling, RBAC) | ≥ 80 % of statements |
 
+### Acceptance Criteria per Objective
+* **OBJ‑001** – Clinicians can retrieve a patient’s complete medical history within 2 seconds of request; all retrieved records must be verified against role permissions.
+* **OBJ‑002** – Patients receive a TLS 1.3 secured page; submitted fields are encrypted at rest using AES‑256; encryption key rotation occurs every 90 days without data loss.
+* **OBJ‑003** – Front‑Desk staff can create and edit their own intake entries; average registration time reduced by at least 30 % compared to baseline manual process.
+* **OBJ‑004** – Administrators can add/remove users, modify RBAC policies, and view immutable audit logs via an admin console; any policy change is logged with user ID and timestamp.
+* **OBJ‑005** – Compliance officers can generate read‑only audit reports covering the previous 90 days; reports must be exportable as tamper‑evident PDFs meeting HIPAA §164.312(b) requirements.
+
 ## Traceability Matrix
 * Functional Requirements: FR-001 (Secure demographic capture), FR-002 (Insurance information capture), FR-003 (Medical history storage), FR-004 (PDF summary generation), FR-005 (Automated testing suite).
 * Non‑Functional Requirements: NFR-001 (<200 ms response time), NFR-002 (99.9 % uptime), NFR-003 (Audit logging), NFR-004 (Role-based access control), NFR-005 (Test coverage thresholds).
@@ -72,14 +122,21 @@ These alignments ensure that every functional component directly supports a meas
 # Business Vision
 The Patient Intake system will enable healthcare providers to capture patient demographic, insurance, and medical history information in a secure, HIPAA‑compliant web form. The solution will be built exclusively with open‑source components, run on‑premises behind an air‑gap, and provide auditable PDF summaries for clinical staff.
 
-## Acceptance Criteria
-* **FR‑001** – All PHI fields are encrypted with AES‑256 at rest and TLS 1.3 in transit; automated scans must report 100 % compliance (KPI‑002). 
-* **FR‑002** – Role‑based access control is enforced via PostgreSQL row‑level security; attempts to access unauthorized records are denied and logged.
-* **FR‑003** – Audit log captures timestamp, user ID, operation type, and affected record ID for 100 % of events (KPI‑003).
-* **FR‑004** – Generated PDFs contain a visible watermark (“Confidential – Patient Intake”) and an embedded timestamp; checksum comparison against source data shows zero differences (KPI‑004).
-* **FR‑008** – Docker‑Compose deployment completes on a fresh air‑gap server without internet access; installation script returns success status on first run (KPI‑005).
-* **NFR‑001** – Form validation latency measured over 1 000 submissions remains under 200 ms average.
-* **NFR‑002** – System uptime logs show ≥ 99.9 % availability over the monitoring period.
+## Risk Register & Mitigations
+| Risk ID | Description | Mitigation |
+|---|---|---|
+| RISK‑001 | Unauthorized exposure of PHI due to weak encryption keys | Enforce TLS 1.3 + AES‑256 field encryption; rotate keys quarterly; store keys in a hardware security module (HSM) |
+| RISK‑002 | Vulnerable third‑party libraries introducing security flaws | Run OWASP Dependency‑Check weekly; apply patches within 30 days of release |
+| RISK‑003 | Misconfiguration of Docker containers leading to privilege escalation | Provide hardened Docker‑Compose templates; execute pre‑deployment validation scripts; conduct staff training sessions |
+
+## KPI Mapping
+| KPI ID | Target | Linked Requirement(s) |
+|---|---|---|
+| KPI‑001 | ≥95 % form completion on first attempt | FR‑001, NFR‑001 |
+| KPI‑002 | 100 % encryption compliance (rest & transit) | FR‑001 |
+| KPI\-003 | 100 % audit log coverage | FR‑003, NFR‑003 |
+| KPI\-004 | 0 % data loss in PDFs (checksum match) | FR\-004, NFR\-004 |
+| KPI\-005 | 100 % successful air‑gap deployments on first try | FR\-008, FR\-009 |
 
 ## Governance & Traceability
 All requirements are traceable to the stakeholder who owns them:

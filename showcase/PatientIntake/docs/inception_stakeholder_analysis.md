@@ -1,5 +1,5 @@
 # Stakeholder Analysis
-
+                
 ### Strategic Objectives
 1. **Regulatory Assurance** – Achieve full compliance with HIPAA Security Rule §164.312(a)(2)(iv) for encryption at rest and in transit (OBJ-001).
 2. **Operational Efficiency** – Reduce manual data entry time by 40 % compared with paper-based intake, measured via average form completion duration (OBJ-002).

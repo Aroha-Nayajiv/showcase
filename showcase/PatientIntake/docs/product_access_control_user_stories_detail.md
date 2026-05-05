@@ -1,5 +1,5 @@
 # Access Control User Stories
-
+                
 ### Personas
 | Persona ID | Role               | Description                                                                                     | Primary Goals                                            | Key Permissions                                          |
 |-----------|--------------------|-------------------------------------------------------------------------------------------------|----------------------------------------------------------|------------------------------------------------------------|
@@ -26,6 +26,8 @@
   - `resource_id`
   - `outcome` (SUCCESS, FAILURE)
   - `justification` (optional, for emergency access)
+
+### User Stories & Acceptance Criteria
 
 #### US-002 – Clinician: Review & Augment Medical History
 **Goal**: Retrieve a patient's complete medical‑history record for review and add clinical notes.
@@ -58,8 +60,6 @@
 5. **Multi‑Tenant Isolation (SAAS Context)** – Each tenant’s patient data stored in separate schema; RBAC enforced per tenant; encryption keys scoped per tenant.
 
 *All specifications comply with HIPAA technical safeguards and align with project KPIs and risk mitigation strategies.*
-
-## User Stories and Acceptance Criteria
 
 ### US-001: Front Desk Clerk submits new patient intake form
 **Persona:** ST-01 (Front Desk Clerk)  

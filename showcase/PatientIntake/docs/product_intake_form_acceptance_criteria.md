@@ -1,5 +1,5 @@
 # Acceptance Criteria Document
-
+                
 ## Personas for the HIPAA‑Compliant Patient Intake System
 
 The following personas are derived directly from the project brief and the asset registry (ST-01, ST-02, ST-03). They capture the distinct roles that will interact with the intake form, define their access privileges, and outline the security expectations required for HIPAA compliance.

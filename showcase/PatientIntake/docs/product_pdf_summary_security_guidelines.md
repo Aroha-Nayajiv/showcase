@@ -1,5 +1,5 @@
 # PDF Export Security Guidelines
-
+                
 ## Personas
 
 ### Front Desk Clerk (ST-01 – Clinical staff)
@@ -128,6 +128,9 @@ Success Metrics: Zero patient‑initiated PDF download attempts recorded in audi
 | outcome             | String | `success`, `denied`, `error` |
 | timestamp           | ISO‑8601 UTC | Time of action |
 | digital_signature   | String | HMAC‑SHA256 of log entry for integrity |
+
+## Transport Security
+All PDF download endpoints require TLS 1.3 with forward secrecy (ECDHE).
 
 ## Rate Limiting
 Maximum **5 export requests per minute per user**. Exceeding limit returns HTTP 429 with message “Rate limit exceeded”.

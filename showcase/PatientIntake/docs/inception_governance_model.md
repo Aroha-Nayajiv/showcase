@@ -91,6 +91,7 @@ Members: Security Operations Center staff. Role: continuously monitors immutable
 |--------|--------------------------------------------------------|------------|--------|-----------------------------------------------------------------------------------------------------|-------|
 | RISK-01| Unauthorized data exposure via compromised credentials   | Medium     | High   | MFA + periodic credential rotation; strict RBAC per tier                                            |	CISO |
 | RISK-02| Open-source component vulnerabilities discovered post-deployment |	High      |	High   |	Automated SBOM scanning (Syft); patch critical CVEs within 30 days                               |	Security Engineer |
+| RISK-03| Misconfiguration of Docker Compose or host firewall leading to accidental exposure of PostgreSQL in air‑gapped environment |	Medium    |	High   |	Immutable Docker images signed with Notary; enforce host firewall rules per deployment guide; run pre‑deployment validation script checking open ports and volume permissions |	Infrastructure Engineer |
 | RISK-04| Compliance audit gaps due to incomplete documentation of controls |	Low       |	High   |	Maintain live control matrix in Confluence; quarterly internal audit; external audit readiness checklist |	Compliance Officer |
 
 ## 12. Scope Definition

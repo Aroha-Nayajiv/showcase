@@ -1,5 +1,5 @@
 # Intake Form User Journey Map
-
+                
 ## 1. Personas
 
 | ID | Persona | Goal | Primary Tasks | Security / Compliance |
