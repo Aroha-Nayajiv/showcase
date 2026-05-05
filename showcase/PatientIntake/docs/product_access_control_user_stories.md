@@ -1,13 +1,13 @@
 # Access Control User Stories
                 
 # Personas
-## Admin (ST-01)
+## Admin (ST-001)
 System administrator responsible for managing user accounts, configuring role permissions, and reviewing audit logs.
 
-## Clinician (ST-02)
+## Clinician (ST-002)
 Healthcare provider who reviews patient intake forms, accesses medical history, and generates PDF summaries.
 
-## Front Desk Staff (ST-03)
+## Front Desk Staff (ST-003)
 Reception personnel who captures patient demographics, insurance information, and initial medical history via the web form.
 
 # Design Needs (for Design Phase)
@@ -48,11 +48,11 @@ Reception personnel who captures patient demographics, insurance information, an
 # Prioritized User Story Table
 | ID | Persona | Description | Business Value / KPI Alignment | MVP Priority |
 |----|---------|-------------|---------------------------------|---------------|
-| US-001 | Front‑Desk Clerk (ST-03) | Create a new patient intake record via the encrypted web form | Satisfies **FR‑001** (secure demographic capture) & **NFR‑003** (audit logging). Aligns with **KPI-001** (response time <200 ms). | 1 |
-| US-002 | Clinician (ST-02) | View a patient's completed intake record and PDF summary | Enables care delivery; ties to **FR‑002**, **KPI-003** (audit log generation). | 2 |
-| US-003 | Admin (ST-01) | Configure role‑based permissions and audit‑log retention policies | Ensures least‑privilege access; mitigates **RISK-001**, **RISK-003**. Aligns with **KPI-002** (system uptime). | 1 |
-| US-004 | Front‑Desk Clerk (ST-03) | Edit a patient's demographic fields before submission is finalized | Reduces downstream correction cost; supports data quality. Aligns with **KPI-005** (test coverage targets). | 3 |
-| US-005 | Clinician (ST-02) | Export a PDF intake summary with watermark and timestamp | Provides legally‑trackable document; fulfills **FR‑005**, **KPI-004** (PDF export security compliance). |
+| US-001 | Front‑Desk Clerk (ST-003) | Create a new patient intake record via the encrypted web form | Satisfies **FR‑001** (secure demographic capture) & **NFR‑003** (audit logging). Aligns with **KPI-001** (response time <200 ms). | 1 |
+| US-002 | Clinician (ST-002) | View a patient's completed intake record and PDF summary | Enables care delivery; ties to **FR‑002**, **KPI-003** (audit log generation). | 2 |
+| US-003 | Admin (ST-001) | Configure role‑based permissions and audit‑log retention policies | Ensures least‑privilege access; mitigates **RISK-001**, **RISK-003**. Aligns with **KPI-002** (system uptime). | 1 |
+| US-004 | Front‑Desk Clerk (ST-003) | Edit a patient's demographic fields before submission is finalized | Reduces downstream correction cost; supports data quality. Aligns with **KPI-005** (test coverage targets). | 3 |
+| US-005 | Clinician (ST-002) | Export a PDF intake summary with watermark and timestamp | Provides legally‑trackable document; fulfills **FR‑005**, **KPI-004** (PDF export security compliance). |
 
 # Backlog Prioritization Rationale
 1. **Core Data Capture (US-001)** – Highest priority because without a secure intake form the system cannot collect PHI; directly satisfies **FR‑001**, **NFR‑003**, and performance target **NFR‑001**.

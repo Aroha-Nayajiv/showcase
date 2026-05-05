@@ -73,9 +73,9 @@ These refined user stories, acceptance criteria in Given/When/Then format, enhan
 ## User Stories Table
 | User Story ID | Persona / Stakeholder | Goal / Description | Business Value / Outcome | Priority |
 |----------------|----------------------|-----------------------|--------------------------|----------|
-| US-001 | Front Desk Clerk (ST-01) | Enter patient demographics, insurance information, and medical history into a structured web form | Patient record is captured securely and ready for clinician review while complying with HIPAA encryption requirements | 1 |
-| US-002 | Clinician (ST-02) | View and verify a completed intake record and request a PDF summary | Enables informed treatment decisions and provides documentation with staff watermark and access timestamp for auditability | 2 |
-| US-003 | System Administrator (ST-03) | Configure role‑based permissions and review immutable audit logs of all read/write operations | Ensures only authorized personnel access sensitive data and demonstrates compliance during audits | 1 |
+| US-001 | Front Desk Clerk (ST-001) | Enter patient demographics, insurance information, and medical history into a structured web form | Patient record is captured securely and ready for clinician review while complying with HIPAA encryption requirements | 1 |
+| US-002 | Clinician (ST-002) | View and verify a completed intake record and request a PDF summary | Enables informed treatment decisions and provides documentation with staff watermark and access timestamp for auditability | 2 |
+| US-003 | System Administrator (ST-003) | Configure role‑based permissions and review immutable audit logs of all read/write operations | Ensures only authorized personnel access sensitive data and demonstrates compliance during audits | 1 |
 
 #### US‑002 – Clinician Review & PDF Generation
 * **Given** a Clinician is authenticated with the "clinician" role and accesses an existing patient record created by the Front Desk Clerk,

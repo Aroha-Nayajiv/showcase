@@ -66,22 +66,7 @@ All log entries are written to a dedicated PostgreSQL table `audit_log` with app
 
 #### 5.1 Role‑Based Access Control Policy (JSON)
 
-{
-  "policy": {
-    "PER-01": {
-      "create": ["intake_record"],
-      "read": ["own_intake_record"],
-      "export_pdf": ["completed_intake"]
-    },
-    "PER-02": {
-      "read": ["any_intake_record"],
-      "export_pdf": ["any_completed_intake"]
-    },
-    "PER-03": {
-      "read_audit": ["all"]
-    }
-  }
-}
+- **policy**: {'PER-01': {'create': ['intake_record'], 'read': ['own_intake_record'], 'export_pdf': ['completed_intake']}, 'PER-02': {'read': ['any_intake_record'], 'export_pdf': ['any_completed_intake']}, 'PER-03': {'read_audit': ['all']}}
 
 #### 5.2 Encryption Specification
 - Algorithm: AES‑256‑GCM for field‑level encryption.
@@ -120,13 +105,13 @@ All log entries are written to a dedicated PostgreSQL table `audit_log` with app
 ### US-002 – Front Desk Clerk Export PDF
 **Role:** Front Desk Clerk
 **Goal:** Provide a printed copy of the intake summary after registration without exposing PHI to unauthorized parties.
-**Traceability:** FR-001, FR-002, FR-003, NFR-003, KPI-01
+**Traceability:** FR-001, FR-002, FR-003, NFR-003, KPI-001
 
 ## Traceability Matrix
 | Artifact ID | Linked Requirement(s) |
 |-------------|------------------------|
-| US-001 | FR-001, FR-002, FR-003, NFR-003, KPI-01 |
-| US-002 | FR-001, FR-002, FR-003, NFR-003, KPI-01 |
-| US-003 | FR-004, NFR-003, KPI-01 |
+| US-001 | FR-001, FR-002, FR-003, NFR-003, KPI-001 |
+| US-002 | FR-001, FR-002, FR-003, NFR-003, KPI-001 |
+| US-003 | FR-004, NFR-003, KPI-001 |
 | Permission Matrix | FR-001…FR-004 |
 | Audit Log Schema | NFR-003 |

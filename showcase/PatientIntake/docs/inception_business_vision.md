@@ -18,11 +18,11 @@ The PatientIntake project will deliver a fully HIPAA‑compliant, open‑source 
 
 | Stakeholder | Role ID | Primary Business Need | Pain Point Addressed | RBAC Tier | Strategic Objective Supported |
 |--------------|----------|-----------------------|---------------------|----------|------------------------------|
-| Patient | ST-02 | Submit accurate demographic, insurance, and medical history data securely | Fear of PHI exposure during transmission or storage | Create‑only (encrypted submissions) | OBJ-001: Achieve 100 % encrypted data capture at rest and in transit |
-| Front‑Desk Staff | ST-01 | Register patients quickly and verify insurance eligibility | Manual re‑entry of data leads to errors and delays | Read‑only access to submissions; flag incomplete records | OBJ-002: Reduce intake processing time by 30 % |
-| Clinician | ST-03 | Review complete medical history to inform care decisions | Need timely access while preserving auditability | Read‑write access with edit logs captured | OBJ-003: Ensure 99 % of record accesses are logged immutably |
-| Administrator | ST-04 | Configure system settings, manage user accounts, oversee audit logs | Must balance security hardening with operational continuity | Full admin privileges including user provisioning and log retention policy management | OBJ-004: Maintain audit log retention of 7 years on immutable storage |
-| Compliance Officer | ST-05 | Verify that all processes meet HIPAA and internal policy requirements | Requires evidence of encryption key lifecycle and access logs | Read‑only access to audit logs and configuration change history | OBJ-005: Pass quarterly compliance audit with zero critical findings |
+| Patient | ST-002 | Submit accurate demographic, insurance, and medical history data securely | Fear of PHI exposure during transmission or storage | Create‑only (encrypted submissions) | OBJ-001: Achieve 100 % encrypted data capture at rest and in transit |
+| Front‑Desk Staff | ST-001 | Register patients quickly and verify insurance eligibility | Manual re‑entry of data leads to errors and delays | Read‑only access to submissions; flag incomplete records | OBJ-002: Reduce intake processing time by 30 % |
+| Clinician | ST-003 | Review complete medical history to inform care decisions | Need timely access while preserving auditability | Read‑write access with edit logs captured | OBJ-003: Ensure 99 % of record accesses are logged immutably |
+| Administrator | ST-004 | Configure system settings, manage user accounts, oversee audit logs | Must balance security hardening with operational continuity | Full admin privileges including user provisioning and log retention policy management | OBJ-004: Maintain audit log retention of 7 years on immutable storage |
+| Compliance Officer | ST-005 | Verify that all processes meet HIPAA and internal policy requirements | Requires evidence of encryption key lifecycle and access logs | Read‑only access to audit logs and configuration change history | OBJ-005: Pass quarterly compliance audit with zero critical findings |
 
 ---
 
@@ -65,10 +65,10 @@ Providing each stakeholder with precisely the access required reduces the attack
 
 | KPI ID | Metric Description | Target | Measurement Method |
 |--------|----------------------|--------|-------------------|
-| KPI-01 | Form Completion Rate | ≥ 90 % of patients complete the web form without assistance | Weekly submission analytics from application logs |
-| KPI-02 | Audit Log Coverage | 100 % of read/write/export actions logged | Log aggregation dashboard verifying event capture |
-| KPI-03 | PDF Export Accuracy | Zero mismatches between stored data and generated PDF (checksum validation) |
-| KPI-04 | Deployment Success in Air‑Gap Lab | First successful Docker‑Compose spin‑up within 30 minutes |
+| KPI-001 | Form Completion Rate | ≥ 90 % of patients complete the web form without assistance | Weekly submission analytics from application logs |
+| KPI-002 | Audit Log Coverage | 100 % of read/write/export actions logged | Log aggregation dashboard verifying event capture |
+| KPI-003 | PDF Export Accuracy | Zero mismatches between stored data and generated PDF (checksum validation) |
+| KPI-004 | Deployment Success in Air‑Gap Lab | First successful Docker‑Compose spin‑up within 30 minutes |
 
 ---
 
@@ -76,11 +76,11 @@ Providing each stakeholder with precisely the access required reduces the attack
 
 | Risk ID | Description | Likelihood / Impact | Mitigation Action |
 |---------|-------------|----------------------|-------------------|
-| RISK-01 | Unauthorized data exposure during transmission | High / High | Enforce TLS 1.3 with perfect forward secrecy; conduct quarterly penetration testing; implement strict cipher suite whitelist |
-| RISK-02 | Open‑source component vulnerabilities | Medium / Medium | Deploy OWASP Dependency‑Check CI pipeline; schedule monthly vulnerability review; apply rapid patching process for critical CVEs |
-| RISK-03 | Misconfiguration of role‑based access controls leading to over‑privileged users | Low / High | Conduct RBAC review workshops; automate policy linting using Open Policy Agent; enforce least‑privilege via scripted provisioning |
-| RISK-04 | Audit log tampering or loss | Low / High | Store logs on write‑once immutable storage; chain log entries using cryptographic hash chaining; perform weekly integrity verification |
-| RISK-05 | Insufficient documentation for air‑gap deployment causing rollout delays | Medium / Medium | Produce step‑by‑step installation guide; include verification checklist; run a mock deployment in a controlled lab before production |
+| RISK-001 | Unauthorized data exposure during transmission | High / High | Enforce TLS 1.3 with perfect forward secrecy; conduct quarterly penetration testing; implement strict cipher suite whitelist |
+| RISK-002 | Open‑source component vulnerabilities | Medium / Medium | Deploy OWASP Dependency‑Check CI pipeline; schedule monthly vulnerability review; apply rapid patching process for critical CVEs |
+| RISK-003 | Misconfiguration of role‑based access controls leading to over‑privileged users | Low / High | Conduct RBAC review workshops; automate policy linting using Open Policy Agent; enforce least‑privilege via scripted provisioning |
+| RISK-004 | Audit log tampering or loss | Low / High | Store logs on write‑once immutable storage; chain log entries using cryptographic hash chaining; perform weekly integrity verification |
+| RISK-005 | Insufficient documentation for air‑gap deployment causing rollout delays | Medium / Medium | Produce step‑by‑step installation guide; include verification checklist; run a mock deployment in a controlled lab before production |
 
 ---
 

@@ -99,8 +99,92 @@ This document defines the OpenAPI‑3.0 contracts and technical architecture for
 |                 "operation_type"            "enum(INSERT,SELECT,UPDATE,DELETE)"        "Yes"       "Type of operation logged" |
 |                 "performed_at"               "timestamp with time zone\”                \”Yes”       “When the operation occurred” |
 |                 \“performed_by_user_id”          “uuid”                                      “Yes”       “User who performed the operation”|
-## 4. API Specification
-All endpoints are versioned under `/api/v1` and require a valid Bearer JWT unless noted otherwise.### 4.1 Authentication**POST** `/api/v1/auth/login`*Request*{    "email": "string",    "password": "string"}*Response* (200){    "token": "string",    "expires_at": "datetime",    "user": {      "id": "uuid",      "role": "admin|clinician|front_desk"   } }*Errors*- `ERR-AUTH-001` – 401 Unauthorized – Missing or invalid credentials.### 4.2 Intake Record Creation**POST** `/api/v1/intake`*Request*{    "demographics_encrypted": "base64",    "insurance_encrypted":    "base64",    "medical_history_encrypted": "base64"}*Response* (201){    "record_id": "uuid",    "status":    "created"}*Errors*- `ERR-AUTH-001` – 401 Missing/invalid JWT.- `ERR-VALID-001` – 400 Validation failed (e.g., missing encrypted fields).- `ERR-ACCESS-001` – 403 User lacks permission to create records.- `ERR-SERVER-001` – 500 Encryption or persistence failure.### 4.3 Retrieve Intake Record**GET** `/api/v1/intake/{record_id}`*Response* (200){    "record_id":               "uuid",    "demographics_encrypted":   "base64",    "insurance_encrypted":      "base64",    "medical_history_encrypted":"base64",    "created_at":               "datetime",    "created_by_user_id":      "uuid"}*Errors*Same set as above plus `ERR-VALID-001` for malformed `record_id`.### 4.4 PDF Summary Generation**GET** `/api/v1/intake/{record_id}/pdf`*Response* (200){    "pdf_url":      "https://cdn.example.com/pdfs/{record_id}.pdf",    "generated_at":"datetime"}*Errors*Same as retrieval endpoint; additionally `ERR-SERVER-001` if PDF generation fails.### 4.5 Audit Log Query**GET** `/api/v1/audit/logs`*Query Parameters*- `record_id` (optional) \,\ r - `operation_type` (`INSERT`,`SELECT`,`UPDATE`,`DELETE`) \,\ r - `page` (default 1) \,\ r - `page_size` (default 20)*Response* (200){    "logs": [     {        "log_id":               "uuid",        "entity_type":           "IntakeRecord",        "entity_id":             "uuid", 																																	     	     	     	     	     	     ,\ r       ...	     },	     // additional log objects ...	 ],	     `	     `	     `	     `	     `	     `	     `	     `	     `	     `	     `	     `	     `,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r]
+
+## 4. API Specification
+All endpoints are versioned under `/api/v1` and require a valid Bearer JWT unless noted otherwise.
+
+### 4.1 Authentication
+
+**POST** `/api/v1/auth/login`
+
+*Request*
+
+- **email**: string
+- **password**: string
+
+*Response* (200)
+
+- **token**: string
+- **expires_at**: datetime
+- **user**: {'id': 'uuid', 'role': 'admin|clinician|front_desk'}
+
+*Errors*
+- `ERR-AUTH-001` – 401 Unauthorized – Missing or invalid credentials.
+
+### 4.2 Intake Record Creation
+
+**POST** `/api/v1/intake`
+
+*Request*
+
+- **demographics_encrypted**: base64
+- **insurance_encrypted**: base64
+- **medical_history_encrypted**: base64
+
+*Response* (201)
+
+- **record_id**: uuid
+- **status**: created
+
+*Errors*
+- `ERR-AUTH-001` – 401 Missing/invalid JWT.
+- `ERR-VALID-001` – 400 Validation failed (e.g., missing encrypted fields).
+- `ERR-ACCESS-001` – 403 User lacks permission to create records.
+- `ERR-SERVER-001` – 500 Encryption or persistence failure.
+
+### 4.3 Retrieve Intake Record
+
+**GET** `/api/v1/intake/{record_id}`
+
+*Response* (200)
+
+- **record_id**: uuid
+- **demographics_encrypted**: base64
+- **insurance_encrypted**: base64
+- **medical_history_encrypted**: base64
+- **created_at**: datetime
+- **created_by_user_id**: uuid
+
+*Errors*
+Same set as above plus `ERR-VALID-001` for malformed `record_id`.
+
+### 4.4 PDF Summary Generation
+
+**GET** `/api/v1/intake/{record_id}/pdf`
+
+*Response* (200)
+
+- **pdf_url**: https://cdn.example.com/pdfs/{record_id}.pdf
+- **generated_at**: datetime
+
+*Errors*
+Same as retrieval endpoint; additionally `ERR-SERVER-001` if PDF generation fails.
+
+### 4.5 Audit Log Query
+
+**GET** `/api/v1/audit/logs`
+
+*Query Parameters*
+- `record_id` (optional) \,\ r - `operation_type` (`INSERT`,`SELECT`,`UPDATE`,`DELETE`) \,\ r - `page` (default 1) \,\ r - `page_size` (default 20)
+
+*Response* (200)
+
+{ 
+   "logs": [
+     { 
+       "log_id":               "uuid", 
+       "entity_type":           "IntakeRecord", 
+       "entity_id":             "uuid", 																																	     	     	     	     	     	     ,\ r       ...	     },	     // additional log objects ...	 ],	     `	     `	     `	     `	     `	     `	     `	     `	     `	     `	     `	     `	     `,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	    ...,	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r}]	r]
 
 # 1. Overview
 This technical design defines the PatientIntake system architecture, API contracts, data models, security controls, and deployment topology required to satisfy functional requirements FR-001 (Secure demographic capture), FR-003 (Medical history storage), FR-005 (PDF Intake Summary Generation) and non-functional requirements NFR-001 (Response time <200 ms), NFR-003 (Comprehensive audit logging).
@@ -209,7 +293,7 @@ All error responses follow the shape:
 - **Microservice Landscape**
   - `auth_service`: OAuth2/OpenID Connect provider, issues JWTs with least‑privilege scopes.
   - `intake_service`: Handles form submission, field‑level encryption, and writes encrypted records.
-  - `pdf_service`: Retrieves encrypted records, decrypts them in‑memory, and produces PDF documents using WeasyPrint.
+  - `pdf_service`: Retrieves encrypted records, decrypts them in‑memory, and produces PDF documents using wkhtmltopdf.
   - `audit_service`: Centralised immutable audit logger persisting events to PostgreSQL.
   - `key_management_service` (HashiCorp Vault): Stores the Master Key (MK) and performs DEK derivation/rotation.
 - **Communication**: All inter‑service HTTP calls use **TLS 1.3** (global `tls_version` set to `TLS 1.3`).
@@ -245,23 +329,13 @@ All error responses follow the shape:
 ### 10.1 POST /api/v1/intake
 **Request Body** (JSON):
 
-{
-  "patient_id": "uuid",
-  "form_data": {
-    "first_name": "string",
-    "last_name": "string",
-    "dob": "YYYY-MM-DD",
-    "insurance_number": "string",
-    "diagnosis": "string"
-  }
-}
+- **patient_id**: uuid
+- **form_data**: {'first_name': 'string', 'last_name': 'string', 'dob': 'YYYY-MM-DD', 'insurance_number': 'string', 'diagnosis': 'string'}
 
 **Response** (201 Created):
 
-{
-  "record_id": "uuid",
-  "status": "encrypted"
-}
+- **record_id**: uuid
+- **status**: encrypted
 
 **Errors**:
 - `ERR-VAL-001` (400) – Validation failure.
@@ -289,8 +363,8 @@ All error responses follow the shape:
 | FR-003 | Medical history storage with immutable audit logging. |
 | NFR-001 | Response time <200 ms for form submissions. |
 | NFR-003 | Mandatory audit logging of every read/write operation. |
-| KPI-01 | Response time compliance (linked to NFR-001). |
-| KPI-03 | Successful audit log generation for every submission (linked to NFR-003). |
+| KPI-001 | Response time compliance (linked to NFR-001). |
+| KPI-003 | Successful audit log generation for every submission (linked to NFR-003). |
 
 All API contracts reference these IDs in their documentation sections.
 
@@ -300,12 +374,8 @@ All API contracts reference these IDs in their documentation sections.
 
 ## 15. Open Issues / Knowledge Gaps
 
-{
-  "knowledge_gaps": [
-    "Exact HIPAA §164.312(a)(2)(iv) technical safeguard requirements for encryption key management",
-    "PostgreSQL row-level security performance characteristics at >10M audit log rows"
-  ]
-}
+- Exact HIPAA §164.312(a)(2)(iv) technical safeguard requirements for encryption key management
+- PostgreSQL row-level security performance characteristics at >10M audit log rows
 
 ---
 *Document version: 1.2 – refined per Reviewer_Agent_1 feedback.*

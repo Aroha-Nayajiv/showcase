@@ -12,10 +12,10 @@ The PatientIntake system will provide a web‑based intake form that captures pa
 ### 3. Success Metrics / KPIs
 | KPI ID | Metric | Target | Measurement Method | Rationale |
 |--------|--------|--------|--------------------|----------|
-| KPI-01 | Form Completion Rate | ≥95 % of initiated forms completed without error | Analytics on submission logs vs start events | Ensures high data capture fidelity |
-| KPI-02 | Audit Log Coverage | 100 % of read/write operations logged | Automated audit script comparing DB operation count to log entry count | Demonstrates compliance with HIPAA audit requirements |
-| KPI-03 | PDF Export Security Compliance | 0 % unauthorized PDF export incidents | Security incident tracking over 90‑day period | Protects PHI during downstream distribution |
-| KPI-04 | Encryption Key Rotation Adherence | 100 % of keys rotated within 90‑day window | Quarterly key‑management audit report | Maintains cryptographic hygiene |
+| KPI-001 | Form Completion Rate | ≥95 % of initiated forms completed without error | Analytics on submission logs vs start events | Ensures high data capture fidelity |
+| KPI-002 | Audit Log Coverage | 100 % of read/write operations logged | Automated audit script comparing DB operation count to log entry count | Demonstrates compliance with HIPAA audit requirements |
+| KPI-003 | PDF Export Security Compliance | 0 % unauthorized PDF export incidents | Security incident tracking over 90‑day period | Protects PHI during downstream distribution |
+| KPI-004 | Encryption Key Rotation Adherence | 100 % of keys rotated within 90‑day window | Quarterly key‑management audit report | Maintains cryptographic hygiene |
 
 ### 4. Governance & Ownership
 | Role | Person/Title | Responsibility |
@@ -29,17 +29,17 @@ The PatientIntake system will provide a web‑based intake form that captures pa
 ### 5. Risk Assessment Register
 | Risk ID | Description | Likelihood | Impact | Mitigation Actions (Owner) |
 |---------|-------------|------------|--------|----------------------------|
-| RISK-01 | Unauthorized disclosure of PHI during transmission or storage. | Medium | High | Implement TLS 1.3 for all network traffic; enforce AES‑256 field‑level encryption at rest; rotate encryption keys quarterly; conduct quarterly penetration testing. – **Security Lead** |
-| RISK-02 | Vulnerabilities in open‑source libraries (e.g., outdated cryptography or web framework). | Medium | Medium | Adopt a Software Bill of Materials (SBOM); run automated dependency scanning nightly; apply security patches within 7 days of release; maintain a whitelist of approved versions. – **DevOps Engineer** |
-| RISK-03 | Misconfiguration of Docker Compose or container runtime leading to privilege escalation or data leakage. | Low | High | Harden container images using CIS Benchmarks; enforce least‑privilege container runtime policies; perform automated configuration validation in CI pipeline; store immutable IaC in version control. – **Infrastructure Engineer** |
-| RISK-04 | Incomplete audit logging that fails HIPAA audit requirements. | Low | High | Design immutable append‑only audit log stored on WORM storage; retain logs for minimum 7 years; implement automated log integrity verification daily. – **Compliance Officer** |
-| RISK-05 | Air‑gap deployment constraints causing delayed updates or missing security controls. | Medium | Medium | Create an offline update process with signed release packages; schedule regular air‑gap maintenance windows; document a rollback procedure verified by QA team. – **Operations Manager** |
+| RISK-001 | Unauthorized disclosure of PHI during transmission or storage. | Medium | High | Implement TLS 1.3 for all network traffic; enforce AES‑256 field‑level encryption at rest; rotate encryption keys quarterly; conduct quarterly penetration testing. – **Security Lead** |
+| RISK-002 | Vulnerabilities in open‑source libraries (e.g., outdated cryptography or web framework). | Medium | Medium | Adopt a Software Bill of Materials (SBOM); run automated dependency scanning nightly; apply security patches within 7 days of release; maintain a whitelist of approved versions. – **DevOps Engineer** |
+| RISK-003 | Misconfiguration of Docker Compose or container runtime leading to privilege escalation or data leakage. | Low | High | Harden container images using CIS Benchmarks; enforce least‑privilege container runtime policies; perform automated configuration validation in CI pipeline; store immutable IaC in version control. – **Infrastructure Engineer** |
+| RISK-004 | Incomplete audit logging that fails HIPAA audit requirements. | Low | High | Design immutable append‑only audit log stored on WORM storage; retain logs for minimum 7 years; implement automated log integrity verification daily. – **Compliance Officer** |
+| RISK-005 | Air‑gap deployment constraints causing delayed updates or missing security controls. | Medium | Medium | Create an offline update process with signed release packages; schedule regular air‑gap maintenance windows; document a rollback procedure verified by QA team. – **Operations Manager** |
 
 ### 6. Monitoring and Review
 Risk owners report status in the weekly steering meeting and update likelihood/impact ratings after each major milestone. Any residual risk exceeding a combined rating of **Medium‑High** triggers escalation to the executive sponsor. Automated alerts from SBOM scanner failures, CI pipeline validation failures, and daily audit‑log integrity checks ensure mitigation actions remain effective throughout development and deployment.
 
 ### 7. Alignment with Success Criteria
-The mitigations above directly support the success criteria defined in the KPI artifact: response time <200 ms (RISK-03), 99.9 % system uptime (RISK-03 & RISK-05), full audit‑log retention (RISK-04), and encrypted PHI handling (RISK-01 & RISK-02). By tracking these risks against measurable KPIs, the project can demonstrate compliance during external HIPAA audits.
+The mitigations above directly support the success criteria defined in the KPI artifact: response time <200 ms (RISK-003), 99.9 % system uptime (RISK-003 & RISK-005), full audit‑log retention (RISK-004), and encrypted PHI handling (RISK-001 & RISK-002). By tracking these risks against measurable KPIs, the project can demonstrate compliance during external HIPAA audits.
 
 ### 8. Functional Requirements (FR)
 | Requirement ID | Description | Acceptance Criteria |
@@ -55,11 +55,11 @@ The mitigations above directly support the success criteria defined in the KPI a
 ### 9. Stakeholder Analysis
 | Stakeholder ID & Role | Primary Need | Key Pain Point | RBAC Tier |
 |------------------------|--------------|-----------------|-----------|
-| ST-01: Clinical staff (Clinician) | Quick access to complete patient intake data for care decisions | Delays caused by manual transcription errors | Clinician (read/write) |
-| ST-02: Patients (Patient) | Assurance that personal health information is protected | Fear of privacy breach if data is mishandled | No direct system access (informational) |
-| ST-03: Compliance Officer (Auditor) | Evidence of auditability and policy adherence | Incomplete logging makes audit impossible | Auditor (read‑only) |
-| ST-04: Front‑Desk Staff (Operator) | Efficient intake workflow without re‑entering data later | Redundant data entry into EMR systems slows throughput |
-| ST-05: Administrator (System Admin) | System configuration control and security patching capability | Lack of centralized configuration leads to drift |
+| ST-001: Clinical staff (Clinician) | Quick access to complete patient intake data for care decisions | Delays caused by manual transcription errors | Clinician (read/write) |
+| ST-002: Patients (Patient) | Assurance that personal health information is protected | Fear of privacy breach if data is mishandled | No direct system access (informational) |
+| ST-003: Compliance Officer (Auditor) | Evidence of auditability and policy adherence | Incomplete logging makes audit impossible | Auditor (read‑only) |
+| ST-004: Front‑Desk Staff (Operator) | Efficient intake workflow without re‑entering data later | Redundant data entry into EMR systems slows throughput |
+| ST-005: Administrator (System Admin) | System configuration control and security patching capability | Lack of centralized configuration leads to drift |
 
 ### 10. Business Objectives (OBJ)
 | Objective ID | Statement |

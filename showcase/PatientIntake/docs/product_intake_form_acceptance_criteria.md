@@ -2,7 +2,7 @@
                 
 ## Personas for the HIPAA‑Compliant Patient Intake System
 
-The following personas are derived directly from the project brief and the asset registry (ST-01, ST-02, ST-03). They capture the distinct roles that will interact with the intake form, define their access privileges, and outline the security expectations required for HIPAA compliance.
+The following personas are derived directly from the project brief and the asset registry (ST-001, ST-002, ST-003). They capture the distinct roles that will interact with the intake form, define their access privileges, and outline the security expectations required for HIPAA compliance.
 
 ### PER-01: Clinical Staff (Clinician)
 - **Primary Goal:** Review and update patient medical history to provide appropriate care.

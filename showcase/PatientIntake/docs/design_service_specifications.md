@@ -22,21 +22,17 @@ The following document provides a detailed architectural overview for the HIPAA�
 7. **API Contracts**:
    - **POST /api/v1/patients** – Create a new patient record.
      
-     {
-       "first_name": "string",
-       "last_name": "string",
-       "date_of_birth": "YYYY-MM-DD",
-       "gender": "Male|Female|Other",
-       "email": "string",
-       "phone_number": "string"
-     }
+- **first_name**: string
+- **last_name**: string
+- **date_of_birth**: YYYY-MM-DD
+- **gender**: Male|Female|Other
+- **email**: string
+- **phone_number**: string
      
      *Response (201)*:
      
-     {
-       "patient_id": "uuid",
-       "created_at": "ISO8601 timestamp"
-     }
+- **patient_id**: uuid
+- **created_at**: ISO8601 timestamp
      
      *Errors*: `ERR‑API‑101` (validation failure), `ERR‑API‑102` (encryption key unavailable).
    - **GET /api/v1/patients/{patient_id}** – Retrieve patient details (fields remain encrypted at rest; decrypted payload returned only to authorized roles).
@@ -175,7 +171,7 @@ Updated on each modification |
 * Primary keys are clustered.
 * Unique index on `patient.email`.
 * GIN index on `medical_history_encrypted` for fast condition search.
-* Partial index on `audit_log` for recent entries (`created_at > now() - interval '30 days'`) to satisfy KPI‑01 response time.
+* Partial index on `audit_log` for recent entries (`created_at > now() - interval '30 days'`) to satisfy KPI-001 response time.
 * Index on `encryption_key_id` to support efficient key lookup during decryption.
 
 ## 10. Error Taxonomy
@@ -235,19 +231,12 @@ The Patient Intake system is built as a set of micro‑services deployed in a mu
 
 POST /api/v1/auth/login
 Request:
-{
-  "email": "string",
-  "password": "string"
-}
+- **email**: string
+- **password**: string
 Response:
-{
-  "token": "string",
-  "expires_at": "string (ISO‑8601)",
-  "user": {
-    "id": "uuid",
-    "role": "admin|clinician|front_desk"
-  }
-}
+- **token**: string
+- **expires_at**: string (ISO‑8601)
+- **user**: {'id': 'uuid', 'role': 'admin|clinician|front_desk'}
 
 *Public endpoint – no bearer token required.*
 
@@ -280,9 +269,9 @@ If the cache expires and Vault remains unavailable, the service aborts the opera
 |--------|------|---------------------------------------------|----------------------------------------------------|----------|
 | ERR-001| 400  | Request payload validation failed           | "Please correct the highlighted fields."           | false    |
 | ERR-002| 401  | Invalid credentials or expired token         | "Authentication failed. Verify email/password."   | false    |
-|-ERR-003|403   | Insufficient permissions                     | "You do not have access to this resource."        | false    |
-|-ERR-004|500   | Encryption key unavailable or Vault error   | "System error; contact administrator."           | true     |
-|-ERR-005|503   | Key Management Service unavailable beyond cache window | "Key service unavailable; operation blocked after cache expiry." | false |
+| ERR-003|403   | Insufficient permissions                     | "You do not have access to this resource."        | false    |
+| ERR-004|500   | Encryption key unavailable or Vault error   | "System error; contact administrator."           | true     |
+| ERR-005|503   | Key Management Service unavailable beyond cache window | "Key service unavailable; operation blocked after cache expiry." | false |
 
 ## 17. Integration Points & Failure Handling
 * **PostgreSQL** – Connection loss triggers **ERR‑003**; client receives HTTP 503 with retry advice.

@@ -1,6 +1,6 @@
-# RBAC Roles and Permissions Table DDL
+# RBAC Roles, Permissions & Audit Logging – Technical Design Document (PatientIntake)
 
-# Audit Logging Subsystem – Technical Design Document (PatientIntake)
+This document defines the RBAC roles and permissions DDL alongside the audit logging subsystem design for the PatientIntake project. Both subsystems are tightly coupled — audit events are access-controlled by RBAC roles, and every RBAC-gated operation generates an immutable audit entry.
 
 ## 1. Purpose and Scope
 The purpose of this document is to define a high‑level architecture for the audit‑logging subsystem of the PatientIntake project. The subsystem must satisfy HIPAA technical safeguard requirements (45 CFR 164.312(a)(2)(iv)), **FR-010** (Comprehensive Audit Logging) and **NFR-003** (mandatory immutable audit logs). It records every read and write operation on patient intake data, provides tamper‑evident storage, and exposes query capabilities for compliance reporting.
@@ -24,10 +24,10 @@ The diagram shows the flow of audit events from the API layer through a durable 
 |---|---|---|---|
 | **Web UI** | Captures user actions; forwards API calls | React (v18) | `POST /api/v1/intake/` (Bearer token) |
 | **API Gateway** | Terminates TLS 1.3, rate‑limits, routes to services | Kong (v3) | Authorization header, `X‑Audit‑Event` header |
-| **Auth Service** | Issues JWTs, validates scopes (admin, clinician, front_desk) | Keycloak (v22) | `/auth/realms/patientintake/protocol/openid-connect/token` |
+| **Auth Service** | Issues JWTs, validates scopes (admin, clinician, front_desk, audit_viewer) | Keycloak (v22) | `/auth/realms/patientintake/protocol/openid-connect/token` |
 | **Audit Service (SVC‑001)** | Receives audit events, validates schema (SCH‑001), writes to queue | Go microservice (net/http) | `POST /api/v1/audit/events` |
 | **RabbitMQ** | Guarantees at‑least‑once delivery of audit events | RabbitMQ (v3.11) | AMQP `audit.exchange` |
-| **Encryption Service** | Performs envelope encryption of each event payload before DB write | HashiCorp Vault (v1.14) – AES‑256‑GCM keys rotated every 30 days |
+| **Encryption Service** | Performs envelope encryption of each event payload before DB write | HashiCorp Vault (v1.14) – AES‑256‑GCM; master keys rotated every 90 days, per-field DEKs every 30 days |
 | **PostgreSQL Audit DB** | Immutable append‑only storage; WAL archiving for tamper evidence | PostgreSQL 15 – pg_audit extension, row‑level security |
 
 ### 3.1 RBAC Roles & Permissions Matrix
@@ -117,15 +117,15 @@ The service automatically creates a corresponding **READ** audit entry.
 
 ## Technical Design Artifact – Patient Intake System
 
-### 9. Overview
+### 10. Overview
 The Patient Intake system captures demographic, insurance and medical history data for clinical workflows while satisfying HIPAA‑mandated security and audit requirements.
 
-### 10. System Architecture
+### 11. System Architecture
 The solution is deployed on‑premises via Docker Compose using micro‑service principles. All services communicate over TLS 1.3 and data at rest is encrypted using AES‑256‑GCM.
 
-### 11. API Specifications
+### 12. API Specifications
 
-#### 11.1 PDF Summary Generation Service (SVC-001)
+#### 12.1 PDF Summary Generation Service (SVC-001)
 
 **Endpoint**: `POST /api/v1/patients/{patient_id}/summary`
 
@@ -155,7 +155,7 @@ The solution is deployed on‑premises via Docker Compose using micro‑service 
 
 **Latency Budget**: ≤200 ms per request (KPI-001). Documented in `project_globals_updates.api_latency_budget`.
 
-#### 11.2 Core Entity Tables
+#### 12.2 Core Entity Tables
 sql
 -- patients table
 CREATE TABLE patients (
@@ -175,8 +175,8 @@ CREATE TABLE insurance_records (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     patient_id UUID NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
     provider_name TEXT NOT NULL,
-    policy_number TEXT NOT NULL ENCRYPTED,
-    group_number TEXT ENCRYPTED,
+    policy_number_encrypted BYTEA NOT NULL,  -- encrypted via pgcrypto trigger
+    group_number_encrypted BYTEA,            -- encrypted via pgcrypto trigger
     effective_date DATE NOT NULL,
     expiration_date DATE NOT NULL CHECK (expiration_date > effective_date),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -186,18 +186,21 @@ CREATE TABLE insurance_records (
 CREATE TABLE medical_history (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     patient_id UUID NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
-    condition TEXT NOT NULL ENCRYPTED,
-    medication TEXT ENCRYPTED,
-    allergies TEXT ENCRYPTED,
-    notes TEXT ENCRYPTED,
+    condition_encrypted BYTEA NOT NULL,      -- encrypted via pgcrypto trigger
+    medication_encrypted BYTEA,              -- encrypted via pgcrypto trigger
+    allergies_encrypted BYTEA,               -- encrypted via pgcrypto trigger
+    notes_encrypted BYTEA,                   -- encrypted via pgcrypto trigger
     recorded_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-#### 11.3 RBAC Metadata Tables
+> **Note:** PostgreSQL does not support an inline `ENCRYPTED` column modifier. All sensitive fields are stored as `BYTEA` and encrypted/decrypted via `pgp_sym_encrypt`/`pgp_sym_decrypt` using a pgcrypto trigger (see patient_records DDL for pattern).
+
+#### 12.3 RBAC Metadata Tables
 sql
 CREATE TABLE roles (
     id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL UNIQUE CHECK (name IN ('admin','clinician','front_desk'));
+    name TEXT NOT NULL UNIQUE CHECK (name IN ('admin','clinician','front_desk'))
+);
 
 CREATE TABLE permissions (
     id SERIAL PRIMARY KEY,
@@ -209,7 +212,7 @@ CREATE TABLE role_permissions (
     permission_id INT NOT NULL REFERENCES permissions(id) ON DELETE CASCADE,
     PRIMARY KEY (role_id, permission_id));
 
-#### 11.4 Audit Log Table
+#### 12.4 Audit Log Table
 sql
 CREATE TABLE audit_log (
     id BIGSERIAL PRIMARY KEY,
@@ -224,15 +227,48 @@ CREATE TABLE audit_log (
     hash BYTEA NOT NULL GENERATED ALWAYS AS (
         digest(concat_ws('|',event_timestamp::text,actor_id::text,object,operation,row_id::text,new_value::text), 'sha256')) STORED);
 
-### 12. Deployment Considerations
+### 13. Row‑Level Security Policies
+sql
+-- Enable RLS on core tables
+ALTER TABLE patients ENABLE ROW LEVEL SECURITY;
+ALTER TABLE insurance_records ENABLE ROW LEVEL SECURITY;
+ALTER TABLE medical_history ENABLE ROW LEVEL SECURITY;
+
+-- Clinician policies
+CREATE POLICY clinician_select_update_patients ON patients
+FOR SELECT USING (current_setting('app.current_role') = 'clinician')
+WITH CHECK (current_setting('app.current_role') = 'clinician');
+
+CREATE POLICY clinician_select_update_insurance ON insurance_records
+FOR SELECT USING (current_setting('app.current_role') = 'clinician')
+WITH CHECK (current_setting('app.current_role') = 'clinician');
+
+CREATE POLICY clinician_select_update_history ON medical_history
+FOR SELECT USING (current_setting('app.current_role') = 'clinician')
+WITH CHECK (current_setting('app.current_role') = 'clinician');
+
+-- Front‑desk policies
+CREATE POLICY front_desk_insert_patients ON patients
+FOR INSERT WITH CHECK (current_setting('app.current_role') = 'front_desk');
+
+CREATE POLICY front_desk_no_med_hist ON medical_history
+FOR ALL USING (false); -- deny all access
+
+-- Admin full access
+CREATE POLICY admin_full_access_patients ON patients
+FOR ALL USING (current_setting('app.current_role') = 'admin')
+WITH CHECK (current_setting('app.current_role') = 'admin');
+-- Similar admin policies for other tables...
+
+### 14. Deployment Considerations
 * Migration script `V1__patient_intake_schema.sql` executed by Docker Compose entrypoint.
 * Encryption keys are provisioned from a local HashiCorp Vault instance; rotation policy defined in `project_globals_updates.key_rotation_interval`.
 * Service runs inside Docker Compose network with TLS 1.3 enforced (`project_globals_updates.tls_version = "TLS1.3"`).
 
-### 13. Traceability Matrix
+### 15. Traceability Matrix
 
-| Requirement ID | Description| Satisfied By |
-|----------------|
+| Requirement ID | Description | Satisfied By |
+|---|---|---|
 | FR-001        | Secure demographic capture               | `patients` table with encrypted PII |
 | FR-003        | Medical history storage                  | `medical_history` table with field‑level encryption |
 | FR-007        | PDF watermark                           | PDF service adds staff identifier as watermark |
@@ -241,16 +277,14 @@ CREATE TABLE audit_log (
 | KPI-001        | Response time <200 ms                    | Latency budget defined in globals and enforced by API gateway |
 | RISK-001       | Unauthorized data exposure              | TLS 1.3, field‑level encryption, RLS policies |
 
-### 14. Security Controls Summary
+### 16. Security Controls Summary
 
 * **Transport security** – TLS 1.3 enforced for all HTTP endpoints.
-* **At‑rest encryption** – Sensitive columns marked `ENCRYPTED` using pgcrypto.
+* **At‑rest encryption** – Sensitive columns stored as `BYTEA` and encrypted via `pgp_sym_encrypt` using pgcrypto.
 * **Access control** – Row‑level security combined with role‑based permissions.
 * **Tamper evidence** – Hash chain stored in `audit_log`.
-* **Key management** – Keys stored in HashiCorp Vault with rotation every 90 days.
+* **Key management** – Keys stored in HashiCorp Vault; master keys rotated every 90 days, per-field DEKs every 30 days.
 
 ---
 
 *Document version: 1.0 | Author: Senior Software Engineer – Design Phase*
-
-{'status': 'error', 'error': 'All micro-goals failed', 'failed_micro_goals': [{'status': 'error', 'error': "Refiner specialized logic failed: Template rendering failed due to undefined variable: 'requester_name' is undefined. This indicates a system error where required context variables were not set. Available context keys: ['artifact_name', 'artifact_description', 'artifact_id', 'dbs_id', 'artifact_type', 'role', 'agent_role', 'phase_name', 'artifact_dependencies', 'forward_dependents', 'project_requirement_text', 'project_requirement_full', 'requirement_text', 'context_summary', 'project_id', 'goal', 'total_micro_goals', 'micro_goal_index', 'acceptance_criteria', 'binding_manifest', 'micro_goal', 'micro_goal_axis', 'micro_goal_level', 'micro_goal_parent_id', 'reasoning_summary', 'artifact_definition', 'dbs_item', 'cipher_context', 'episodic_patterns', 'software_dna_context', 'existing_artifacts', 'existing_artifacts_summary', 'sibling_artifacts', 'decomposer_artifact_ids_so_far', 'decomposer_cot_commitment', 'previous_phase_artifacts', 'jigsaw_map', 'coordinated_insights', 'coordination_available', 'domain_knowledge_context', 'research_context', 'vp_feedback', 'vp_primary_gaps', 'task_context', 'multi_turn_instruction', 'content_to_refine', 'reviewer_feedback', 'executor_output', 'original_output', 'peer_reviews', 'refinement_context_mode', 'refinement_segment_index', 'refinement_segment_total', 'current_agent_role', 'templates', 'contracts', 'technology_stack', 'chain_of_thought_context', 'reasoning_for_current_goal', 'decomposition_reasoning_context', 'executor_reasoning_digest', 'executor_self_critique', '_stage_context', 'previous_phase_learnings', 'previous_phase_context', 'pipeline_conductor_context', 'pipeline_conductor_hint', 'pipeline_conductor_focus_artifacts', 'pipeline_conductor_metadata', 'decomposition_retry_delta_block', 'generated_content', 'artifact_content', 'content', 'previous_output', 'content_to_review', 'reviewer_feedback_markdown', 'refined_outputs_markdown', 'executor_inputs_markdown', 'micro_goal_context', 'dna_insights', 'previous_phase_dna', 'dna_domain_concepts', 'consolidation_manifest', 'completed_sections', 'sections_already_produced', 'project_grounding_facts', 'project_grounding_summary', 'context_tier', 'include_methodology_deep', 'stage_name', 'jigsaw_universal_contract', '_cbr_reference_metadata', 'phase_prompt_preamble', 'artifact_prompt_delta', 'phase_prompt_scope_id', 'content_to_approve', 'episodic_patterns_summary', 'pass_name', 'reflection_critique_summary', 'task_description', 'focus_area', 'research_reasoning', 'research_results', 'results_count', 'results_used', 'existing_knowledge_summary', 'project_context', 'project_description', 'project_domain', 'artifact_summary', 'tech_stack', 'query_analysis', 'query_type', 'level_1_relevance', 'level_1_results_count', 'level_2_relevance', 'level_2_results_count', 'next_level', 'purpose', 'requirement', 'sequence_number', 'source', 'total_goals', 'context', 'phase', 'context_keys', 'phase_key', 'quality_criteria', 'quality_score', 'execution_content', 'dependencies', 'success_criteria', 'phase_blueprint', 'description_one_line', 'goal_id', 'micro_goal_description', 'role_specific_field', 'role_specific_field_description', 'required_item_fields', 'output_content', 'content_size', 'context_ref_id', 'ref_id', 'ref_type', 'relevance_score', 'summary', 'codebase_content', 'codebase_chunk', 'codebase_sample', 'entities_to_analyze', 'extracted_dna', 'relational_context', 'structural_context', 'behavioral_context', 'architectural_context', 'filename', 'document_type', 'document_path', 'content_preview', 'diagram_type', 'flow_type', 'new_content', 'old_content', 'extraction_results', 'ingested_documents', 'content_to_classify', 'artifacts', 'reasoning_scaffold']. This should trigger self-correction to retry with proper context.. No code fallback.", 'goal_index': 0}]}

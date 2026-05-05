@@ -41,7 +41,7 @@ Each micro‑service can be scaled horizontally via Docker Compose’s `scale` c
 All design decisions reference asset IDs:
 - Functional Requirements: **FR-001**, **FR-002**, **FR-003**, **FR-005**
 - Non‑Functional Requirements: **NFR-001**, **NFR-002**, **NFR-003**, **NFR-006**
-- KPIs: **KPI-001**, **KPI-02**
+- KPIs: **KPI-001**, **KPI-002**
 - Risks: **RISK-001**, **RISK-003**
 This ensures full traceability from requirement to implementation artifact.
 

@@ -50,10 +50,10 @@ The project delivers a HIPAA-compliant patient intake system that enables on-pre
 ## Stakeholder Responsibility Matrix
 | Stakeholder ID | Role                     | Primary Interests                                            | Key Risks Addressed                                 | Ownership of Requirements                     |
 |----------------|--------------------------|--------------------------------------------------------------|------------------------------------------------------|----------------------------------------------|
-| ST-01          | Clinical Staff (Clinician) | Immediate access to accurate intake data for care decisions | Downtime affecting patient care | FR-001, FR-002, KPI-01 |
-| ST-02 | Front Desk Staff | Efficient capture of demographics and insurance information | Manual re-entry errors if system unavailable | FR-001, FR-002, KPI-01 |
-| ST-03 | Compliance Officer | Demonstrable HIPAA compliance and auditability | Non-compliant audit logs or encryption gaps | FR-003, NFR-003, KPI-02 |
-| ST-04 | System Administrator (Admin) | Secure configuration, container hardening, air-gap deployment | Misconfiguration leading to data exposure | FR-004, FR-005, KPI-04 |
+| ST-001          | Clinical Staff (Clinician) | Immediate access to accurate intake data for care decisions | Downtime affecting patient care | FR-001, FR-002, KPI-001 |
+| ST-002 | Front Desk Staff | Efficient capture of demographics and insurance information | Manual re-entry errors if system unavailable | FR-001, FR-002, KPI-001 |
+| ST-003 | Compliance Officer | Demonstrable HIPAA compliance and auditability | Non-compliant audit logs or encryption gaps | FR-003, NFR-003, KPI-002 |
+| ST-004 | System Administrator (Admin) | Secure configuration, container hardening, air-gap deployment | Misconfiguration leading to data exposure | FR-004, FR-005, KPI-004 |
 
 ## Functional Requirements
 | Requirement ID | Description                                                                                                                            | Acceptance Criteria                                                                                                                                                                                                                                                                                                                                                                                                                     |
@@ -68,22 +68,22 @@ The project delivers a HIPAA-compliant patient intake system that enables on-pre
 ## Success Criteria / KPIs
 | KPI ID   | Metric                              | Target                                 | Measurement Method                               |
 |----------|-------------------------------------|----------------------------------------|------------------------------------------------|
-| KPI-01   | Form Completion Rate                | ≥ 90 % of patients complete intake within 5 min | Session analytics aggregated weekly            |
-| KPI-02   | Audit Log Coverage                  | 100 % of read/write operations logged    | Log audit reports                           |
-| KPI-03   | PDF Export Security Compliance      | 100 % of exported PDFs contain correct watermark and timestamp | Manual sample inspection                     |
-| KPI-04   | Incident-Free Deployment Days      | ≥ 30 consecutive days without security incident | Security incident tracking system               |
+| KPI-001   | Form Completion Rate                | ≥ 90 % of patients complete intake within 5 min | Session analytics aggregated weekly            |
+| KPI-002   | Audit Log Coverage                  | 100 % of read/write operations logged    | Log audit reports                           |
+| KPI-003   | PDF Export Security Compliance      | 100 % of exported PDFs contain correct watermark and timestamp | Manual sample inspection                     |
+| KPI-004   | Incident-Free Deployment Days      | ≥ 30 consecutive days without security incident | Security incident tracking system               |
 
 ## Risk Register
 | Risk ID   | Description                                                                                 | Likelihood (L/M/H)   | Impact (L/M/H)   | Mitigation Actions                                                                                                                                                                                                                                                                                                                                                 |
 |-----------|---------------------------------------------------------------------------------------------|---------------------|-------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| RISK-01   | Unauthorized disclosure of PHI during transmission or storage                         | M                   | H                 | Enforce TLS 1.3 for all network traffic.<br>- Apply field-level AES‑256 encryption at rest.<br>- Implement strict key-management procedures with rotation every 90 days.<br>- Quarterly penetration testing.                                                                                                                            |
-| RISK-02   | Vulnerabilities in open-source components leading to exploitable attack surface    | M                   | H                 | Maintain a Software Bill of Materials (SBOM).<br>- Integrate automated CVE scanning into CI pipeline.<br>- Pin package versions and apply weekly security patches.<br>- Approve only vetted packages from a whitelist.                                                                                                         |
-| RISK-03   | Misconfiguration of Docker Compose or container runtime causing data exposure or outage    | L                   | H                 | Provide hardened Docker Compose templates with least‑privilege defaults.<br>- Run configuration validation scripts before each deployment.<br>- Use immutable container images and read-only file systems.<br>- Document step-by-step air-gap deployment checklist.                                                   |
-| RISK-04   | Inadequate audit-log retention leading to non-compliance with HIPAA record‑keeping requirements | L                   | M                 | Store logs on write-once media with immutable flag.<br>- Retain logs for minimum 7 years. |
+| RISK-001   | Unauthorized disclosure of PHI during transmission or storage                         | M                   | H                 | Enforce TLS 1.3 for all network traffic.<br>- Apply field-level AES‑256 encryption at rest.<br>- Implement strict key-management procedures with rotation every 90 days.<br>- Quarterly penetration testing.                                                                                                                            |
+| RISK-002   | Vulnerabilities in open-source components leading to exploitable attack surface    | M                   | H                 | Maintain a Software Bill of Materials (SBOM).<br>- Integrate automated CVE scanning into CI pipeline.<br>- Pin package versions and apply weekly security patches.<br>- Approve only vetted packages from a whitelist.                                                                                                         |
+| RISK-003   | Misconfiguration of Docker Compose or container runtime causing data exposure or outage    | L                   | H                 | Provide hardened Docker Compose templates with least‑privilege defaults.<br>- Run configuration validation scripts before each deployment.<br>- Use immutable container images and read-only file systems.<br>- Document step-by-step air-gap deployment checklist.                                                   |
+| RISK-004   | Inadequate audit-log retention leading to non-compliance with HIPAA record‑keeping requirements | L                   | M                 | Store logs on write-once media with immutable flag.<br>- Retain logs for minimum 7 years. |
 >- Apply tamper-evident hashing on each entry.
 >- Schedule monthly log integrity verification.
 |
-| RISK-05   | Failure to generate PDF intake summaries with required watermark and timestamp causing unauthorized distribution | L                   | M                 | Use vetted open-source PDF library that automatically adds staff watermark and UTC timestamp.
+| RISK-005   | Failure to generate PDF intake summaries with required watermark and timestamp causing unauthorized distribution | L                   | M                 | Use vetted open-source PDF library that automatically adds staff watermark and UTC timestamp.
 >- Automated validation tests on each PDF output before release.
 >- Maintain change-control log for PDF template updates.
 >- Periodic manual inspection of sample PDFs.

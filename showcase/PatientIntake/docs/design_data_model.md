@@ -32,7 +32,7 @@ The diagram shows the flow of a patient intake request from the React front‑en
 - **React SPA (FE)** – Renders a structured intake form; performs client‑side field‑level encryption using the Web Crypto API before transmission.
 - **FastAPI Gateway (APIGW)** – Authenticates requests via OAuth2 Bearer tokens, validates JWT claims against an RBAC matrix (admin, clinician, front‑desk), and routes to downstream services.
 - **Intake Service (IS)** – Implements business rules for patient record creation; encrypts each PHI field with per‑field keys fetched from Vault; writes records using prepared statements; emits `PatientCreated` events.
-- **PDF Generation Service (PDFS)** – Listens for `PatientCreated` or on‑demand export requests; assembles a PDF using **WeasyPrint**; applies a dynamic watermark containing the staff username and an ISO 8601 access timestamp; stores the generated file reference in the `pdf_documents` table.
+- **PDF Generation Service (PDFS)** – Listens for `PatientCreated` or on‑demand export requests; assembles a PDF using **wkhtmltopdf**; applies a dynamic watermark containing the staff username and an ISO 8601 access timestamp; stores the generated file reference in the `pdf_documents` table.
 - **Audit Logging Service (AUD)** – Writes immutable audit entries to `audit_log` table; each entry includes operation type, actor ID, timestamp, and cryptographic hash of the payload for tamper evidence.
 - **PostgreSQL DB** – Hosts tables `patients`, `insurance`, `medical_history`, `pdf_documents`, `audit_log`; column‑level encryption via pgcrypto; row‑level security policies enforce that only authorized roles can SELECT/UPDATE specific columns.
 - **HashiCorp Vault** – Securely stores master encryption keys; provides per‑field data‑encryption keys on demand; rotates keys every 90 days (project global).
@@ -70,7 +70,13 @@ The Intake Service exposes two primary REST endpoints. Both require Bearer Token
     "first_name": "string",
     "last_name": "string",	"date_of_birth": "date",	"ssN": "string",	"address": "string",	"phone": "string",	"email": "string"	},	"insurance": [	{	"provider": "string",	"policy_number": "string",	"group_number": "string",	"effective_date": "date",	"expiry_date": "date"	}	],	"medical_history": {	"records": { /* decrypted JSON */ }	},	"audit_log_summary": {	"read_count": "integer",	"last_read_at": "timestamp"	}	}	
 **Possible Error Responses**
-| HTTP | Error Code | Description |	--- |	--- |	--- |	--- |	--- |	--- |	--- |	--- |	--- |	--- |	--- |	--- |	--- |	--- |	--- |	--- |	--- |	--- |	--- |	--- |	--- |	--- |	--- |	--- |	--- |	--- |	--- |	--- |	--- |	table continues as above with ERR-001…ERR-005 applicable where relevant (e.g., invalid UUID → ERR-001). \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \   ")   // placeholder to keep formatting correct      \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \   \      ---   ## 4. Error Taxonomy (ERR‑001 – ERR‑005)   | Code | HTTP | Description | Message | Retryable | |------|------|-------------|---------|-----------| | ERR-001 | 400 | Validation failure – request payload does not conform to SCH‑001 | The submitted form contains invalid or missing fields. | No | | ERR-002 | 401 | Authentication failure – missing or invalid Bearer token | Authentication required. Please log in again. | No | | ERR-003 | 403 | Authorization failure – role lacks permission for the operation | You do not have permission to perform this action. | No | | ERR-004 | 409 | Conflict – duplicate patient record detected (e.g., same SSN) | A patient with this identifier already exists. | No | | ERR-005 | 500 | Internal server error – unexpected failure during encryption or DB write | An unexpected error occurred. Please contact support. | Yes | ## 5. Service Boundaries (SVC‑001 – SVC‑004)   | Service Name | Responsibility | Dependencies | Events Emitted | Events Consumed |
+| HTTP Status | Error Code | Description |
+|---|---|---|
+| 400 | ERR-001 | Validation failure – request payload does not conform to schema |
+| 401 | ERR-002 | Authentication failure – missing or invalid Bearer token |
+| 403 | ERR-003 | Authorization failure – role lacks permission for the operation |
+| 409 | ERR-004 | Conflict – duplicate record detected |
+| 500 | ERR-005 | Internal server error – unexpected failure during processing |
 |--------------------|--------------------------|--------------------|------------------|------------------|
 | Intake Service (SVC-001) | Accepts intake submissions, validates & encrypts PHI, writes to DB, emits `PatientCreated` event | FastAPI Gateway, Vault, PostgreSQL DB | PatientCreated, IntakeFailed | PDF Generation Service (on-demand export), Audit Logging Service |
 | PDF Generation Service (SVC-002) | Generates HIPAA‑compliant PDFs with watermark/timestamp; stores reference in DB | Intake Service (event), Vault, PostgreSQL DB | PDFGenerated, PDFGenerationFailed | — |
@@ -83,9 +89,9 @@ The Intake Service exposes two primary REST endpoints. Both require Bearer Token
 - **NFR-003 (Audit logging):** Immutable audit_log table with cryptographic hash of payload ensures tamper evidence.
 
 ## 10. Risk Mitigation
-- **RISK-01 Unauthorized data exposure:** Encryption in transit & at rest + strict RBAC.
-- **RISK-02 Open-source component vulnerabilities:** Regular dependency scanning CI pipeline (outside design scope but noted).
-- **RISK-03 Deployment misconfiguration:** Air‑gap deployment guide includes hardened host checklist and network isolation.
+- **RISK-001 Unauthorized data exposure:** Encryption in transit & at rest + strict RBAC.
+- **RISK-002 Open-source component vulnerabilities:** Regular dependency scanning CI pipeline (outside design scope but noted).
+- **RISK-003 Deployment misconfiguration:** Air‑gap deployment guide includes hardened host checklist and network isolation.
 
 ---
 *Document generated by Refiner role – design phase.*

@@ -91,9 +91,9 @@ and the logs are immutable (append‑only) and retained for ≥7 years.
 ## PDF Intake Summary – Feature Specification
 
 ### Personas
-- **ST-01** – Front Desk Clerk: Captures patient demographic data via the web form and requests a PDF for printing or hand‑off.
-- **ST-02** – Clinician: Reviews a patient's medical history and exports the PDF for clinical use.
-- **ST-03** – Compliance Officer (Auditor): Monitors audit logs, reviews alerts, and validates that all security controls are in place.
+- **ST-001** – Front Desk Clerk: Captures patient demographic data via the web form and requests a PDF for printing or hand‑off.
+- **ST-002** – Clinician: Reviews a patient's medical history and exports the PDF for clinical use.
+- **ST-003** – Compliance Officer (Auditor): Monitors audit logs, reviews alerts, and validates that all security controls are in place.
 
 ### Design Artifacts (Hand‑off to Design)
 1. **Field‑Level Encryption Specification** – AES‑256‑GCM per field, IV generated with a cryptographically secure random source, per‑field keys wrapped by RSA‑OAEP 2048‑bit keys stored in an on‑prem HSM.
@@ -202,14 +202,14 @@ and the logs are immutable (append‑only) and retained for ≥7 years.
 | NFR-001 | Response time <200 ms for form submissions | — |
 | NFR-002 | System uptime 99.9 % | — |
 | NFR-003 | Mandatory audit logging of every read/write operation | US-005, US-006 |
-| KPI-01 | Response time compliance | — |
-| KPI-02 | System availability | — |
-| KPI-03 | Successful audit log generation per submission | — |
-| RISK-01 | Unauthorized data exposure | Mitigated by encryption & RBAC |
-| RISK-02 | Open-source component vulnerabilities | Managed via dependency scanning |
-| RISK-03 | Deployment misconfiguration | Addressed by mTLS & HSTS |
-| RISK-04 | Compliance audit gaps | Covered by immutable logs & alerts |
-| RISK-05 | On-prem deployment constraints | Capacity monitoring & buffer resources |
+| KPI-001 | Response time compliance | — |
+| KPI-002 | System availability | — |
+| KPI-003 | Successful audit log generation per submission | — |
+| RISK-001 | Unauthorized data exposure | Mitigated by encryption & RBAC |
+| RISK-002 | Open-source component vulnerabilities | Managed via dependency scanning |
+| RISK-003 | Deployment misconfiguration | Addressed by mTLS & HSTS |
+| RISK-004 | Compliance audit gaps | Covered by immutable logs & alerts |
+| RISK-005 | On-prem deployment constraints | Capacity monitoring & buffer resources |
 
 # Feature Specification: HIPAA‑Compliant Patient Intake PDF Generation
 
@@ -219,9 +219,9 @@ The system shall generate a secure, auditable PDF intake summary for each patien
 ## 5. Personas
 | ID   | Role                | Description                                                                 |
 |------|---------------------|-----------------------------------------------------------------------------|
-| ST-01| Clinical Staff      | Captures patient demographics and initiates PDF export.                     |
-| ST-02| Patient             | Provides demographic data via the intake form.                            |
-| ST-03| Compliance Officer  | Verifies that every PDF export is auditable, watermarked, and timestamped according to HIPAA audit requirements. |
+| ST-001| Clinical Staff      | Captures patient demographics and initiates PDF export.                     |
+| ST-002| Patient             | Provides demographic data via the intake form.                            |
+| ST-003| Compliance Officer  | Verifies that every PDF export is auditable, watermarked, and timestamped according to HIPAA audit requirements. |
 
 ### US-001: Generate HIPAA‑compliant PDF Intake Summary
 **As** a **Clinical Staff (ST-001)**
@@ -252,13 +252,11 @@ The system shall generate a secure, auditable PDF intake summary for each patien
 
 ### PDF Metadata Schema (stored alongside each PDF)
 
-{
-  "patient_id": "string",
-  "generated_at": "ISO8601 timestamp",
-  "watermark_text": "string",
-  "checksum_sha256": "string",
-  "encryption_key_id": "string"
-}
+- **patient_id**: string
+- **generated_at**: ISO8601 timestamp
+- **watermark_text**: string
+- **checksum_sha256**: string
+- **encryption_key_id**: string
 
 *Traceability*: maps to FR‑007 (watermark), NFR‑001 (encryption), NFR‑003 (audit).
 

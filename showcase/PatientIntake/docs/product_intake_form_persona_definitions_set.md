@@ -3,11 +3,11 @@
 ## Personas
 | ID | Role | Description | Needs | Constraints |
 |---|---|---|---|---|
-| PER-01 | Front Desk Clerk (ST-01) | Staff member who receives patients and initiates the intake process on a secured workstation within the clinic network. | Capture accurate demographic and insurance data; start the medical history form; ensure data is saved without delay. | Must not view protected health information (PHI) beyond what is required for intake; must ensure TLS‑1.3 for data in transit and field‑level encryption at rest (45 CFR 164.312(a)(2)(iv)). |
-| PER-02 | Clinician (ST-02) Licensed medical professional who reviews completed intake forms, adds clinical notes, and signs off on the PDF summary. |
+| PER-01 | Front Desk Clerk (ST-001) | Staff member who receives patients and initiates the intake process on a secured workstation within the clinic network. | Capture accurate demographic and insurance data; start the medical history form; ensure data is saved without delay. | Must not view protected health information (PHI) beyond what is required for intake; must ensure TLS‑1.3 for data in transit and field‑level encryption at rest (45 CFR 164.312(a)(2)(iv)). |
+| PER-02 | Clinician (ST-002) Licensed medical professional who reviews completed intake forms, adds clinical notes, and signs off on the PDF summary. |
  Verify completeness of patient‑provided data; add clinical observations; approve PDF export for treatment planning. |
  | Requires role‑based access to PHI; actions must be logged immutably (45 CFR 164.308(a)(1)(ii)). |
-| PER-03 Patient (ST-03) |
+| PER-03 Patient (ST-003) |
  Individual seeking care who fills out the web‑based intake form on a personal device or clinic kiosk. |
  Provide accurate personal, insurance, and medical history information; receive confirmation that data was securely received. |
  | Must be assured that each field is encrypted at rest; consent capture required before submission (45 CFR 164.508). |

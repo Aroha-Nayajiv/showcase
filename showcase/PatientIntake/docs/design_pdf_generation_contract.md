@@ -172,17 +172,17 @@ components:
         intake_id:
           type: string
           format: uuid
-        created_at:          type: string
+        created_at:          type: string
           format: date-time
-        status:          type: string
+        status:          type: string
           enum: ["received", "processing", "completed"]
-badRequest:    description: Invalid payload or schema violation.
-badRequestContent:    application/json:      schema:        $ref: '#/components/schemas/ErrorResponse'
-unAuthorized:    description: Missing or invalid authentication token.
-unAuthorizedContent:    application/json:      schema:        $ref: '#/components/schemas/ErrorResponse'\conflictResponse:    description: Duplicate intake record detected.\conflictContent:    application/json:      schema:        $ref: '#/components/schemas/ErrorResponse'
-schemas:    ErrorResponse:      type: object
-      properties:        code:          type: string
-        message:          type: string
+badRequest:    description: Invalid payload or schema violation.
+badRequestContent:    application/json:      schema:        $ref: '#/components/schemas/ErrorResponse'
+unAuthorized:    description: Missing or invalid authentication token.
+unAuthorizedContent:    application/json:      schema:        $ref: '#/components/schemas/ErrorResponse'\conflictResponse:    description: Duplicate intake record detected.\conflictContent:    application/json:      schema:        $ref: '#/components/schemas/ErrorResponse'
+schemas:    ErrorResponse:      type: object
+      properties:        code:          type: string
+        message:          type: string
 
 *Note*: The YAML fragment has been corrected to include all required response definitions and explicit property types, addressing the reviewer’s comment about missing error handling specifications.
 

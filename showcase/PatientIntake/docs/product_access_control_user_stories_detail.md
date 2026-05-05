@@ -62,7 +62,7 @@
 *All specifications comply with HIPAA technical safeguards and align with project KPIs and risk mitigation strategies.*
 
 ### US-001: Front Desk Clerk submits new patient intake form
-**Persona:** ST-01 (Front Desk Clerk)  
+**Persona:** ST-001 (Front Desk Clerk)  
 **Priority:** High  
 
 **Description:** The clerk captures patient demographic and insurance information via a web form.
@@ -80,17 +80,17 @@
  | An immutable audit log entry of type CREATE_RECORD is written with timestamp, user_id, patient_id, and outcome 'success'. |
 
 ### US-002: Clinician accesses patient record
-**Persona:** ST-02 (Clinician)  
+**Persona:** ST-002 (Clinician)  
 **Priority:** High  
 
 **Description:** Clinician views a patient’s stored record.
 
 ### US-003: Administrator reviews audit logs
-**Persona:** ST-03 (Administrator)  
+**Persona:** ST-003 (Administrator)  
 **Priority:** Medium
 
 ### US-005: Emergency override for clinician access
-**Persona:** ST-03 (Administrator)  
+**Persona:** ST-003 (Administrator)  
 **Priority:** Medium
 
 ## Design Needs (for hand‑off to Design phase)
@@ -121,7 +121,7 @@
 
 | Persona ID | Role Name        | Description                                 |
 |------------|------------------|---------------------------------------------|
-| ST-01     | Front Desk Clerk| Captures patient intake data at reception desk.| 
-| ST-02     | Clinician        | Provides care and accesses patient records.| 
-| ST-03     | Administrator    | Manages system configuration and overrides.| 
-| ST-04     | Compliance Officer| Oversees regulatory compliance activities.|
+| ST-001     | Front Desk Clerk| Captures patient intake data at reception desk.| 
+| ST-002     | Clinician        | Provides care and accesses patient records.| 
+| ST-003     | Administrator    | Manages system configuration and overrides.| 
+| ST-004     | Compliance Officer| Oversees regulatory compliance activities.|

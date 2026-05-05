@@ -35,10 +35,10 @@ All containers are orchestrated by Docker Compose with explicit network isolatio
 ### 5. Success Metrics / KPIs
 | KPI ID | Metric | Target | Measurement Method | Linked Objective |
 |--------|--------|--------|-------------------|----------------|
-| KPI-01 | Form submission response time (p95) | ≤ 200 ms | Automated load test suite measuring end‑to‑end latency | OBJ-002 |
-| KPI-02 | System availability (monthly uptime) | ≥ 99.9 % | Monitoring platform uptime logs aggregated monthly | OBJ-002 |
-| KPI-03 | Audit log completeness rate | 100 % of transactions logged | Log audit script cross‑checking transaction count vs log entries | OBJ-004 |
-| KPI-04 | PDF export security compliance | Watermark present & timestamp verified on 100 % of exports | Manual spot check of 50 random PDFs per release cycle | OBJ-003 |
+| KPI-001 | Form submission response time (p95) | ≤ 200 ms | Automated load test suite measuring end‑to‑end latency | OBJ-002 |
+| KPI-002 | System availability (monthly uptime) | ≥ 99.9 % | Monitoring platform uptime logs aggregated monthly | OBJ-002 |
+| KPI-003 | Audit log completeness rate | 100 % of transactions logged | Log audit script cross‑checking transaction count vs log entries | OBJ-004 |
+| KPI-004 | PDF export security compliance | Watermark present & timestamp verified on 100 % of exports | Manual spot check of 50 random PDFs per release cycle | OBJ-003 |
 
 ## Business Requirements – Functional Requirements Traceability Matrix
 | ID | Requirement | Acceptance Criteria |
@@ -58,18 +58,18 @@ All functional requirements are aligned with the strategic objectives to deliver
 ## Stakeholder Analysis
 | Stakeholder ID | Role / Need | Pain Points / Risks | Assigned RBAC Tier | Linked Objective |
 |-----------------|-------------|----------------------|--------------------|------------------|
-| ST-01 | Patient (Data Subject) | Fear of data exposure; cumbersome paper forms | None (view only of own submitted data) | OBJ-001 |
-| ST-02 | Front Desk Staff | Manual re‑entry errors; validation failures | Operator (create & submit) | OBJ-002 |
-| ST-03 | Clinician | Delayed access to critical information | Viewer (read‑only) | OBJ-003 |
-| ST-04 | Administrator | Complexity of role provisioning; compliance reporting workload | Admin (full control) | OBJ-004 |
-| ST-05 | Compliance Officer / Auditor | Unclear audit‑log retention; regulatory assurance gaps | Auditor (read‑audit) | OBJ-005 |
+| ST-001 | Patient (Data Subject) | Fear of data exposure; cumbersome paper forms | None (view only of own submitted data) | OBJ-001 |
+| ST-002 | Front Desk Staff | Manual re‑entry errors; validation failures | Operator (create & submit) | OBJ-002 |
+| ST-003 | Clinician | Delayed access to critical information | Viewer (read‑only) | OBJ-003 |
+| ST-004 | Administrator | Complexity of role provisioning; compliance reporting workload | Admin (full control) | OBJ-004 |
+| ST-005 | Compliance Officer / Auditor | Unclear audit‑log retention; regulatory assurance gaps | Auditor (read‑audit) | OBJ-005 |
 
 ### RACI Assignment for Core Inception Activities
 | Activity | Responsible | Accountable | Consulted | Informed |
 |----------|--------------|--------------|------------|----------|
-| Define project scope and objectives | Administrator (ST-04) | Administrator (ST-04) | Compliance Officer (ST-05), Clinician (ST-03) | Front Desk Staff (ST-02) |
-| Capture functional requirements (FR‑001–FR‑008) | Front Desk Staff (ST-02) & Clinician (ST-03) | Administrator (ST-04) | Clinician (ST-03), Compliance Officer (ST-05) |
-| Validate HIPAA compliance criteria | Compliance Officer (ST-05) | Administrator (ST-04) | Clinician (ST-03), Front Desk Staff (ST-02) |
+| Define project scope and objectives | Administrator (ST-004) | Administrator (ST-004) | Compliance Officer (ST-005), Clinician (ST-003) | Front Desk Staff (ST-002) |
+| Capture functional requirements (FR‑001–FR‑008) | Front Desk Staff (ST-002) & Clinician (ST-003) | Administrator (ST-004) | Clinician (ST-003), Compliance Officer (ST-005) |
+| Validate HIPAA compliance criteria | Compliance Officer (ST-005) | Administrator (ST-004) | Clinician (ST-003), Front Desk Staff (ST-002) |
 
 ## Business Vision
 The PatientIntake project will deliver a HIPAA‑compliant patient intake system that enables front‑desk staff to capture demographic, insurance and medical history data through a secure web form, stores the encrypted records in a locally hosted PostgreSQL database, and provides authorized clinicians with a tamper‑evident PDF summary that includes watermarking and export timestamps. All components are built exclusively with open‑source technologies and deployed on‑premises via Docker Compose to satisfy the organization’s air‑gap policy.

@@ -27,10 +27,10 @@ The solution follows a modular, container‑based architecture built exclusively
 ### 5. Key Performance Indicators
 | KPI ID | Metric Description | Target |
 |--------|----------------------|--------|
-| KPI-01 | Form Completion Rate – % of sessions resulting in successful submission within 2 min | ≥ 95 % |
-| KPI-02 | Audit Log Completeness – % of transactions logged | 100 % |
-| KPI-03 | PDF Export Accuracy – % of PDFs containing correct watermark and timestamp | 100 % |
-| KPI-04 | Test Coverage Ratio – Automated test coverage percentage | ≥ 90 % |
+| KPI-001 | Form Completion Rate – % of sessions resulting in successful submission within 2 min | ≥ 95 % |
+| KPI-002 | Audit Log Completeness – % of transactions logged | 100 % |
+| KPI-003 | PDF Export Accuracy – % of PDFs containing correct watermark and timestamp | 100 % |
+| KPI-004 | Test Coverage Ratio – Automated test coverage percentage | ≥ 90 % |
 
 ### 7. Out‑of‑Scope Statement
 The project does **not** include:
@@ -57,11 +57,11 @@ The **PatientIntake** system will enable health‑care organizations to capture 
 
 | Stakeholder | Need | Pain Point | Role | Objective |
 |---|---|---|---|---|
-| ST-01 Clinical Staff (Physicians, Nurses) | Immediate access to complete, accurate patient medical histories to inform care decisions | Delays caused by paper forms and fragmented electronic records; risk of missing critical history | Clinician (read/write for assigned patients) | OBJ-001: Enable timely, accurate clinical decision‑making |
-| ST-02 Patients | Secure, convenient way to provide personal and health information without exposing PHI | Lack of trust in data handling; fear of data breaches; need for privacy | Patient (no direct system access; data entry via web form) | OBJ-002: Ensure patient confidence and compliance with HIPAA |
-| ST-03 Front‑Desk Staff | Efficient capture and verification of intake data to streamline registration workflow | Manual transcription errors; time‑consuming verification; regulatory compliance overhead | Front‑Desk (create/read own entries, limited edit) | OBJ-003: Reduce registration time and error rate |
-| ST-04 Administrator (IT / System Admin) | Ability to configure system policies, manage user accounts, and audit logs | Complex configuration tools; lack of audit visibility; risk of misconfiguration | Administrator (full system control) | OBJ-004: Maintain system integrity and auditability |
-| ST-05 Compliance Officer | Assurance that all data handling meets HIPAA technical and administrative safeguards | Difficulty proving compliance during audits; incomplete logging | Compliance Officer (read‑only audit logs) | OBJ-005: Demonstrate continuous HIPAA compliance |
+| ST-001 Clinical Staff (Physicians, Nurses) | Immediate access to complete, accurate patient medical histories to inform care decisions | Delays caused by paper forms and fragmented electronic records; risk of missing critical history | Clinician (read/write for assigned patients) | OBJ-001: Enable timely, accurate clinical decision‑making |
+| ST-002 Patients | Secure, convenient way to provide personal and health information without exposing PHI | Lack of trust in data handling; fear of data breaches; need for privacy | Patient (no direct system access; data entry via web form) | OBJ-002: Ensure patient confidence and compliance with HIPAA |
+| ST-003 Front‑Desk Staff | Efficient capture and verification of intake data to streamline registration workflow | Manual transcription errors; time‑consuming verification; regulatory compliance overhead | Front‑Desk (create/read own entries, limited edit) | OBJ-003: Reduce registration time and error rate |
+| ST-004 Administrator (IT / System Admin) | Ability to configure system policies, manage user accounts, and audit logs | Complex configuration tools; lack of audit visibility; risk of misconfiguration | Administrator (full system control) | OBJ-004: Maintain system integrity and auditability |
+| ST-005 Compliance Officer | Assurance that all data handling meets HIPAA technical and administrative safeguards | Difficulty proving compliance during audits; incomplete logging | Compliance Officer (read‑only audit logs) | OBJ-005: Demonstrate continuous HIPAA compliance |
 
 ## Narrative Summary
 The intake workflow is designed around five primary personas. Clinical staff require real‑time, trustworthy access to a patient’s full medical history while being protected by least‑privilege RBAC. Patients need a secure web form that encrypts each field at rest and in transit, fostering confidence that their PHI will not be exposed. Front‑Desk personnel benefit from a streamlined capture process that eliminates manual transcription and reduces registration bottlenecks. Administrators must have unrestricted system control to enforce policies, manage accounts, and maintain full auditability. Compliance officers require immutable, read‑only audit logs to satisfy HIPAA technical safeguards and support audit readiness.
@@ -77,11 +77,11 @@ These alignments ensure that every functional component directly supports a meas
 ## Risk Assessment Register
 | Risk ID | Description | Likelihood | Impact | Mitigation Actions | Owner |
 |---|---|---|---|---|---|
-| RISK-01 | Unauthorized disclosure of PHI during transmission or storage. | H | H | • Enforce TLS 1.3 for all network traffic.<br>• Apply field‑level AES‑256 encryption at rest.<br>• Rotate encryption keys every 90 days.<br>• Conduct quarterly penetration testing. | Security Lead |
-| RISK-02 | Vulnerabilities in open‑source components that could be exploited. | M | H | • Maintain a Software Bill of Materials (SBOM).<br>• Integrate OWASP Dependency‑Check into CI pipeline.<br>• Patch CVSS ≥ 7.0 vulnerabilities within 48 hours.<br>• Curate an approved whitelist of packages. | DevOps Engineer |
-| RISK-03 | Misconfiguration of Docker Compose or container runtime leading to privilege escalation or data leakage. | M | H | • Use minimal base images and run containers as non‑root users.<br>• Enforce read‑only filesystem where possible. • Validate compose files against a hardened schema before deployment. | • Perform weekly configuration drift detection. | Infrastructure Engineer |
-| RISK-04 | Incomplete or tampered audit logs that fail to provide a reliable chain of custody for PHI access events. | L | H | • Enable immutable append‑only logging in PostgreSQL. • Replicate logs to a write‑once storage volume. • Sign each log entry with a quarterly‑rotated HMAC key. | • Retain logs for a minimum of 7 years per HIPAA §164.310(d). | Compliance Officer |
-| RISK-05 | Failure to meet HIPAA administrative safeguards during onboarding of new staff or third‑party contractors. | M | M | • Implement a formal onboarding checklist covering role‑based provisioning, security awareness training, and signed Business Associate Agreements. • Conduct quarterly access right audits. | • Revoke privileges within 24 hours of role change. | HR Manager |
+| RISK-001 | Unauthorized disclosure of PHI during transmission or storage. | H | H | • Enforce TLS 1.3 for all network traffic.<br>• Apply field‑level AES‑256 encryption at rest.<br>• Rotate encryption keys every 90 days.<br>• Conduct quarterly penetration testing. | Security Lead |
+| RISK-002 | Vulnerabilities in open‑source components that could be exploited. | M | H | • Maintain a Software Bill of Materials (SBOM).<br>• Integrate OWASP Dependency‑Check into CI pipeline.<br>• Patch CVSS ≥ 7.0 vulnerabilities within 48 hours.<br>• Curate an approved whitelist of packages. | DevOps Engineer |
+| RISK-003 | Misconfiguration of Docker Compose or container runtime leading to privilege escalation or data leakage. | M | H | • Use minimal base images and run containers as non‑root users.<br>• Enforce read‑only filesystem where possible. • Validate compose files against a hardened schema before deployment. | • Perform weekly configuration drift detection. | Infrastructure Engineer |
+| RISK-004 | Incomplete or tampered audit logs that fail to provide a reliable chain of custody for PHI access events. | L | H | • Enable immutable append‑only logging in PostgreSQL. • Replicate logs to a write‑once storage volume. • Sign each log entry with a quarterly‑rotated HMAC key. | • Retain logs for a minimum of 7 years per HIPAA §164.310(d). | Compliance Officer |
+| RISK-005 | Failure to meet HIPAA administrative safeguards during onboarding of new staff or third‑party contractors. | M | M | • Implement a formal onboarding checklist covering role‑based provisioning, security awareness training, and signed Business Associate Agreements. • Conduct quarterly access right audits. | • Revoke privileges within 24 hours of role change. | HR Manager |
 
 ## Key Observations
 1. **Likelihood Distribution** – The most probable risks are RISK-001 (unauthorized disclosure) and RISK-002/03 (software and configuration issues), reflecting the open‑source stack and containerized deployment model.
@@ -101,11 +101,11 @@ These alignments ensure that every functional component directly supports a meas
 ### Success Criteria / KPIs
 | KPI ID | Description | Target |
 |---|---|---|
-| KPI-01 | Form submission response time < 200 ms per transaction | ≤ 200 ms |
-| KPI-02 | System availability (uptime) | ≥ 99.9 % |
-| KPI-03 | Successful audit log generation for every read/write operation | 100 % coverage |
-| KPI-04 | PDF export security compliance (watermark present, timestamp recorded) | 100 % compliance |
-| KPI-05 | Test coverage for critical paths (form validation, encryption handling, RBAC) | ≥ 80 % of statements |
+| KPI-001 | Form submission response time < 200 ms per transaction | ≤ 200 ms |
+| KPI-002 | System availability (uptime) | ≥ 99.9 % |
+| KPI-003 | Successful audit log generation for every read/write operation | 100 % coverage |
+| KPI-004 | PDF export security compliance (watermark present, timestamp recorded) | 100 % compliance |
+| KPI-005 | Test coverage for critical paths (form validation, encryption handling, RBAC) | ≥ 80 % of statements |
 
 ### Acceptance Criteria per Objective
 * **OBJ‑001** – Clinicians can retrieve a patient’s complete medical history within 2 seconds of request; all retrieved records must be verified against role permissions.

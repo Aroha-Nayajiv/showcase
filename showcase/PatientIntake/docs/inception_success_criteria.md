@@ -77,7 +77,7 @@ The PatientIntake system will enable healthcare providers to capture complete pa
  100 % of PHI fields encrypted |
  Automated field‑level scan report |
  OBJ-001 |
-|-KPI- 3| Audit Log Integrity| Zero missing or altered entries over 90 days| Weekly hash verification of log files| OBJ- 04| KPI- 04| PDF Export Security Compliance| All exported PDFs contain watermark and timestamp; access logged| Automated validation script after each export| OBJ- 05| 
+| KPI- 3| Audit Log Integrity| Zero missing or altered entries over 90 days| Weekly hash verification of log files| OBJ- 04| KPI- 04| PDF Export Security Compliance| All exported PDFs contain watermark and timestamp; access logged| Automated validation script after each export| OBJ- 05| 
 
 ### Stakeholder Roles Overview
 | Stakeholder ID |
@@ -90,6 +90,6 @@ Actually provide proper table:
 
 | Stakeholder ID | Role Name               | Primary Need                                            | System Access Rights                                                                                 |
 |-----------------|------------------------|--------------------------------------------------------|------------------------------------------------------------------------------------------------------|
-| ST-01          | Front\u2011Desk Staff   | Efficient intake workflow and verification of insurance eligibility | Read patient demographic & insurance fields; write intake status flags; no access to clinical notes |
+| ST-001          | Front\u2011Desk Staff   | Efficient intake workflow and verification of insurance eligibility | Read patient demographic & insurance fields; write intake status flags; no access to clinical notes |
 
 ...

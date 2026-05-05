@@ -82,11 +82,11 @@ All user stories now include explicit Given/When/Then scenarios aligned with fun
 
 | ID       | Description |
 |----------|-------------|
-| RISK-01  | Unauthorized data exposure due to mis‑configured encryption keys. |
-| RISK-02  | Open‑source component vulnerabilities in encryption libraries. |
-| RISK-03  | Deployment misconfiguration leading to insecure container settings. |
-| RISK-04  | Compliance audit gaps caused by incomplete audit logs. |
-| RISK-05  | On‑premise deployment without auto‑scaling may cause capacity bottlenecks. |
+| RISK-001  | Unauthorized data exposure due to mis‑configured encryption keys. |
+| RISK-002  | Open‑source component vulnerabilities in encryption libraries. |
+| RISK-003  | Deployment misconfiguration leading to insecure container settings. |
+| RISK-004  | Compliance audit gaps caused by incomplete audit logs. |
+| RISK-005  | On‑premise deployment without auto‑scaling may cause capacity bottlenecks. |
 
 ### US-001 – Secure Demographic Capture (Priority 1)
 **As a** Front Desk Operator (**PER‑01**)
@@ -130,10 +130,8 @@ Headers:
   Authorization: Bearer <JWT>
   Content-Type: application/json
 Body:
-{
-  "policyNumber": "string",
-  "patientId": "uuid"
-}
+- **policyNumber**: string
+- **patientId**: uuid
 Responses:
   200 OK { "status": "verified", "details": { ... } }
   400 Bad Request { "error": "Invalid policy format" }

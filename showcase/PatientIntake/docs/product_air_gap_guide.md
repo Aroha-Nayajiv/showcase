@@ -436,24 +436,9 @@ Docker bypasses UFW by default. You must secure the `DOCKER-USER` chain to preve
 
 **API Endpoint**: `POST /api/v1/intake`
 
-{
-  "patient": {
-    "firstName": "string",
-    "lastName": "string",
-    "dob": "YYYY-MM-DD",
-    "address": "string",
-    "phone": "string"
-  },
-  "insurance": {
-    "provider": "string",
-    "policyNumber": "string",
-    "groupNumber": "string"
-  },
-  "medicalHistory": {
-    "conditions": ["string"],
-    "medications": ["string"]
-  }
-}
+- **patient**: {'firstName': 'string', 'lastName': 'string', 'dob': 'YYYY-MM-DD', 'address': 'string', 'phone': 'string'}
+- **insurance**: {'provider': 'string', 'policyNumber': 'string', 'groupNumber': 'string'}
+- **medicalHistory**: {'conditions': ['string'], 'medications': ['string']}
 
 **Response (201 Created)** includes `location` header pointing to the generated PDF summary.
 *Security*: OAuth2 Bearer token required; payload encrypted in transit (**NFR‑005**) and validated against schema.

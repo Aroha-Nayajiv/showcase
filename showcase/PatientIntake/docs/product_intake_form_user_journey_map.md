@@ -4,10 +4,10 @@
 
 | ID | Persona | Goal | Primary Tasks | Security / Compliance |
 |----|--------|------|---------------|----------------------|
-| PER-01 | Front Desk Clerk (ST-01) | Capture accurate patient demographics and insurance data quickly. | Initiate intake form, verify required fields, submit encrypted data, trigger audit log entry. | Must ensure data is encrypted at rest and in transit; audit log must record creation event (FR-001, NFR-003). |
-| PER-02 | Clinician (ST-02) | Review medical history and verify completeness before consultation. | Access submitted records, view encrypted fields after decryption via authorized session, add clinical notes if permitted. | Access controlled by role‑based permissions; every read operation logged (FR-002, NFR-003). |
-| PER-03 | Compliance Officer (ST-03) | Verify that intake process meets HIPAA technical safeguards and audit requirements. | Audit logs, validate encryption key management, ensure watermark and timestamp on PDF exports. | Directly tied to compliance checks (NFR‑001, NFR‑003). |
-| PER-04 | Patient (ST-04) | Provide personal and medical information securely and receive confirmation of receipt. Fill out web form, consent to data handling, receive PDF summary link after approval. |
+| PER-01 | Front Desk Clerk (ST-001) | Capture accurate patient demographics and insurance data quickly. | Initiate intake form, verify required fields, submit encrypted data, trigger audit log entry. | Must ensure data is encrypted at rest and in transit; audit log must record creation event (FR-001, NFR-003). |
+| PER-02 | Clinician (ST-002) | Review medical history and verify completeness before consultation. | Access submitted records, view encrypted fields after decryption via authorized session, add clinical notes if permitted. | Access controlled by role‑based permissions; every read operation logged (FR-002, NFR-003). |
+| PER-03 | Compliance Officer (ST-003) | Verify that intake process meets HIPAA technical safeguards and audit requirements. | Audit logs, validate encryption key management, ensure watermark and timestamp on PDF exports. | Directly tied to compliance checks (NFR‑001, NFR‑003). |
+| PER-04 | Patient (ST-004) | Provide personal and medical information securely and receive confirmation of receipt. Fill out web form, consent to data handling, receive PDF summary link after approval. |
  | Consent handling and secure transmission are required by 45 CFR 164.312(a)(2)(iv). |
 
 ## 2. Edge Cases & Failure Scenarios

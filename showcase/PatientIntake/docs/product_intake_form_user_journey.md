@@ -3,9 +3,9 @@
 ## Personas
 | ID   | Role               | Description |
 |------|--------------------|-------------|
-| ST-01 | Clinical Staff    | Licensed clinicians (physicians, nurses, physician assistants) who review and update patient medical histories after intake. |
-| ST-02 | Front Desk Staff | Administrative personnel who capture patient demographics, insurance information, and basic medical history during check‑in. |
-| ST-03 | Compliance Officer | Auditor responsible for ensuring the intake system meets HIPAA technical safeguards and internal policies. |
+| ST-001 | Clinical Staff    | Licensed clinicians (physicians, nurses, physician assistants) who review and update patient medical histories after intake. |
+| ST-002 | Front Desk Staff | Administrative personnel who capture patient demographics, insurance information, and basic medical history during check‑in. |
+| ST-003 | Compliance Officer | Auditor responsible for ensuring the intake system meets HIPAA technical safeguards and internal policies. |
 
 ## User Stories
 | ID     | As a               | I want                                                                                                   | So that                                                                                                         |

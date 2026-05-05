@@ -79,7 +79,7 @@ they receive 409 Conflict with details of the latest version.
 | FR-001 (Secure data capture) | US-001, US-002, US-003 → AC-001, AC-003, AC-004 |
 | FR-003 (PDF export control) | US-002 → AC-004 |
 | NFR-003 (Audit logging) | All → AC-001–AC-005 |
-| KPI-01 (Response <200 ms) | All → performance monitoring metric referenced in design needs |
+| KPI-001 (Response <200 ms) | All → performance monitoring metric referenced in design needs |
 
 ---
 
@@ -117,16 +117,12 @@ Retention: retain for 7 years per NIST AU‑6; archive older rows to cold storag
 ### PDF Generation Service Contract
 
 POST /api/v1/intake/{record_id}/export-pdf
-{
-  "requester_role": "clinician",
-  "requester_name": "Dr. Alice Smith"
-}
+- **requester_role**: clinician
+- **requester_name**: Dr. Alice Smith
 Response 200:
-{
-  "pdf_url": "https://storage.example.com/pdfs/record12345.pdf",
-  "watermark": "Clinician:Dr. Alice Smith",
-  "timestamp": "2026-05-05T12:34:56Z"
-}
+- **pdf_url**: https://storage.example.com/pdfs/record12345.pdf
+- **watermark**: Clinician:Dr. Alice Smith
+- **timestamp**: 2026-05-05T12:34:56Z
 
 Errors: 502 for generation failure, 403 for unauthorized role.
 

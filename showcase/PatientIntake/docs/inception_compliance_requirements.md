@@ -29,10 +29,10 @@ The PatientIntake project will deliver a HIPAA‑compliant, open‑source patien
 ### 4. Success Metrics / KPIs
 | KPI ID   | Metric                     | Target                                 | Measurement Method                                 |
 |----------|----------------------------|----------------------------------------|---------------------------------------------------|
-| KPI-01   | Form completion rate       | ≥ 90 % of attempted submissions completed without error   | Daily logs of successful vs attempted submissions |
-| KPI-02   | System availability        | ≥ 99.9 % monthly uptime | Prometheus uptime metric aggregated monthly |
-| KPI-03   | Audit log completeness | 100 % of read/write operations recorded with immutable checksum verification | Weekly log integrity check script |
-| KPI-04 | PDF export security compliance | 100 % of exported PDFs contain correct watermark and timestamp verified by automated scan | Post‑export validation job |
+| KPI-001   | Form completion rate       | ≥ 90 % of attempted submissions completed without error   | Daily logs of successful vs attempted submissions |
+| KPI-002   | System availability        | ≥ 99.9 % monthly uptime | Prometheus uptime metric aggregated monthly |
+| KPI-003   | Audit log completeness | 100 % of read/write operations recorded with immutable checksum verification | Weekly log integrity check script |
+| KPI-004 | PDF export security compliance | 100 % of exported PDFs contain correct watermark and timestamp verified by automated scan | Post‑export validation job |
 
 ### 5. Governance & Approval Process
 All artifacts produced in this inception phase will be reviewed by the Project Sponsor, Compliance Officer, and Technical Lead before sign‑off. The sign‑off checklist includes verification of each functional requirement against its acceptance criteria, confirmation that all KPI targets are measurable, and validation that identified risks have concrete mitigation actions. A RACI matrix (artifact ID RACI-001) defines responsibility for each deliverable.
@@ -53,19 +53,19 @@ The Patient Intake initiative delivers a HIPAA‑compliant, open‑source patien
 ## 10. Stakeholder Matrix
 | Stakeholder | Primary Need | Pain Point / Concern | System Role | Objective |
 |---|---|---|---|---|
-| Patient (ST-02) | Secure, frictionless intake experience that protects PHI | Fear of data exposure; forms perceived as time‑consuming | View‑only (no write) | OBJ‑001: Ensure HIPAA‑compliant data capture and encryption at rest/in transit |
-| Front‑Desk Staff (ST-01) | Rapid entry and verification of patient data to keep clinic flow moving | Manual re‑entry errors; lack of real‑time audit visibility | Create & edit submissions; read all records | OBJ‑002: Complete intake within two minutes per patient |
-| Clinician (ST-03) | Immediate access to complete medical history for care decisions | Delayed or incomplete records hinder treatment planning | Read‑only access to submitted forms; can append clinical notes | OBJ‑003: Provide verified data within 30 seconds of submission |
-| Administrator (ST-04) | Governance over configuration, user provisioning, and audit log retention | Need centralized control without exposing PHI | Full system privileges; manage roles and audit logs | OBJ‑004: Maintain immutable audit log for seven years meeting HIPAA §164.312(b) |
-| Compliance Officer (ST-05) | Assurance that processes meet regulatory mandates | Requires evidence of encryption key management and audit trail completeness | Read‑only access to logs and configuration reports | OBJ‑005: Achieve quarterly compliance audit pass rate ≥ 95% |
+| Patient (ST-002) | Secure, frictionless intake experience that protects PHI | Fear of data exposure; forms perceived as time‑consuming | View‑only (no write) | OBJ‑001: Ensure HIPAA‑compliant data capture and encryption at rest/in transit |
+| Front‑Desk Staff (ST-001) | Rapid entry and verification of patient data to keep clinic flow moving | Manual re‑entry errors; lack of real‑time audit visibility | Create & edit submissions; read all records | OBJ‑002: Complete intake within two minutes per patient |
+| Clinician (ST-003) | Immediate access to complete medical history for care decisions | Delayed or incomplete records hinder treatment planning | Read‑only access to submitted forms; can append clinical notes | OBJ‑003: Provide verified data within 30 seconds of submission |
+| Administrator (ST-004) | Governance over configuration, user provisioning, and audit log retention | Need centralized control without exposing PHI | Full system privileges; manage roles and audit logs | OBJ‑004: Maintain immutable audit log for seven years meeting HIPAA §164.312(b) |
+| Compliance Officer (ST-005) | Assurance that processes meet regulatory mandates | Requires evidence of encryption key management and audit trail completeness | Read‑only access to logs and configuration reports | OBJ‑005: Achieve quarterly compliance audit pass rate ≥ 95% |
 
 ## 12. Key Performance Indicators
 | ID | Target |
 |---|---|
-| KPI-01 | Form submission response time <200 ms average |
-| KPI-02 | System availability ≥99.9 % monthly |
-| KPI-03 | Audit log generated for 100 % of submissions |
-| KPI-04 | PDF export includes watermark and timestamp; unauthorized export attempts ≤0 |
+| KPI-001 | Form submission response time <200 ms average |
+| KPI-002 | System availability ≥99.9 % monthly |
+| KPI-003 | Audit log generated for 100 % of submissions |
+| KPI-004 | PDF export includes watermark and timestamp; unauthorized export attempts ≤0 |
 
 ## 13. RACI Assignment for Core Activities
 | Activity | Responsible (R) | Accountable (A) | Consulted (C) | Informed (I) |
@@ -94,34 +94,34 @@ Overall, this analysis delivers a clear, auditable blueprint that aligns stakeho
 ## 15. Risk Register
 | ID | Description | Likelihood (L/M/H) | Impact (L/M/H) | Mitigation Actions |
 |---|---|---|---|---|
-| RISK-01 | Unauthorized disclosure of PHI during transmission or storage due to inadequate encryption controls. | M | H | Implement field‑level AES‑256 encryption for all form fields at rest; enforce TLS 1.3 for in‑flight data; rotate keys every 90 days using open‑source Vault alternative; log every key retrieval. |
-| RISK-02 | Vulnerabilities in open‑source components (web framework, PDF library) could be exploited to gain access to PHI. | M | H | Adopt continuous vulnerability scanning pipeline using OWASP Dependency‑Check; enforce patching of critical CVEs within seven days; maintain a software bill of materials generated by CycloneDX; assign security champion review. |
-| RISK-03 = Misconfiguration of Docker Compose or host OS leading to accidental exposure of PostgreSQL port or audit logs. | L | H Implement CIS Docker Benchmarks hardening; disable external network interfaces on database container; enforce host firewall rules; conduct quarterly configuration audits using Lynis. |
-| RISK-04 = Incomplete audit logging or log tampering that would prevent compliance verification during a HIPAA audit. | M | H Design immutable append‑only audit log stored on WORM storage; retain logs for seven years; verify log integrity daily with SHA‑256 hash chaining; restrict log write permissions to system service account only. |
+| RISK-001 | Unauthorized disclosure of PHI during transmission or storage due to inadequate encryption controls. | M | H | Implement field‑level AES‑256 encryption for all form fields at rest; enforce TLS 1.3 for in‑flight data; rotate keys every 90 days using open‑source Vault alternative; log every key retrieval. |
+| RISK-002 | Vulnerabilities in open‑source components (web framework, PDF library) could be exploited to gain access to PHI. | M | H | Adopt continuous vulnerability scanning pipeline using OWASP Dependency‑Check; enforce patching of critical CVEs within seven days; maintain a software bill of materials generated by CycloneDX; assign security champion review. |
+| RISK-003 = Misconfiguration of Docker Compose or host OS leading to accidental exposure of PostgreSQL port or audit logs. | L | H Implement CIS Docker Benchmarks hardening; disable external network interfaces on database container; enforce host firewall rules; conduct quarterly configuration audits using Lynis. |
+| RISK-004 = Incomplete audit logging or log tampering that would prevent compliance verification during a HIPAA audit. | M | H Design immutable append‑only audit log stored on WORM storage; retain logs for seven years; verify log integrity daily with SHA‑256 hash chaining; restrict log write permissions to system service account only. |
 
 ## 16. Detailed Mitigation Plans
 
-### 16.1 Encryption & Key Management (RISK-01)
+### 16.1 Encryption & Key Management (RISK-001)
 * Use OWASP‑vetted field‑level encryption libraries written in Go/Python.
 * Each form field is encrypted client‑side before transmission; server stores ciphertext only.
 * TLS 1.3 termination performed by Caddy reverse proxy configured with strong cipher suites.
 * Keys reside in HashiCorp Vault OSS replica; access limited to application service account; every retrieval logged.
 * Quarterly key rotation exercises are scheduled and documented in change management logs.
 
-### 16.2 Dependency Hardening (RISK-02)
+### 16.2 Dependency Hardening (RISK-002)
 * Generate SBOM with CycloneDX on each CI run.
 * OWASP Dependency‑Check scans for CVE ≥7; build fails on detection.
 * Security champion reviews new third‑party packages before merge.
 * Monthly security bulletin disseminated to development team.
 
-### 16.3 Container & Host Hardening (RISK-03)
+### 16.3 Container & Host Hardening (RISK-003)
 * Apply CIS Docker Benchmarks during image build.
 * Use Docker Compose version pinning; set `restart: unless-stopped`.
 * Disable external exposure of PostgreSQL port via `ports: []` inside compose file; rely on internal network only.
 * Host firewall (`ufw`) blocks inbound traffic except from trusted LAN subnet.
 * Quarterly audits executed with Lynis report reviewed by Infrastructure Lead.
 
-### 16.4 Immutable Audit Logging (RISK-04)
+### 16.4 Immutable Audit Logging (RISK-004)
 * Configure PostgreSQL logical replication to write audit events to separate WORM volume.
 * Each log entry includes SHA‑256 hash chained to previous entry.
 * Daily cron job verifies hash chain integrity; alerts on mismatch.
@@ -131,9 +131,9 @@ Overall, this analysis delivers a clear, auditable blueprint that aligns stakeho
 ## Stakeholder Identification and Needs
 | Stakeholder ID | Role | Primary Need |
 |---|---|---|
-| ST-01 | Clinical staff | Quick access to accurate patient demographics and medical history during care delivery |
-| ST-02 | Patients | Assurance that personal health information is collected and stored confidentially |
-| ST-03 | Compliance officers | Verifiable audit trails and encryption evidence for regulatory inspections |
+| ST-001 | Clinical staff | Quick access to accurate patient demographics and medical history during care delivery |
+| ST-002 | Patients | Assurance that personal health information is collected and stored confidentially |
+| ST-003 | Compliance officers | Verifiable audit trails and encryption evidence for regulatory inspections |
 
 ## Compliance Alignment
 The above controls map directly to HIPAA Security Rule:

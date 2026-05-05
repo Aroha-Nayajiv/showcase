@@ -314,13 +314,13 @@ All CRUD operations on `patient_intake` and PDF generation emit an immutable rec
 
 ## 9. Security Considerations & Compliance Alignment
 - **HIPAA §164.312(a)(2)(iv)** – Encryption of PHI at rest and in transit is enforced via TLS 1.3 and AES‑256‑GCM.
-- **SOC 2 – Security Trust Principle** – Role‑based access control enforced by Vault policies and JWT claims.- **Zero Trust** – No implicit trust; every request is authenticated and authorized before any data access.- **Principle of Least Privilege** – Service accounts have read/write only on their own tenant’s data; Vault policies restrict key access accordingly.- **Rate Limiting & DDoS Protection** – API gateway enforces per‑IP limits and integrates with Cloudflare WAF for additional protection.- **Audit Log Integrity** – Append‑only table with trigger preventing tampering satisfies regulatory immutability requirements.---## 8. Deployment & Operational Guidelines (SAAS Context)
+- **SOC 2 – Security Trust Principle** – Role‑based access control enforced by Vault policies and JWT claims.- **Zero Trust** – No implicit trust; every request is authenticated and authorized before any data access.- **Principle of Least Privilege** – Service accounts have read/write only on their own tenant’s data; Vault policies restrict key access accordingly.- **Rate Limiting & DDoS Protection** – API gateway enforces per‑IP limits and integrates with Cloudflare WAF for additional protection.- **Audit Log Integrity** – Append‑only table with trigger preventing tampering satisfies regulatory immutability requirements.---## 8. Deployment & Operational Guidelines (SAAS Context)
 b- **Containerization** – Each microservice runs in Docker containers orchestrated by Kubernetes.
 b- **Horizontal Scalability** – Stateless API layer scales behind an ingress controller; database read replicas support high read throughput.
 b- **Multi‑Tenant Isolation** – Tenant ID is part of every request context; row‑level security policies enforce tenant data separation.
 b- **Backup & Disaster Recovery** – Daily encrypted backups stored in offsite object storage; point‑in‑time recovery tested weekly.
 b---
-b## 9. References & Traceability Matrix| ID | Description ||----|-------------|| FR‑001 | Secure demographic capture || FR‑002 | Insurance information capture || FR‑003 | Medical history storage || NFR‑003 | Mandatory audit logging || RISK-001 | Unauthorized data exposure |---*All specifications above are traceable to the listed IDs.*
+b## 9. References & Traceability Matrix| ID | Description ||----|-------------|| FR‑001 | Secure demographic capture || FR‑002 | Insurance information capture || FR‑003 | Medical history storage || NFR‑003 | Mandatory audit logging || RISK-001 | Unauthorized data exposure |---*All specifications above are traceable to the listed IDs.*
 
 # System Architecture Overview
 
@@ -362,20 +362,10 @@ flowchart TD
 
 **Request Body (`application/json`):
 
-{
-  "patientId": "string",
-  "demographics": {
-    "firstName": "string",
-    "lastName": "string",
-    "dateOfBirth": "YYYY-MM-DD",
-    "gender": "M|F|Other"
-  },
-  "insuranceInfo": {
-    "provider": "string",
-    "policyNumber": "string"
-  },
-  "clinicalNotes": "string"
-}
+- **patientId**: string
+- **demographics**: {'firstName': 'string', 'lastName': 'string', 'dateOfBirth': 'YYYY-MM-DD', 'gender': 'M|F|Other'}
+- **insuranceInfo**: {'provider': 'string', 'policyNumber': 'string'}
+- **clinicalNotes**: string
 
 *Validated against schema `SCH‑001`.*
 
@@ -401,11 +391,9 @@ flowchart TD
 ## Error Handling Standards
 All services return errors in a consistent JSON envelope:
 
-{
-  "errorCode": "<MODULE>-<NNN>",
-  "message": "<human readable description>",
-  "timestamp": "ISO8601"
-}
+- **errorCode**: <MODULE>-<NNN>
+- **message**: <human readable description>
+- **timestamp**: ISO8601
 
 Error code namespace mapping:
 - `VAL` – Validation errors (e.g., `VAL‑001`).

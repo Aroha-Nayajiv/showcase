@@ -51,12 +51,12 @@ This document defines the Minimum‑Viable‑Product (MVP) capabilities required
 ## 4. Required MVP Features
 | Feature | Description | Requirement IDs | KPI |
 |---|---|---|---|
-| Structured Web Form | Collects patient demographics, insurance information, and medical history via HTML5 inputs; each field is encrypted client‑side before transmission. | FR-001<br>FR-002<br>FR-003 | KPI-01 (≤200 ms response) |
-| Field‑Level Encryption | Uses OpenSSL‑compatible AES‑256‑GCM for each field; keys stored in a local HashiCorp Vault instance. | NFR-001<br>NFR-002 | KPI-03 (audit log completeness) |
-| Role‑Based Access Control (RBAC) | Admin, Clinician, Front Desk roles with least‑privilege permissions enforced by PostgreSQL row‑level security. | FR-004<br>FR-005 | KPI-02 (99.9 % uptime) |
-| Immutable Audit Log | Every CREATE/READ/UPDATE/DELETE operation writes a tamper‑evident entry to an append‑only log table; log entries are signed with HMAC‑SHA256. | FR-006<br>NFR-003 | KPI-03 |
-| PDF Intake Summary Generation | Generates PDF/A‑2b compliant summary using wkhtmltopdf; adds configurable watermark ("Authorized Staff Only") and UTC timestamp on each export. | FR-007<br>FR-008 | KPI-04 (PDF export security) |
-| Docker Compose Air‑Gap Deployment | All containers (nginx, app, PostgreSQL, Vault) are defined in a single docker-compose.yml with `network_mode: bridge` and no external network access; includes offline image loading script. | FR-009<br>RISK-03 | KPI-05 (deployment reproducibility) |
+| Structured Web Form | Collects patient demographics, insurance information, and medical history via HTML5 inputs; each field is encrypted client‑side before transmission. | FR-001<br>FR-002<br>FR-003 | KPI-001 (≤200 ms response) |
+| Field‑Level Encryption | Uses OpenSSL‑compatible AES‑256‑GCM for each field; keys stored in a local HashiCorp Vault instance. | NFR-001<br>NFR-002 | KPI-003 (audit log completeness) |
+| Role‑Based Access Control (RBAC) | Admin, Clinician, Front Desk roles with least‑privilege permissions enforced by PostgreSQL row‑level security. | FR-004<br>FR-005 | KPI-002 (99.9 % uptime) |
+| Immutable Audit Log | Every CREATE/READ/UPDATE/DELETE operation writes a tamper‑evident entry to an append‑only log table; log entries are signed with HMAC‑SHA256. | FR-006<br>NFR-003 | KPI-003 |
+| PDF Intake Summary Generation | Generates PDF/A‑2b compliant summary using wkhtmltopdf; adds configurable watermark ("Authorized Staff Only") and UTC timestamp on each export. | FR-007<br>FR-008 | KPI-004 (PDF export security) |
+| Docker Compose Air‑Gap Deployment | All containers (nginx, app, PostgreSQL, Vault) are defined in a single docker-compose.yml with `network_mode: bridge` and no external network access; includes offline image loading script. | FR-009<br>RISK-003 | KPI-005 (deployment reproducibility) |
 
 ## 5. Checklist Mapping
 | Requirement | Traceability |
@@ -89,11 +89,11 @@ This document defines the Minimum‑Viable‑Product (MVP) capabilities required
 ## 8. Ranked User Stories (Highest Priority First)
 | # | User Story ID | Persona (Stakeholder) | Goal | Business Value | Priority |
 |---|---|---|---|---|---|
-| 1 | US-001 | Front Desk Clerk (**ST-01**) | Submit a fully encrypted patient intake form | Data captured securely and audit‑logged before clinician review | 5 |
-| 2 | US-002 | Clinician (**ST-02**) | Retrieve a patient's encrypted medical history after successful authentication | Enables care delivery while preserving confidentiality | 5 |
-| 3 | US-003 | Compliance Officer (**ST-03**) | Generate a PDF intake summary with watermark and timestamp for audit review | Verifies export complies with HIPAA audit requirements and traceability | 4 |
-| 4 | US-004 | Admin (**ST-04**) | Run the Docker Compose deployment in an air‑gapped environment using the provided checklist | System launched without external network exposure, meeting RISK-003 mitigation | 3 |
-| 5 | US-005 | Front Desk Clerk (**ST-01**) | View deployment status dashboard after each release | Confirms all pre‑deployment security controls passed before patients use the form | 2 |
+| 1 | US-001 | Front Desk Clerk (**ST-001**) | Submit a fully encrypted patient intake form | Data captured securely and audit‑logged before clinician review | 5 |
+| 2 | US-002 | Clinician (**ST-002**) | Retrieve a patient's encrypted medical history after successful authentication | Enables care delivery while preserving confidentiality | 5 |
+| 3 | US-003 | Compliance Officer (**ST-003**) | Generate a PDF intake summary with watermark and timestamp for audit review | Verifies export complies with HIPAA audit requirements and traceability | 4 |
+| 4 | US-004 | Admin (**ST-004**) | Run the Docker Compose deployment in an air‑gapped environment using the provided checklist | System launched without external network exposure, meeting RISK-003 mitigation | 3 |
+| 5 | US-005 | Front Desk Clerk (**ST-001**) | View deployment status dashboard after each release | Confirms all pre‑deployment security controls passed before patients use the form | 2 |
 
 ## Change Impact Note
 No public interfaces were altered; only documentation artifacts were enriched. No sibling artifacts require updates.
@@ -171,9 +171,5 @@ No public interfaces were altered; only documentation artifacts were enriched. N
 
 ## Open Knowledge Gaps
 
-{
-  "knowledge_gaps": [
-    "Exact HIPAA § 164.312(a)(2)(iv) technical safeguard requirements for encryption key management",
-    "PostgreSQL row-level security performance characteristics at 10M+ audit log rows"
-  ]
-}
+- Exact HIPAA § 164.312(a)(2)(iv) technical safeguard requirements for encryption key management
+- PostgreSQL row-level security performance characteristics at 10M+ audit log rows

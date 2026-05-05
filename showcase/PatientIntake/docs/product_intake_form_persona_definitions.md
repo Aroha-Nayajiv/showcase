@@ -2,7 +2,7 @@
 
 ## Persona Definitions for Patient Intake System (Overview)
 
-The following personas capture the primary human actors who will interact with the PatientIntake system. They are derived directly from the project requirements (collect demographics, secure storage, audit logging, PDF export) and the stakeholder list (ST-01 Clinical staff, ST-02 Patients, ST-03 Compliance officer). Each persona includes role‑specific goals, motivations, constraints, and security considerations that inform downstream design and testing.
+The following personas capture the primary human actors who will interact with the PatientIntake system. They are derived directly from the project requirements (collect demographics, secure storage, audit logging, PDF export) and the stakeholder list (ST-001 Clinical staff, ST-002 Patients, ST-003 Compliance officer). Each persona includes role‑specific goals, motivations, constraints, and security considerations that inform downstream design and testing.
 
 ### PER-02: Front‑Desk Staff (Receptionist / Registration Clerk)
 1. **Role Summary**: Administrative personnel responsible for initial patient registration, data entry of demographics and insurance details, and initiating PDF intake summaries for authorized staff.
@@ -76,66 +76,3 @@ The following personas capture the primary human actors who will interact with t
 ---
 
 *All functional references map to existing asset IDs:* FR‑001 (Secure demographic capture), FR‑002 (Insurance verification), FR‑003 (Immutable audit logging), FR‑005 (PDF generation with watermark), NFR‑001 (Encryption at rest & transit), NFR‑003 (Audit log integrity), KPI-001 (Form submission response time <200 ms), KPI-004 (Data entry error rate <1 %).
-
-{'status': 'error', 'error': 'All micro-goals failed', 'failed_micro_goals': [{'status': 'error', 'error': "Refiner specialized logic failed: Template rendering failed due to undefined variable: 'watermark' is undefined. This indicates a system error where required context variables were not set. Available context keys: ['artifact_name', 'artifact_description', 'artifact_id', 'dbs_id', 'artifact_type', 'role', 'agent_role', 'phase_name', 'artifact_dependencies', 'forward_dependents', 'project_requirement_text', 'project_requirement_full', 'requirement_text', 'context_summary', 'project_id', 'goal', 'total_micro_goals', 'micro_goal_index', 'acceptance_criteria', 'binding_manifest', 'micro_goal', 'micro_goal_axis', 'micro_goal_level', 'micro_goal_parent_id', 'reasoning_summary', 'artifact_definition', 'dbs_item', 'cipher_context', 'episodic_patterns', 'software_dna_context', 'existing_artifacts', 'existing_artifacts_summary', 'sibling_artifacts', 'decomposer_artifact_ids_so_far', 'decomposer_cot_commitment', 'previous_phase_artifacts', 'jigsaw_map', 'coordinated_insights', 'coordination_available', 'domain_knowledge_context', 'research_context', 'vp_feedback', 'vp_primary_gaps', 'task_context', 'multi_turn_instruction', 'content_to_refine', 'reviewer_feedback', 'executor_output', 'original_output', 'peer_reviews', 'refinement_context_mode', 'refinement_segment_index', 'refinement_segment_total', 'current_agent_role', 'templates', 'contracts', 'technology_stack', 'chain_of_thought_context', 'reasoning_for_current_goal', 'decomposition_reasoning_context', 'executor_reasoning_digest', 'executor_self_critique', '_stage_context', 'previous_phase_learnings', 'previous_phase_context', 'pipeline_conductor_context', 'pipeline_conductor_hint', 'pipeline_conductor_focus_artifacts', 'pipeline_conductor_metadata', 'decomposition_retry_delta_block', 'generated_content', 'artifact_content', 'content', 'previous_output', 'content_to_review', 'reviewer_feedback_markdown', 'refined_outputs_markdown', 'executor_inputs_markdown', 'micro_goal_context', 'dna_insights', 'previous_phase_dna', 'dna_domain_concepts', 'consolidation_manifest', 'completed_sections', 'sections_already_produced', 'project_grounding_facts', 'project_grounding_summary', 'context_tier', 'include_methodology_deep', 'stage_name', 'jigsaw_universal_contract', '_cbr_reference_metadata', 'phase_prompt_preamble', 'artifact_prompt_delta', 'phase_prompt_scope_id', 'content_to_approve', 'episodic_patterns_summary', 'pass_name', 'reflection_critique_summary', 'task_description', 'focus_area', 'research_reasoning', 'research_results', 'results_count', 'results_used', 'existing_knowledge_summary', 'project_context', 'project_description', 'project_domain', 'artifact_summary', 'tech_stack', 'query_analysis', 'query_type', 'level_1_relevance', 'level_1_results_count', 'level_2_relevance', 'level_2_results_count', 'next_level', 'purpose', 'requirement', 'sequence_number', 'source', 'total_goals', 'context', 'phase', 'context_keys', 'phase_key', 'quality_criteria', 'quality_score', 'execution_content', 'dependencies', 'success_criteria', 'phase_blueprint', 'description_one_line', 'goal_id', 'micro_goal_description', 'role_specific_field', 'role_specific_field_description', 'required_item_fields', 'output_content', 'content_size', 'context_ref_id', 'ref_id', 'ref_type', 'relevance_score', 'summary', 'codebase_content', 'codebase_chunk', 'codebase_sample', 'entities_to_analyze', 'extracted_dna', 'relational_context', 'structural_context', 'behavioral_context', 'architectural_context', 'filename', 'document_type', 'document_path', 'content_preview', 'diagram_type', 'flow_type', 'new_content', 'old_content', 'extraction_results', 'ingested_documents', 'content_to_classify', 'artifacts', 'reasoning_scaffold']. This should trigger self-correction to retry with proper context.. No code fallback.", 'goal_index': 0}]}
-
-# Patient Intake System – Feature Specification (Refined)
-
-## Overview
-This document defines the user‑value artefacts for the **Patient Intake** SaaS product. It captures personas, user stories, acceptance criteria, and priority rationale that are directly traceable to the functional requirements (FR‑001 – FR‑004) and compliance obligations (HIPAA, SOC 2). All artefacts are written for a multi‑tenant cloud deployment.
-
-### US‑001 – Expired Encryption Key Handling
-**Requirement ID:** FR‑001
-**Description:** When a field‑level encryption key reaches its rotation date, decryption attempts must fail with a clear error and trigger admin notification.
-
-**Acceptance Criteria**
-- **Given** a patient form contains data encrypted with a key whose rotation date has passed,
-- **When** the system attempts to decrypt the field,
-- **Then** the operation returns a `KeyRotationRequired` error,
-- **And** an email/notification is sent to the system administrator with details of the affected key and instructions to rotate it,
-- **And** new submissions are rejected until the key is rotated.
-
-### US‑002 – Data Validation on Expired Key
-**Requirement ID:** FR‑002
-**Description:** Prevent submission of records that would be encrypted with an expired key.
-
-**Acceptance Criteria**
-- **Given** a user fills out the intake form,
-- **When** they attempt to submit and the underlying encryption key is expired,
-- **Then** the UI displays an inline validation message "Encryption key expired – contact admin",
-- **And** the submission is blocked.
-
-### US‑003 – Concurrent Edit Conflict Detection
-**Requirement ID:** FR‑003
-**Description:** Detect simultaneous edits of the same patient record and present a conflict resolution dialog.
-
-**Acceptance Criteria**
-- **Given** two front‑desk users load the same patient record version `v1`,
-- **When** User A saves changes creating version `v2` and User B subsequently attempts to save their edits based on `v1`,
-- **Then** optimistic locking detects the version mismatch,
-- **And** a conflict dialog shows both versions side‑by‑side,
-- **And** the user can choose to merge or overwrite.
-
-### US‑004 – PDF Export Access Control
-**Requirement ID:** FR‑004
-**Description:** Restrict PDF export functionality to authorized roles and log unauthorized attempts.
-
-**Acceptance Criteria**
-- **Given** a front‑desk user with role `staff` views a patient record,
-- **When** they click the "Export PDF" button,
-- **Then** the button is disabled (grayed out) per RBAC policy,
-- **And** any attempt to invoke the export endpoint results in an `UnauthorizedAccess` audit event recorded with timestamp, user ID, and patient ID.
-
-## Priority Rationale
-| Priority | User Story(s) | Rationale |
-|----------|----------------|----------|
-| **High (1)** | US‑001, US‑003, US‑004 | Directly enforce HIPAA technical safeguards (encryption key management, audit logging, access control). Mandatory for compliance certification. |
-| **Medium (2)** | US‑002 | Improves data quality and operational efficiency but does not affect core security posture. |
-
-## Traceability Matrix
-| User Story | Functional Requirement | KPI | Risk Mitigated |
-|-------------|--------------------------|-----|----------------|
-| US‑001 | FR‑001 | KPI-004 (PDF export security compliance) | RISK-001 (Unauthorized data exposure) |
-| US‑002 | FR‑002 | KPI-005 (Test coverage targets) | RISK-002 (Open‑source component vulnerabilities) |
-| US‑003 | FR‑003 | KPI-003 (Successful audit log generation) | RISK-003 (Deployment misconfiguration) |
-| US‑004 | FR‑004 | KPI-002 (System availability) | RISK-001 (Unauthorized data exposure) |

@@ -122,24 +122,29 @@ and *Then* an audit log entry `event_type="PDF_EXPORT"` is recorded.
 | Requirement ID | Description                                 | Linked User Story(s) |
 |-----------------|---------------------------------------------|----------------------|
 | FR-001          | Secure demographic capture                  | US-001               |
-| FR-002          | Insurance data validation & storage         |	US-003, US-004	|	|	FR-003          	|	Audit logging for all operations	|	US-001, US-002, US-004, US-005, US-006	|	NFR-001          	|	TLS 1.3 for all transport layers	|	All interactions	|	NFR-003          	|	Mandatory audit logging of every read/write operation	|	All audit entries	|	KPI-01          	|	<200 ms response time for form submissions	|	US-001	|	KPI-03          	|	Successful audit log generation for every submission	|	US-001, US-002	|	RISK-01          	|	Unauthorized data exposure due to key compromise	|	Mitigation in Edge Cases	|	RISK-02          	|	Open-source component vulnerabilities (e.g., wkhtmltopdf)	|	Mitigation in Edge Cases	|	RISK-03          	|	Deployment misconfiguration leading to insecure TLS settings	|	Mitigation in Edge Cases	|	RISK-06          	|	Insufficient multi‑tenant isolation in SaaS deployment	|	Row-level security per tenant	|	
+| FR-002          | Insurance data validation & storage         |	US-003, US-004	|
+| FR-003 | Audit logging for all operations | US-001, US-002, US-004, US-005, US-006 |
+| NFR-001 | TLS 1.3 for all transport layers | All interactions |
+| NFR-003 | Mandatory audit logging of every read/write operation | All audit entries |
+| KPI-001 | <200 ms response time for form submissions | US-001 |
+| KPI-003 | Successful audit log generation for every submission | US-001, US-002 |
+| RISK-001 | Unauthorized data exposure due to key compromise | Mitigation in Edge Cases |
+| RISK-002 | Open-source component vulnerabilities (e.g., wkhtmltopdf) | Mitigation in Edge Cases |
+| RISK-003 | Deployment misconfiguration leading to insecure TLS settings | Mitigation in Edge Cases |
+| RISK-006 | Insufficient multi‑tenant isolation in SaaS deployment | Row-level security per tenant |
 ---
 
 ## Risks & Mitigations
 | Risk ID   | Description                                                   | Mitigation                                                                                 |
 |-----------|---------------------------------------------------------------|--------------------------------------------------------------------------------------------|
-| RISK-01   | Unauthorized data exposure due to key compromise              |	Implement key rotation policy; store keys in HSM; audit key usage (see Edge Cases).        |
-| RISK-02   |	Open-source component vulnerabilities (e.g., wkhtmltopdf)      |	Regular dependency scanning; apply patches promptly.                                      |
-|-RISK-03    |-Deployment misconfiguration leading to insecure TLS settings      |-Use automated configuration validation scripts; enforce TLS 1.3 via CI checks.| RISK-06    |-Insufficient multi-tenancy isolation in SaaS deployment        |-Enforce row-level security per tenant; separate encryption keys per tenant.| --- |
+| RISK-001   | Unauthorized data exposure due to key compromise              |	Implement key rotation policy; store keys in HSM; audit key usage (see Edge Cases).        |
+| RISK-002   |	Open-source component vulnerabilities (e.g., wkhtmltopdf)      |	Regular dependency scanning; apply patches promptly.                                      |
+| RISK-003    | Deployment misconfiguration leading to insecure TLS settings      | Use automated configuration validation scripts; enforce TLS 1.3 via CI checks.| RISK-006    | Insufficient multi-tenancy isolation in SaaS deployment        | Enforce row-level security per tenant; separate encryption keys per tenant.| --- |
 
 ## Open Issues / Knowledge Gaps
 
-{
-  "knowledge_gaps": [
-    "Exact HIPAA §164.312(a)(2)(iv) technical safeguard requirements for encryption key management",
-    "PostgreSQL row-level security performance characteristics at 10M+ audit log rows"
-  ]
-}
+- Exact HIPAA §164.312(a)(2)(iv) technical safeguard requirements for encryption key management
+- PostgreSQL row-level security performance characteristics at 10M+ audit log rows
 
 ## Feature Specification – Patient Intake System
 
@@ -153,7 +158,7 @@ Then the system stores the data encrypted at rest (AES-256-GCM)
 And an immutable audit log entry (AC-001) is created with operation type CREATE
 And the submission response time is ≤200 ms.
 
-*Traceability*: FR-001, FR-002, NFR-003, KPI-01
+*Traceability*: FR-001, FR-002, NFR-003, KPI-001
 
 **US-002 – Review Patient Record (Clinician)**
 
@@ -163,7 +168,7 @@ Then the system renders the decrypted data to the UI
 And an audit log entry (AC-002) with operation type READ is recorded before rendering
 And access is denied if the record is not assigned to the clinician.
 
-*Traceability*: FR-003, NFR-003, KPI-02
+*Traceability*: FR-003, NFR-003, KPI-002
 
 **US-003 – Audit Log Review (Compliance Officer)**
 
@@ -173,7 +178,7 @@ Then the system returns a list of entries showing timestamp, actor ID, operation
 And each entry complies with NIST 800-53 AC-002 and AU‑6 controls
 And the officer can export the result as a PDF with watermark and hash verification.
 
-*Traceability*: FR-001, FR-002, FR-003, NFR-003, KPI-03
+*Traceability*: FR-001, FR-002, FR-003, NFR-003, KPI-003
 
 ### Functional Requirements – Audit Logging
 | ID     | User Story | Scenario                     | Preconditions                                 | Steps                                            | Expected Result |

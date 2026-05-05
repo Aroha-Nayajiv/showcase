@@ -34,28 +34,28 @@ The PatientIntake system will enable healthcare providers to capture patient dem
 # 5. Success Criteria / KPIs
 | KPI ID | Metric |
 |--------|--------|
-| KPI-01 | Form Completion Rate – ≥ 90 % of sessions result in successful submission. |
-| KPI-02 | Response Time Compliance – ≥ 95 % of submissions ≤ 200 ms. |
-| KPI-03 | System Availability – ≥ 99.9 % uptime per month. |
-| KPI-04 | Audit Log Generation Rate – 100 % of read/write/export actions logged with integrity verification. |
+| KPI-001 | Form Completion Rate – ≥ 90 % of sessions result in successful submission. |
+| KPI-002 | Response Time Compliance – ≥ 95 % of submissions ≤ 200 ms. |
+| KPI-003 | System Availability – ≥ 99.9 % uptime per month. |
+| KPI-004 | Audit Log Generation Rate – 100 % of read/write/export actions logged with integrity verification. |
 
 # 6. Stakeholder Analysis
 | Stakeholder ID | Role | Primary Need | Key Pain Point | RBAC Tier |
 |----------------|------|-------------|----------------|-----------|
-| ST-01 | Clinical Staff | Immediate access to accurate patient history for care decisions | Delays caused by manual paperwork | Clinician |
-| ST-02 | Patients | Assurance that personal health information is protected | Fear of data breach exposing sensitive health data | Read‑only (view only) |
-| ST-03 | Compliance Officer | Evidence of HIPAA compliance for audits | Lack of verifiable audit trails | Read‑only |
-| ST-04 | Front‑Desk Staff | Efficient intake workflow with minimal re‑entry effort | Inconsistent data entry leading to errors | Front‑Desk |
-| ST-05 | Administrator | Ability to configure roles, policies and audit logs securely | Complex configuration risking mis‑settings | Admin |
+| ST-001 | Clinical Staff | Immediate access to accurate patient history for care decisions | Delays caused by manual paperwork | Clinician |
+| ST-002 | Patients | Assurance that personal health information is protected | Fear of data breach exposing sensitive health data | Read‑only (view only) |
+| ST-003 | Compliance Officer | Evidence of HIPAA compliance for audits | Lack of verifiable audit trails | Read‑only |
+| ST-004 | Front‑Desk Staff | Efficient intake workflow with minimal re‑entry effort | Inconsistent data entry leading to errors | Front‑Desk |
+| ST-005 | Administrator | Ability to configure roles, policies and audit logs securely | Complex configuration risking mis‑settings | Admin |
 
 # 7. Risk Register
 | Risk ID | Description | Likelihood / Impact | Mitigation |
 |---------|-------------|---------------------|-----------|
-| RISK-01 | Unauthorized data exposure during transmission of patient form data over the network. | M / H | Enforce TLS 1.3 for all web traffic; implement field‑level AES‑256 encryption at rest; conduct quarterly penetration testing; enforce strict key‑management procedures. |
-| RISK-02 | Vulnerabilities in open‑source components leading to potential exploitation. | M / H | Adopt continuous dependency scanning pipeline (e.g., OWASP Dependency‑Check) with automatic patching; maintain curated whitelist of vetted libraries; perform monthly security reviews. |
-| RISK-03 | Deployment misconfiguration in the Docker‑Compose air‑gapped environment causing service downtime or exposure of logs. | L / M Create immutable Docker images signed with Notary; enforce configuration‑as‑code reviews; run automated compliance checks against hardened baseline before each release. |
-| RISK-04 | Gaps in audit‑log generation or retention that could cause non‑compliance with HIPAA §164.312(b). | L / H Implement write‑once read‑many (WORM) storage for audit logs; automate daily checksum verification scripts that alert security team within 24 hours of any discrepancy; conduct quarterly audit‑log completeness review against regulatory checklist. |
-| RISK-05 | Schedule slippage due to resource constraints in an on‑premises environment lacking cloud elasticity. | M / M Establish two‑sprint buffer in project plan; secure dedicated hardware resources early; track capacity utilization weekly via dashboard visible to PMO. |
+| RISK-001 | Unauthorized data exposure during transmission of patient form data over the network. | M / H | Enforce TLS 1.3 for all web traffic; implement field‑level AES‑256 encryption at rest; conduct quarterly penetration testing; enforce strict key‑management procedures. |
+| RISK-002 | Vulnerabilities in open‑source components leading to potential exploitation. | M / H | Adopt continuous dependency scanning pipeline (e.g., OWASP Dependency‑Check) with automatic patching; maintain curated whitelist of vetted libraries; perform monthly security reviews. |
+| RISK-003 | Deployment misconfiguration in the Docker‑Compose air‑gapped environment causing service downtime or exposure of logs. | L / M Create immutable Docker images signed with Notary; enforce configuration‑as‑code reviews; run automated compliance checks against hardened baseline before each release. |
+| RISK-004 | Gaps in audit‑log generation or retention that could cause non‑compliance with HIPAA §164.312(b). | L / H Implement write‑once read‑many (WORM) storage for audit logs; automate daily checksum verification scripts that alert security team within 24 hours of any discrepancy; conduct quarterly audit‑log completeness review against regulatory checklist. |
+| RISK-005 | Schedule slippage due to resource constraints in an on‑premises environment lacking cloud elasticity. | M / M Establish two‑sprint buffer in project plan; secure dedicated hardware resources early; track capacity utilization weekly via dashboard visible to PMO. |
 
 # 8. Narrative Summary
 1. **Compliance Focus** – Risks RISK-001 and RISK-004 directly affect HIPAA compliance. Mitigations reference specific technical safeguards (encryption at rest and in transit) and audit‑log retention requirements, ensuring that any breach can be detected and reported within mandated timeframes.

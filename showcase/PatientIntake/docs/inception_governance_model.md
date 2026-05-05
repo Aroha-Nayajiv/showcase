@@ -81,18 +81,18 @@ Members: Security Operations Center staff. Role: continuously monitors immutable
 * **Escalation Matrix** – Critical issues → 48 h; High → 5 days; Medium → 15 days.
 
 ## 10. Success Criteria / KPIs
-* **KPI-01 – Encryption Compliance Rate** – 100 % of PHI fields encrypted; measured by automated configuration audit script.
-* **KPI-02 – Audit Log Coverage** – 100 % of read/write events logged; validated by monthly integrity checksum report.
-* **KPI-03 – PDF Export Watermark Accuracy** – 100 % of PDFs contain staff watermark and timestamp; verified by random sample inspection per release.
-* **KPI-04 – System Availability** – ≥ 99.9 % uptime per month; reported via infrastructure monitoring dashboard.
+* **KPI-001 – Encryption Compliance Rate** – 100 % of PHI fields encrypted; measured by automated configuration audit script.
+* **KPI-002 – Audit Log Coverage** – 100 % of read/write events logged; validated by monthly integrity checksum report.
+* **KPI-003 – PDF Export Watermark Accuracy** – 100 % of PDFs contain staff watermark and timestamp; verified by random sample inspection per release.
+* **KPI-004 – System Availability** – ≥ 99.9 % uptime per month; reported via infrastructure monitoring dashboard.
 
 ## 11. Risk Assessment
 | Risk ID | Description                                            | Likelihood | Impact | Mitigation Strategy                                                                                 | Owner |
 |--------|--------------------------------------------------------|------------|--------|-----------------------------------------------------------------------------------------------------|-------|
-| RISK-01| Unauthorized data exposure via compromised credentials   | Medium     | High   | MFA + periodic credential rotation; strict RBAC per tier                                            |	CISO |
-| RISK-02| Open-source component vulnerabilities discovered post-deployment |	High      |	High   |	Automated SBOM scanning (Syft); patch critical CVEs within 30 days                               |	Security Engineer |
-| RISK-03| Misconfiguration of Docker Compose or host firewall leading to accidental exposure of PostgreSQL in air‑gapped environment |	Medium    |	High   |	Immutable Docker images signed with Notary; enforce host firewall rules per deployment guide; run pre‑deployment validation script checking open ports and volume permissions |	Infrastructure Engineer |
-| RISK-04| Compliance audit gaps due to incomplete documentation of controls |	Low       |	High   |	Maintain live control matrix in Confluence; quarterly internal audit; external audit readiness checklist |	Compliance Officer |
+| RISK-001| Unauthorized data exposure via compromised credentials   | Medium     | High   | MFA + periodic credential rotation; strict RBAC per tier                                            |	CISO |
+| RISK-002| Open-source component vulnerabilities discovered post-deployment |	High      |	High   |	Automated SBOM scanning (Syft); patch critical CVEs within 30 days                               |	Security Engineer |
+| RISK-003| Misconfiguration of Docker Compose or host firewall leading to accidental exposure of PostgreSQL in air‑gapped environment |	Medium    |	High   |	Immutable Docker images signed with Notary; enforce host firewall rules per deployment guide; run pre‑deployment validation script checking open ports and volume permissions |	Infrastructure Engineer |
+| RISK-004| Compliance audit gaps due to incomplete documentation of controls |	Low       |	High   |	Maintain live control matrix in Confluence; quarterly internal audit; external audit readiness checklist |	Compliance Officer |
 
 ## 12. Scope Definition
 *In Scope*: End-to-end patient intake web form, field-level encryption at rest and in transit, role-based access controls, immutable audit logging, PDF generation with watermarking and timestamps, Docker Compose deployment guide for air-gapped environment, automated unit and integration tests covering validation, encryption, and access control edge cases.

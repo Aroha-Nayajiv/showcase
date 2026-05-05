@@ -29,10 +29,8 @@ All services write to the same encrypted PostgreSQL instance but enforce row‑l
 
 **Request Header**
 
-{
-  "Authorization": "Bearer <jwt-token>",
-  "Content-Type": "application/json"
-}
+- **Authorization**: Bearer <jwt-token>
+- **Content-Type**: application/json
 
 **Request Body Schema**
 
@@ -69,9 +67,7 @@ All services write to the same encrypted PostgreSQL instance but enforce row‑l
 
 **Request Header**
 
-{
-  "Authorization": "Bearer <jwt-token>"
-}
+- **Authorization**: Bearer <jwt-token>
 
 **Path Parameter**
 - `id`: UUID of the patient record.
@@ -284,28 +280,16 @@ Rel(audit_service,db,"Append-only SQL over TLS")
 
 **IntakeRequest**
 
-{
-  "patient_id": "string",
-  "demographics": {
-    "first_name": "string",
-    "last_name": "string",
-    "dob": "date",
-    "ssn_encrypted": "string"
-  },
-  "insurance": {
-    "provider": "string",
-    "policy_number_encrypted": "string"
-  },
-  "clinical_notes_encrypted": "string"
-}
+- **patient_id**: string
+- **demographics**: {'first_name': 'string', 'last_name': 'string', 'dob': 'date', 'ssn_encrypted': 'string'}
+- **insurance**: {'provider': 'string', 'policy_number_encrypted': 'string'}
+- **clinical_notes_encrypted**: string
 
 **IntakeResponse**
 
-{
-  "intake_id": "uuid",
-  "status": "accepted",
-  "created_at": "timestamp"
-}
+- **intake_id**: uuid
+- **status**: accepted
+- **created_at**: timestamp
 
 *Error handling*: When HashiCorp Vault is unavailable the service returns **503 Service Unavailable** with body `{ "error":"VaultUnavailable","detail":"Unable to retrieve encryption keys" }`. The client must retry with exponential back‑off up to five attempts.
 
@@ -360,7 +344,16 @@ All traffic is encrypted in transit using **TLS 1.3**. Services retrieve encry
 | FR-004 |	Automated unit & integration tests for form validation & encryption handling |	Test plan (not shown) |
 | FR-005 |	PDF Intake Summary Generation with watermark & timestamp |	PDF Generation Service |
 | FR-006 |	PDF generation compliance (AES‑256)                |	PDF Generation Service |
-| FR-007 |	Watermark & Timestamp requirement                    |	PDF Generation Service | s| FR-008 |	Containerized deployment isolation (Docker Compose)   |	Docker‑compose.yml (`secrets:` block) | s| FR-009 |	Docker Compose deployment orchestration               |	Docker‑compose.yml | s| FR-010 |	Comprehensive Audit Logging (new)                    |	Audit Service | s| NFR-001|	Response time <200 ms for form submissions (KPI-001)   |	API Gateway latency budget | s| NFR-002|	System uptime ≥99.9 % (KPI-002)                     |	Deployment redundancy | s| NFR-003|	Mandatory audit logging of every read/write operation (KPI-003)|	Audit Service | s| KPI-003|	Successful audit log generation for every submission verified by integration tests | | s| RISK-001|	Unauthorized data exposure mitigated by TLS 1.3 and field‑level encryption | | s| RISK-003|	Deployment misconfiguration mitigated by Docker Compose network isolation and explicit secret handling | s## 6 Security Controls Summary |
+| FR-007 |	Watermark & Timestamp requirement                    |	PDF Generation Service |
+| FR-008 |	Containerized deployment isolation (Docker Compose)   |	Docker‑compose.yml (`secrets:` block) |
+| FR-009 |	Docker Compose deployment orchestration               |	Docker‑compose.yml |
+| FR-010 |	Comprehensive Audit Logging (new)                    |	Audit Service |
+| NFR-001|	Response time <200 ms for form submissions (KPI-001)   |	API Gateway latency budget |
+| NFR-002|	System uptime ≥99.9 % (KPI-002)                     |	Deployment redundancy |
+| NFR-003|	Mandatory audit logging of every read/write operation (KPI-003)|	Audit Service |
+| KPI-003|	Successful audit log generation for every submission verified by integration tests | |
+| RISK-001|	Unauthorized data exposure mitigated by TLS 1.3 and field‑level encryption | |
+| RISK-003|	Deployment misconfiguration mitigated by Docker Compose network isolation and explicit secret handling | s## 6 Security Controls Summary |
 * **Zero Trust Network** – All inter‑service calls require mutual TLS.
 s* **Defense in Depth** – Secrets stored in Vault; environment variables injected via Docker Compose `secrets:`; no secret in code repository.
 s* **Circuit Breaker & Retry** – Configured per failure scenario above.

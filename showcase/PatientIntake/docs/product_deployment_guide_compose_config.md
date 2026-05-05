@@ -150,8 +150,8 @@ This document defines the product‑level expectations for the **PatientIntake**
 ## 8. Traceability Matrix
 | Artifact ID | Requirement ID(s) |
 |------------|-------------------|
-| US-001    | FR-001, KPI-01   |
-| US-002    │ FR-002, KPI-04   │ │ US-003    │ FR-003, NFR-003 │ │ US-010    │ FR-001          │ │ US-011    │ FR-002          │ │ US-012    │ NFR-003         │ │ US-013    │ RISK-03         │ │ US-014    │ FR-004          │ |
+| US-001    | FR-001, KPI-001   |
+| US-002    │ FR-002, KPI-004   │ │ US-003    │ FR-003, NFR-003 │ │ US-010    │ FR-001          │ │ US-011    │ FR-002          │ │ US-012    │ NFR-003         │ │ US-013    │ RISK-003         │ │ US-014    │ FR-004          │ |
 
 ---
 

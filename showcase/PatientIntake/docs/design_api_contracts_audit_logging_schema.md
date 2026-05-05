@@ -18,14 +18,9 @@ The following architecture diagram and accompanying description define the end�
 
 **Error Handling**: Standardised error payloads are returned for all endpoints.
 
-{
-  "errorCode": "ERR001",
-  "message": "Invalid request payload",
-  "details": {
-    "field": "action",
-    "expected": ["CREATE","READ","UPDATE","DELETE"]
-  }
-}
+- **errorCode**: ERR001
+- **message**: Invalid request payload
+- **details**: {'field': 'action', 'expected': ['CREATE', 'READ', 'UPDATE', 'DELETE']}
 
 Common error codes:
 - `ERR001` – Validation error (400)
@@ -38,7 +33,7 @@ Common error codes:
 | Service | Purpose | Tech Stack | Events Emitted | Dependencies |
 |--------|---------|------------|----------------|----------------|
 | **audit-service** (SVC‑001) | Persist immutable audit records, enforce append‑only policy | PostgreSQL (audit-db), JWT verification library | `AuditEventCreated` | None |
-| **pdf-generation-service** (SVC‑002) | Render PDF intake summaries, apply watermark & timestamp | Python 3.11, WeasyPrint, wkhtmltopdf (v0.12) | `PdfGenerated`, `PdfExported` | Calls `audit-service` for export logging |
+| **pdf-generation-service** (SVC‑002) | Render PDF intake summaries, apply watermark & timestamp | Python 3.11, wkhtmltopdf, wkhtmltopdf (v0.12) | `PdfGenerated`, `PdfExported` | Calls `audit-service` for export logging |
 | **auth-service** (SVC‑003) | Issue JWTs, validate credentials against local user store | PostgreSQL (auth-db), bcrypt | `UserAuthenticated` | None |
 
 ### 4. Data Layer
@@ -64,7 +59,7 @@ Common error codes:
 - **Retention Policy**: A nightly job purges records older than 7 years in compliance with HIPAA audit‑log retention requirements.
 
 ### 5. PDF Generation Service
-Implemented in Python 3.11 using WeasyPrint for HTML→PDF conversion.
+Implemented in Python 3.11 using wkhtmltopdf for HTML→PDF conversion.
 The service receives a request containing a patient identifier, fetches the encrypted patient record via the internal API, decrypts fields in memory, renders an HTML template, then converts it to PDF.
 Before returning the PDF bytes, the service:
 1. Applies a semi‑transparent watermark containing the staff username and export timestamp.
@@ -74,10 +69,8 @@ PDF files are streamed directly to the client; no persistent storage is used.
 #### PDF Generation API Contract
 
 POST /api/v1/pdf/generate
-{
-  "patientId": "uuid",
-  "requestorId": "uuid"
-}
+- **patientId**: uuid
+- **requestorId**: uuid
 
 *Response* (`200 OK`): binary PDF stream with `Content-Type: application/pdf`.
 *Error Cases*:
@@ -152,10 +145,8 @@ networks:
 
 ### 8. Knowledge Gaps Identified
 
-[
-  "Exact HIPAA §164.312(a)(2)(iv) technical safeguard requirements for encryption key management",
-  "Performance impact of PostgreSQL row-level security at >10M audit rows"
-]
+- Exact HIPAA §164.312(a)(2)(iv) technical safeguard requirements for encryption key management
+- Performance impact of PostgreSQL row-level security at >10M audit rows
 
 These gaps will be addressed by downstream research activities.
 
@@ -187,26 +178,18 @@ Content-Type: application/json
 
 **Request Body (Schema SCH‑001)**
 
-{
-  "event_type": "CREATE|READ|UPDATE|DELETE|PDF_EXPORT",
-  "record_id": "<UUID>",
-  "user_id": "<string>",
-  "details": {
-    "changed_fields": ["first_name", "last_name"],
-    "ip_address": "192.0.2.1",
-    "additional_context": { }
-  }
-}
+- **event_type**: CREATE|READ|UPDATE|DELETE|PDF_EXPORT
+- **record_id**: <UUID>
+- **user_id**: <string>
+- **details**: {'changed_fields': ['first_name', 'last_name'], 'ip_address': '192.0.2.1', 'additional_context': {}}
 
 *All fields are required except `changed_fields` which is optional for READ events.*
 
 **Response (200 OK)**
 
-{
-  "event_id": "<bigserial>",
-  "status": "recorded",
-  "timestamp": "2026-05-05T12:34:56Z"
-}
+- **event_id**: <bigserial>
+- **status**: recorded
+- **timestamp**: 2026-05-05T12:34:56Z
 
 ## 13. Error Taxonomy
 | Code | HTTP Status | Description | Message |
@@ -218,11 +201,9 @@ Content-Type: application/json
 
 All error responses follow the common envelope:
 
-{
-  "error_code": "ERR-XXX",
-  "message": "...",
-  "details": { }
-}
+- **error_code**: ERR-XXX
+- **message**: ...
+- **details**: {}
 
 ## 14. Integration Failure Handling
 | Integration Point | Failure Mode | HTTP Status | Error Code | Retry Strategy |
@@ -297,7 +278,7 @@ All PHI fields are stored encrypted using AES‑256‑GCM via `pgp_sym_encrypt`.
 | admin        | ✅                     ✅                  ✅                | The matrix is enforced both at the API gateway (JWT role claim) and via PostgreSQL RLS policies. |
 
 ## 18. Compliance Traceability
-- **FR-003** – Secure demographic capture → every read/write generates an immutable audit record. - **NFR-003** – Mandatory audit logging of every read/write operation → enforced by append‑only table and RLS. - **FR-010** – Encryption key management via Vault → DEK rotation monthly; keys stored in Vault and accessed through short‑lived tokens. - **NFR-001** – <200 ms response time for API calls → API design kept lightweight; indexes support fast queries. - **NFR-002** – 99.9 % uptime → containerized deployment with health checks and automatic restart in Docker Compose air‑gap environment. - **NFR-004** – Audit log tamper evidence → HMAC‑SHA256 signature stored per row. - **KPI-03** – Successful audit log generation for every submission → measured by monitoring alerts on failed insertions. All traceability links are captured in the requirements matrix maintained in the asset registry.
+- **FR-003** – Secure demographic capture → every read/write generates an immutable audit record. - **NFR-003** – Mandatory audit logging of every read/write operation → enforced by append‑only table and RLS. - **FR-010** – Encryption key management via Vault → DEK rotation monthly; keys stored in Vault and accessed through short‑lived tokens. - **NFR-001** – <200 ms response time for API calls → API design kept lightweight; indexes support fast queries. - **NFR-002** – 99.9 % uptime → containerized deployment with health checks and automatic restart in Docker Compose air‑gap environment. - **NFR-004** – Audit log tamper evidence → HMAC‑SHA256 signature stored per row. - **KPI-003** – Successful audit log generation for every submission → measured by monitoring alerts on failed insertions. All traceability links are captured in the requirements matrix maintained in the asset registry.
 
 ## 19. API Endpoints
 | Method | Path | Description | Request Schema | Response Schema | Security |
@@ -329,11 +310,9 @@ All PHI fields are stored encrypted using AES‑256‑GCM via `pgp_sym_encrypt`.
 All endpoints return standard HTTP status codes:
 * **400 Bad Request** – schema validation failure (e.g., missing required field, invalid enum). Response body follows **ERR-400** schema:
 
-{
-  "error_code": "ERR-400",
-  "message": "Validation error",
-  "details": [{"field":"actor_role","issue":"must be one of [admin,clinician,front_desk]"}]
-}
+- **error_code**: ERR-400
+- **message**: Validation error
+- {'field': 'actor_role', 'issue': 'must be one of [admin,clinician,front_desk]'}
 
 * **401 Unauthorized** – missing or invalid Bearer token.
 * **403 Forbidden** – caller lacks permission for the requested resource.
@@ -350,7 +329,7 @@ All endpoints return standard HTTP status codes:
 | resource             | VARCHAR(100)             | Logical identifier e.g., `patient/12345` |
 | resource_id          | UUID                     | FK to target entity when applicable |
 | timestamp            | TIMESTAMPTZ              | Stored in UTC, ISO‑8601 format |
-| details_encrypted   | BYTEA                    | AES‑256‑GCM encrypted blob; encryption keys rotated quarterly per security policy |
+| details_encrypted   | BYTEA                    | AES‑256‑GCM encrypted blob; encryption master keys rotated every 90 days, per-field DEKs every 30 days per security policy |
 
 ### Indexes & Performance
 * Primary key on `event_id`.

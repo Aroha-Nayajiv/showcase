@@ -12,9 +12,9 @@
 
 | Stakeholder ID | Role |
 |----------------|------|
-| **ST-01** | Clinician (maps to PER‑01) |
-| **ST-02** | Front Desk Staff (maps to PER‑02) |
-| **ST-03** | Administrator / Compliance Officer (maps to PER‑03) |
+| **ST-001** | Clinician (maps to PER‑01) |
+| **ST-002** | Front Desk Staff (maps to PER‑02) |
+| **ST-003** | Administrator / Compliance Officer (maps to PER‑03) |
 
 ---
 
@@ -66,18 +66,12 @@
 
 ### Audit Log Schema
 
-{
-  "event_type": "[CREATE|READ|UPDATE|DELETE|UNAUTHORIZED_*|ROLE_CHANGE|PDF_EXPORT]",
-  "actor_id": "string",
-  "actor_role": "string",
-  "timestamp": "ISO-8601 UTC",
-  "target_id": "patient_record_id or role_id",
-  "metadata": {
-    "ip_address": "string",
-    "hash_chain": "SHA-256 of previous entry",
-    "details": "optional free text"
-  }
-}
+- **event_type**: [CREATE|READ|UPDATE|DELETE|UNAUTHORIZED_*|ROLE_CHANGE|PDF_EXPORT]
+- **actor_id**: string
+- **actor_role**: string
+- **timestamp**: ISO-8601 UTC
+- **target_id**: patient_record_id or role_id
+- **metadata**: {'ip_address': 'string', 'hash_chain': 'SHA-256 of previous entry', 'details': 'optional free text'}
 
 *Each entry includes a SHA‑256 hash chain linking to the previous entry to ensure immutability (**NFR‑003**, **KPI-003**).*
 

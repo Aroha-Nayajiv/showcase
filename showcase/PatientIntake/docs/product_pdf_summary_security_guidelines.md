@@ -2,7 +2,7 @@
                 
 ## Personas
 
-### Front Desk Clerk (ST-01 – Clinical staff)
+### Front Desk Clerk (ST-001 – Clinical staff)
 Role Summary: The Front Desk Clerk registers patients, captures demographic and insurance information via the structured web form, and initiates the generation of the PDF intake summary for downstream review.
 
 HIPAA‑related Concerns:
@@ -18,7 +18,7 @@ Workflow Interactions:
 
 Success Metrics: ≤ 200 ms response time for PDF preview (KPI-001), zero unauthorized download attempts logged.
 
-### Clinician (ST-01 – Clinical staff)
+### Clinician (ST-001 – Clinical staff)
 Role Summary: Clinicians review patient histories, sign off on care plans, and are authorized to export the PDF intake summary for clinical documentation or external referral.
 
 HIPAA‑related Concerns:
@@ -37,7 +37,7 @@ Workflow Interactions:
 
 Success Metrics: ≥ 99.9 % audit‑log integrity (NFR‑003), ≤ 1 % error rate on watermark integrity checks.
 
-### Patient (ST-02 – Patient)
+### Patient (ST-002 – Patient)
 Role Summary: The patient provides personal and medical information through the intake form but never directly interacts with PDF export functionality.
 
 Assurances:

@@ -4,9 +4,9 @@
 
 | Persona ID | Role | Description | Permissions | Security Controls |
 |------------|------|-------------|------------|-------------------|
-| ST-01 | Front Desk Clerk | Captures patient demographics, insurance information, and initial medical history via the web form. Verifies completeness before submission. | Create (submit) records; view own submissions; cannot edit after submission. | Immutable audit entry on CREATE with user ID, timestamp, operation type. Session token expires after 30 minutes of inactivity. Client‑side field encryption using AES‑256‑GCM over TLS 1.3. |
-| ST-02 | Clinician | Reviews submitted intake forms; adds clinical observations; approves or rejects records for further processing. | Read all submissions; update clinical notes field; cannot delete records. | READ operations logged; UPDATE operations logged with before‑and‑after hash of encrypted fields. Row‑level security enforces assignment to records. |
-| ST-03 | Compliance Officer | Ensures HIPAA technical safeguards are met; monitors audit logs; generates compliance reports. | Read all audit logs; export reports; no write access to patient data. | Queries logged (AUDIT_QUERY) with filters (operation type, role, date). Export generates PDF signed with server‑side private key and watermarked "Confidential – Compliance Review". |
+| ST-001 | Front Desk Clerk | Captures patient demographics, insurance information, and initial medical history via the web form. Verifies completeness before submission. | Create (submit) records; view own submissions; cannot edit after submission. | Immutable audit entry on CREATE with user ID, timestamp, operation type. Session token expires after 30 minutes of inactivity. Client‑side field encryption using AES‑256‑GCM over TLS 1.3. |
+| ST-002 | Clinician | Reviews submitted intake forms; adds clinical observations; approves or rejects records for further processing. | Read all submissions; update clinical notes field; cannot delete records. | READ operations logged; UPDATE operations logged with before‑and‑after hash of encrypted fields. Row‑level security enforces assignment to records. |
+| ST-003 | Compliance Officer | Ensures HIPAA technical safeguards are met; monitors audit logs; generates compliance reports. | Read all audit logs; export reports; no write access to patient data. | Queries logged (AUDIT_QUERY) with filters (operation type, role, date). Export generates PDF signed with server‑side private key and watermarked "Confidential – Compliance Review". |
 
 ## User Stories
 
@@ -112,13 +112,13 @@ The file is delivered over HTTPS and an immutable audit log entry records the SH
 | PDF export watermark & metadata      |	FR-006 |
 | Re‑export handling logic            |	FR-007 |
 | Audit log immutability               |	NFR-003 |
-| Performance latency ≤200 ms         |	KPI-01 |
-|	PDF generation ≤2 seconds            |	KPI-02 |
+| Performance latency ≤200 ms         |	KPI-001 |
+|	PDF generation ≤2 seconds            |	KPI-002 |
 
 ## Risks Addressed
 
-* **RISK-01** – Unauthorized data exposure mitigated by TLS 1.2+, encryption at rest and in transit.
-* **RISK-02** – Open‑source component vulnerabilities addressed by pinning wkhtmltopdf version 0.12.6 and regular vulnerability scanning.
-* **RISK-03** – Deployment misconfiguration mitigated by containerized deployment guidelines (Docker Compose – FR-009).
-* **RISK-04** – Compliance audit gaps covered by immutable audit log and detailed export metadata.
-* **RISK-05** – On‑prem deployment constraints acknowledged; capacity monitoring recommended.
+* **RISK-001** – Unauthorized data exposure mitigated by TLS 1.2+, encryption at rest and in transit.
+* **RISK-002** – Open‑source component vulnerabilities addressed by pinning wkhtmltopdf version 0.12.6 and regular vulnerability scanning.
+* **RISK-003** – Deployment misconfiguration mitigated by containerized deployment guidelines (Docker Compose – FR-009).
+* **RISK-004** – Compliance audit gaps covered by immutable audit log and detailed export metadata.
+* **RISK-005** – On‑prem deployment constraints acknowledged; capacity monitoring recommended.
