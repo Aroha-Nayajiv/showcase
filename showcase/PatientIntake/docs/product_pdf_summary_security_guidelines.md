@@ -16,7 +16,7 @@ Workflow Interactions:
 4. If authorized, the PDF is generated with a watermark containing the patient identifier (hashed) and an access timestamp.
 5. An audit log entry (AU‑6) records who, when, and what action was performed.
 
-Success Metrics: ≤ 200 ms response time for PDF preview (KPI‑01), zero unauthorized download attempts logged.
+Success Metrics: ≤ 200 ms response time for PDF preview (KPI-001), zero unauthorized download attempts logged.
 
 ### Clinician (ST-01 – Clinical staff)
 Role Summary: Clinicians review patient histories, sign off on care plans, and are authorized to export the PDF intake summary for clinical documentation or external referral.
@@ -60,9 +60,9 @@ Success Metrics: Zero patient‑initiated PDF download attempts recorded in audi
 ## User Stories
 
 ## Metrics & Success Indicators
-- **KPI‑01**: Export operation latency ≤ 200 ms under normal load.
-- **KPI‑03**: 100 % of exported PDFs contain correct watermark and timestamp.
-- **KPI‑05**: Audit log completeness ≥ 99.9 % of export events recorded (aligned with NFR‑003).
+- **KPI-001**: Export operation latency ≤ 200 ms under normal load.
+- **KPI-003**: 100 % of exported PDFs contain correct watermark and timestamp.
+- **KPI-005**: Audit log completeness ≥ 99.9 % of export events recorded (aligned with NFR‑003).
 
 ## Priority Ranking
 | Story | Priority | Rationale |
@@ -74,8 +74,8 @@ Success Metrics: Zero patient‑initiated PDF download attempts recorded in audi
 ## Traceability
 - **FR‑003** – Medical history storage (supports PDF generation).
 - **NFR‑003** – Mandatory audit logging of every read/write operation.
-- **KPI‑01**, **KPI‑03**, **KPI‑05** – Success metrics referenced above.
-- **RISK‑01** – Unauthorized data exposure mitigated by RBAC and audit logging.
+- **KPI-001**, **KPI-003**, **KPI-005** – Success metrics referenced above.
+- **RISK-001** – Unauthorized data exposure mitigated by RBAC and audit logging.
 
 # User Stories and Acceptance Criteria
 
@@ -168,8 +168,8 @@ Maximum **5 export requests per minute per user**. Exceeding limit returns HTTP�
 | FR‑005         | PDF Generation Engine |
 | FR‑006         | Encryption Store |
 | FR‑007         | Audit Logger |
-| NFR‑001        | Performance KPI‑01 |
-| NFR‑002        | Availability KPI‑02 |
+| NFR‑001        | Performance KPI-001 |
+| NFR‑002        | Availability KPI-002 |
 | NFR‑003        | Audit Logging requirement |
 | NFR‑004        | Encryption requirement |
 | NFR‑005        | Rate limiting policy |
@@ -178,5 +178,5 @@ Maximum **5 export requests per minute per user**. Exceeding limit returns HTTP�
 # References
 - HIPAA §164.312(a)(2)(iv) – Encryption at rest
 - HIPAA §164.312(a)(2)(i) – Encryption key management
-- NIST SP 800‑53 AC‑2 – Account Management
+- NIST SP 800‑53 AC-002 – Account Management
 - NIST SP 800‑53 AU‑6 – Audit Review, Analysis, and Reporting

@@ -134,7 +134,7 @@ All services return a standardized JSON envelope for errors.
   }
 }
 
-**Error Code Catalog** (traces to functional requirement FR‑001 and risk RISK‑01):
+**Error Code Catalog** (traces to functional requirement FR‑001 and risk RISK-001):
 | Error Code | HTTP Status | Description | User Message | Retryable? |
 |-----------|------------|-------------|--------------|------------|
 | ERR-001 | 400 | Invalid input – schema validation failed or required encrypted field missing. | The submitted data is invalid or incomplete. | false |
@@ -215,7 +215,7 @@ volumes:
 
 ## Cross‑cutting Concerns
 - **Security** – All traffic uses TLS 1.3; client‑side encryption of PII; database column encryption via pgcrypto; row‑level security enforces least‑privilege access.
-- **Compliance** – Design satisfies HIPAA technical safeguards (encryption at rest & in transit), aligns with NFR‑001 (<200 ms response time) and NFR‑003 (mandatory audit logging). Risk mitigations for RISK‑01 are addressed via standardized error handling and audit trails.
+- **Compliance** – Design satisfies HIPAA technical safeguards (encryption at rest & in transit), aligns with NFR‑001 (<200 ms response time) and NFR‑003 (mandatory audit logging). Risk mitigations for RISK-001 are addressed via standardized error handling and audit trails.
 - **Scalability & Multi‑Tenancy** – Services are containerised; horizontal scaling can be achieved by adding replicas behind the Kong gateway; PostgreSQL can be sharded or scaled read‑replicas for high load.
 - **Observability** – Each service emits structured logs and publishes audit events to a message bus for centralized monitoring.
 ---

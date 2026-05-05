@@ -24,7 +24,7 @@
 |-------|---------|------|--------------------------------------|----------|
 | **US-001** | Front Desk Staff (PER‑02) | Create a new patient intake record with encrypted fields | Patient data is protected at rest and in transit, satisfying HIPAA §164.312(a)(2)(iv) | 1 |
 | **US-002** | Clinician (PER‑01) | Read a patient's intake record after successful authentication | Enables timely care while ensuring only authorized access per **FR‑001** and **NFR‑003** | 1 |
-| **US-003** | Administrator (PER‑03) | Audit every read/write operation and generate immutable logs | Compliance officers can verify access trails for HIPAA audit requirements (**KPI‑03**) | 2 |
+| **US-003** | Administrator (PER‑03) | Audit every read/write operation and generate immutable logs | Compliance officers can verify access trails for HIPAA audit requirements (**KPI-003**) | 2 |
 | **US-004** | Clinician (PER‑01) | Export a PDF summary of a patient record with a watermark and timestamp | Exported document is traceable to the exporting staff and meets PDF security policy (**FR‑005**) | 2 |
 
 ---
@@ -79,7 +79,7 @@
   }
 }
 
-*Each entry includes a SHA‑256 hash chain linking to the previous entry to ensure immutability (**NFR‑003**, **KPI‑03**).*
+*Each entry includes a SHA‑256 hash chain linking to the previous entry to ensure immutability (**NFR‑003**, **KPI-003**).*
 
 ### PDF Generation Parameters
 
@@ -105,17 +105,17 @@
 
 | AC ID | Linked Requirement(s) |
 |-------|----------------------|
-| AC‑001 – AC‑002 | FR‑001, NFR‑001, NFR‑003, KPI‑01 |
-| AC‑003 – AC‑005 | FR‑005, NFR‑003, KPI‑03 |
-| AC‑006 – AC‑009 | FR‑004, FR‑005, NFR‑003, KPI‑03 |
+| AC‑001 – AC‑002 | FR‑001, NFR‑001, NFR‑003, KPI-001 |
+| AC‑003 – AC‑005 | FR‑005, NFR‑003, KPI-003 |
+| AC‑006 – AC‑009 | FR‑004, FR‑005, NFR‑003, KPI-003 |
 
 ---
 
 ## Compliance & Risk Mapping
 
-* **RISK‑01:** Unauthorized data exposure – mitigated by encryption & RBAC.
-* **RISK‑02:** Open-source component vulnerabilities – addressed in separate security backlog.
-* **RISK‑03:** Deployment misconfiguration – covered by infrastructure hardening checklist.
+* **RISK-001:** Unauthorized data exposure – mitigated by encryption & RBAC.
+* **RISK-002:** Open-source component vulnerabilities – addressed in separate security backlog.
+* **RISK-003:** Deployment misconfiguration – covered by infrastructure hardening checklist.
 
 ---
 

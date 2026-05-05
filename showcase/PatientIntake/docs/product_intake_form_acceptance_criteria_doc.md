@@ -11,7 +11,7 @@
 ## User Stories
 
 **US-001 – Front Desk Clerk: Capture Patient Demographics**
-- **Given** the clerk is authenticated with role ST‑01 and has a valid session token.
+- **Given** the clerk is authenticated with role ST-001 and has a valid session token.
 - **When** the clerk fills out the structured web form containing required fields (name, DOB, insurance policy number, etc.) and clicks **Submit**.
 - **Then** the system must:
   1. Validate that all mandatory fields are present; if any are missing, display an inline error without persisting partial data and log a `VALIDATION_FAILURE` event (traceable to FR‑001).
@@ -20,24 +20,24 @@
   4. Return a success confirmation to the clerk.
 
 **US-002 – Clinician: Review and Augment Intake Form**
-- **Given** the clinician is authenticated with role ST‑02 and is assigned to a specific patient record.
+- **Given** the clinician is authenticated with role ST-002 and is assigned to a specific patient record.
 - **When** the clinician opens a pending intake form and adds clinical observations in the free‑text field.
 - **Then** the system must:
   1. Log the READ operation of the form (traceable to NFR‑003).
   2. Allow the clinician to edit only the `clinical_observations` field; other fields remain read‑only.
   3. Encrypt the new observation client‑side using AES‑256‑GCM before storage.
   4. Store the updated record and log an `UPDATE` event that includes before‑and‑after hashes of the encrypted field (traceable to FR‑004).
-  5. If the clinician attempts to edit a record they are not assigned to, return HTTP 403 Forbidden, display a user‑friendly error message, and log an `ACCESS_DENIED` event (traceable to RISK‑01).
+  5. If the clinician attempts to edit a record they are not assigned to, return HTTP 403 Forbidden, display a user‑friendly error message, and log an `ACCESS_DENIED` event (traceable to RISK-001).
 
 **US-003 – Compliance Officer: Generate Audit‑Ready PDF Export**
-- **Given** the compliance officer is authenticated with role ST‑03.
+- **Given** the compliance officer is authenticated with role ST-003.
 - **When** the officer selects a patient record and requests a PDF intake summary export.
 - **Then** the system must:
   1. Verify the officer’s role before generating the PDF.
   2. Produce a PDF that includes a watermark "Confidential – Compliance Review" and a timestamp of export.
   3. Sign the PDF with a server‑side private key to ensure integrity.
-  4. Create an immutable audit log entry of type `EXPORT` that records user ID, timestamp, patient record ID, and hash of the generated PDF (traceable to NFR‑003 and KPI‑04).
-  5. If the officer lacks proper role, block the action, return an error message, and log an `UNAUTHORIZED_EXPORT` event (traceable to RISK‑02).
+  4. Create an immutable audit log entry of type `EXPORT` that records user ID, timestamp, patient record ID, and hash of the generated PDF (traceable to NFR‑003 and KPI-004).
+  5. If the officer lacks proper role, block the action, return an error message, and log an `UNAUTHORIZED_EXPORT` event (traceable to RISK-002).
 
 ### Cross‑Persona Security Requirements
 - All audit events (`CREATE`, `READ`, `UPDATE`, `EXPORT`, `VALIDATION_FAILURE`, `ACCESS_DENIED`, `UNAUTHORIZED_EXPORT`) must be immutable and stored in an append‑only log meeting HIPAA technical safeguard §164.312(a)(2)(i).
@@ -50,8 +50,8 @@
 - **NFR‑004**: Audit logs must be tamper‑evident and retain data for at least 7 years.
 
 ### KPI Alignment
-- **KPI‑01**: <200 ms response time compliance for form submissions.
-- **KPI‑04**: Successful PDF export with correct watermark and signature for every request.
+- **KPI-001**: <200 ms response time compliance for form submissions.
+- **KPI-004**: Successful PDF export with correct watermark and signature for every request.
 
 ---
 *All IDs referenced above correspond to entries in the project asset registry.*
@@ -96,7 +96,7 @@ The file is delivered over HTTPS and an immutable audit log entry records the SH
 * **Audit log schema** – immutable append‑only table `audit_log` (log_id PK, record_id FK, action, actor_role, timestamp, hash). Supports tamper evidence per NIST SP 800‑53 AU‑6.
 * **PDF generation contract** – input HTML template fields, required watermark text, timestamp format ISO‑8601, digital signature metadata fields (`exporter_user_id`, `export_timestamp`).
 * **Error handling conventions** – JSON payload `{ "error_code": "...", "message": "...", "retryable": true/false }` for front‑end consumption.
-* **Performance thresholds** – form submission latency ≤200 ms (KPI‑01); PDF generation ≤2 seconds for average record size ≤5 KB (KPI‑02).
+* **Performance thresholds** – form submission latency ≤200 ms (KPI-001); PDF generation ≤2 seconds for average record size ≤5 KB (KPI-002).
 
 ## Traceability Matrix
 

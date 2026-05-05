@@ -22,7 +22,7 @@ flowchart TD
 ### 2. API Contracts (Overview)
 
 #### 2.1 Introduction
-This document defines the OpenAPI 3.0 contracts for the PatientIntake system’s `/api/v1/intake` endpoint and related services required to satisfy functional requirements FR‑001 through FR‑007, non‑functional requirements NFR‑001 and NFR‑003, and KPIs KPI‑01 through KPI‑03. All protected health information (PHI) fields are encrypted at rest using AES‑256‑GCM and transmitted over TLS 1.3 as mandated by HIPAA §164.312(a)(2)(iv). The contracts are written to be directly consumable by developers in the Development phase.
+This document defines the OpenAPI 3.0 contracts for the PatientIntake system’s `/api/v1/intake` endpoint and related services required to satisfy functional requirements FR‑001 through FR‑007, non‑functional requirements NFR‑001 and NFR‑003, and KPIs KPI-001 through KPI-003. All protected health information (PHI) fields are encrypted at rest using AES‑256‑GCM and transmitted over TLS 1.3 as mandated by HIPAA §164.312(a)(2)(iv). The contracts are written to be directly consumable by developers in the Development phase.
 
 #### 2.2 Component Interaction Diagram
 mermaid
@@ -320,7 +320,7 @@ b- **Horizontal Scalability** – Stateless API layer scales behind an ingress c
 b- **Multi‑Tenant Isolation** – Tenant ID is part of every request context; row‑level security policies enforce tenant data separation.
 b- **Backup & Disaster Recovery** – Daily encrypted backups stored in offsite object storage; point‑in‑time recovery tested weekly.
 b---
-b## 9. References & Traceability Matrix| ID | Description ||----|-------------|| FR‑001 | Secure demographic capture || FR‑002 | Insurance information capture || FR‑003 | Medical history storage || NFR‑003 | Mandatory audit logging || RISK‑01 | Unauthorized data exposure |---*All specifications above are traceable to the listed IDs.*
+b## 9. References & Traceability Matrix| ID | Description ||----|-------------|| FR‑001 | Secure demographic capture || FR‑002 | Insurance information capture || FR‑003 | Medical history storage || NFR‑003 | Mandatory audit logging || RISK-001 | Unauthorized data exposure |---*All specifications above are traceable to the listed IDs.*
 
 # System Architecture Overview
 
@@ -416,7 +416,7 @@ Error code namespace mapping:
 
 ## Non‑Functional Considerations
 - **Scalability:** Services are stateless; horizontal scaling via container orchestration (Kubernetes). Database read replicas for load distribution.
-- **Availability:** Deploy API Gateway and services across multiple zones; PostgreSQL configured with streaming replication achieving >99.9 % uptime (target KPI‑02).
+- **Availability:** Deploy API Gateway and services across multiple zones; PostgreSQL configured with streaming replication achieving >99.9 % uptime (target KPI-002).
 a- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​---
 some placeholder text removed for brevity---
 sorry this part truncated due to length constraints.

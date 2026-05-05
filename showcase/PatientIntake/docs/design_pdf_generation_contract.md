@@ -197,7 +197,7 @@ and more ...
 - **Containerisation** – Deployed via Docker Compose (`docker-compose.yml`) using PostgreSQL 13 for persistence and a side‑car encryption service based on **libsodium‑1.0.18**.
 - **Horizontal Scalability** – The service is replicated behind a load balancer; each instance shares the same PostgreSQL cluster using read‑replicas.
 - **Multi‑Tenant Isolation** – Tenant ID is part of every request context and enforced via row‑level security (RLS) policies in PostgreSQL.
-- **Monitoring & Alerting** – Prometheus metrics (`pdf_generation_duration_seconds`, `pdf_generation_errors_total`) and Grafana dashboards monitor latency and error rates to satisfy **KPI‑01** and **KPI‑02**.
+- **Monitoring & Alerting** – Prometheus metrics (`pdf_generation_duration_seconds`, `pdf_generation_errors_total`) and Grafana dashboards monitor latency and error rates to satisfy **KPI-001** and **KPI-002**.
 
 ## 10. API Definitions
 
@@ -361,7 +361,7 @@ AuditLog:
 ### Audit Logging Enhancements (addresses reviewer gap)
 - Every PDF generation (`GENERATE_PDF`) and revocation (`REVOKE_PDF`) writes an entry to `AuditLog` with `details_jsonb` containing the original request payload (patient_id, requested_by) and the resulting `pdf_id`.
 - The service also logs encryption failures with operation_type `ERROR_ENCRYPTION` (custom enum value) to aid forensic analysis.
-- Log retention policy is defined by **KPI‑03** (audit log retention ≥ 90 days).
+- Log retention policy is defined by **KPI-003** (audit log retention ≥ 90 days).
 
 ## 12. Integration Points & Failure Handling
 | Integration Point | Dependency | Failure Condition & Handling |

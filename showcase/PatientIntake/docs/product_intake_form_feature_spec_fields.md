@@ -38,7 +38,7 @@
 ### 5. Prioritization & Business Justification
 | Persona ID | Priority Rank | Business Justification |
 |------------|--------------|------------------------|
-| PER-01     | 1            | Directly creates protected health information; errors affect downstream compliance metrics (KPI‑01, KPI‑03). |
+| PER-01     | 1            | Directly creates protected health information; errors affect downstream compliance metrics (KPI-001, KPI-003). |
 | PER-02     	|	2	|	Needs timely access to accurate intake data; PDF export is critical for care decisions and must be secure.	|
 | PER-03     	|	3	|	Provides oversight; essential for audit readiness but read‑only, can be implemented after core data capture stabilizes.	|
 
@@ -133,7 +133,13 @@ and *Then* an audit log entry `event_type="PDF_EXPORT"` is recorded.
 |-RISK-03    |-Deployment misconfiguration leading to insecure TLS settings      |-Use automated configuration validation scripts; enforce TLS 1.3 via CI checks.| RISK-06    |-Insufficient multi-tenancy isolation in SaaS deployment        |-Enforce row-level security per tenant; separate encryption keys per tenant.| --- |
 
 ## Open Issues / Knowledge Gaps
-{  "knowledge_gaps": [    "Exact HIPAA §164.312(a)(2)(iv) technical safeguard requirements for encryption key management",    "PostgreSQL row-level security performance characteristics at 10M+ audit log rows"  ]}
+
+{
+  "knowledge_gaps": [
+    "Exact HIPAA §164.312(a)(2)(iv) technical safeguard requirements for encryption key management",
+    "PostgreSQL row-level security performance characteristics at 10M+ audit log rows"
+  ]
+}
 
 ## Feature Specification – Patient Intake System
 
@@ -164,7 +170,7 @@ And access is denied if the record is not assigned to the clinician.
 Given a compliance officer accesses the audit console
 When they query audit logs for a given time window (e.g., last 24 hours)
 Then the system returns a list of entries showing timestamp, actor ID, operation type, affected fields and cryptographic hash
-And each entry complies with NIST 800-53 AC‑2 and AU‑6 controls
+And each entry complies with NIST 800-53 AC-002 and AU‑6 controls
 And the officer can export the result as a PDF with watermark and hash verification.
 
 *Traceability*: FR-001, FR-002, FR-003, NFR-003, KPI-03

@@ -83,23 +83,23 @@ The PatientIntake project will deliver a HIPAA‑compliant patient intake system
 ## Key Performance Indicators (KPI)
 | KPI ID | Metric |
 |---|---|
-| KPI‑01 | Form submission response time < 200 ms under normal load |
-| KPI‑02 | System availability 99.9 % monthly uptime |
-| KPI‑03 | Successful audit log generation for 100 % of read/write events |
-| KPI‑04 | PDF export compliance – watermark present on 100 % of PDFs and timestamp accuracy within 1 second |
-| KPI‑05 | Test coverage ≥ 80 % for unit tests and ≥ 70 % for integration tests |
+| KPI-001 | Form submission response time < 200 ms under normal load |
+| KPI-002 | System availability 99.9 % monthly uptime |
+| KPI-003 | Successful audit log generation for 100 % of read/write events |
+| KPI-004 | PDF export compliance – watermark present on 100 % of PDFs and timestamp accuracy within 1 second |
+| KPI-005 | Test coverage ≥ 80 % for unit tests and ≥ 70 % for integration tests |
 
 ## Risk Identification and Prioritization
 | Risk ID | Description | Likelihood | Impact | Mitigation Action |
 |---|---|---|---|---|
-| RISK‑01 | Unauthorized disclosure of PHI during data transmission between the web client and the on‑prem server. | M | H | Enforce TLS 1.3 for all network traffic; apply field‑level AES‑256 encryption before transmission; conduct quarterly penetration testing with OWASP ZAP. |
-| RISK‑02 | Vulnerabilities in open‑source libraries that could bypass audit logging. | M | H | Adopt continuous dependency scanning (Dependabot); enforce zero‑day remediation within 7 days; maintain a Bill of Materials and perform annual third‑party code audit. |
-| RISK‑03 | Misconfiguration of Docker Compose or host firewall leading to accidental exposure of PostgreSQL in an air‑gapped environment. | L | H | Use immutable Docker images signed with Notary; enforce host firewall rules documented in the deployment guide; run pre‑deployment validation script that checks open ports and volume permissions. |
-| RISK‑04 | Failure to retain immutable audit logs for the legally required retention period. | L | H | Define log retention policy of seven years on WORM storage; automate log archiving using rsync to an offline encrypted volume; perform quarterly log integrity checks using SHA‑256 hashes. |
+| RISK-001 | Unauthorized disclosure of PHI during data transmission between the web client and the on‑prem server. | M | H | Enforce TLS 1.3 for all network traffic; apply field‑level AES‑256 encryption before transmission; conduct quarterly penetration testing with OWASP ZAP. |
+| RISK-002 | Vulnerabilities in open‑source libraries that could bypass audit logging. | M | H | Adopt continuous dependency scanning (Dependabot); enforce zero‑day remediation within 7 days; maintain a Bill of Materials and perform annual third‑party code audit. |
+| RISK-003 | Misconfiguration of Docker Compose or host firewall leading to accidental exposure of PostgreSQL in an air‑gapped environment. | L | H | Use immutable Docker images signed with Notary; enforce host firewall rules documented in the deployment guide; run pre‑deployment validation script that checks open ports and volume permissions. |
+| RISK-004 | Failure to retain immutable audit logs for the legally required retention period. | L | H | Define log retention policy of seven years on WORM storage; automate log archiving using rsync to an offline encrypted volume; perform quarterly log integrity checks using SHA‑256 hashes. |
 
 ## Compliance Controls Alignment
 * HIPAA §164.312(a)(2)(iv) – Encryption: All PHI at rest is encrypted with AES‑256 as required by FR‑001 through FR‑003.
-* HIPAA §164.308(a)(1)(ii) – Audit Controls: Immutable audit log strategy satisfies the audit control requirement (RISK‑04).
+* HIPAA §164.308(a)(1)(ii) – Audit Controls: Immutable audit log strategy satisfies the audit control requirement (RISK-004).
 * NIST SP 800‑53 CM‑7 – Least Functionality: Open‑source component selection is limited to actively maintained packages with CVE tracking.
 
 ## Monitoring and Reporting

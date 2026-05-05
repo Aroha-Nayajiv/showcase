@@ -42,12 +42,12 @@
 - **And** an `UPDATE` audit entry is recorded,
 - **And** the UI shows a “Saved” confirmation,
 - **If** HSM key retrieval fails, the system displays “Decryption unavailable”, logs an `ERROR` entry, and prevents note entry.
-*(Traceability: FR‑003, NFR‑003, KPI‑02)*
+*(Traceability: FR‑003, NFR‑003, KPI-002)*
 
 ### Traceability Matrix
 | User Story ID | Linked Functional Requirements      | Linked Non‑Functional Requirements | KPIs / Risks |
 |---------------|--------------------------------------|--------------------------------------|---------------|
-| US-001       | FR‑001, FR‑002, FR‑003              | NFR‑003                              |	KPI‑01 |
+| US-001       | FR‑001, FR‑002, FR‑003              | NFR‑003                              |	KPI-001 |
 | US-002       |	FR‑003                               |	NFR\-003                            |	KPI\-02 |
 | US\-003       |	FR\-005                               |	NFR\-003                            |	KPI\-04 |
 | US\-004       |	FR\-010                               |	NFR\-003                            |	RISK\-01 |
@@ -113,9 +113,9 @@
 | FR‑006       | Watermark & timestamp on PDFs              | US‑004 (AC‑009)                                           |
 | NFR‑001      | Response time <200 ms for form submissions | US‑001 (AC‑001)                                           |
 | NFR‑003      | Audit log immutability & retention         | US‑002, US‑003                                            |
-| KPI‑01       | Response time compliance                  | US‑001                                                    |
-| RISK‑01      | Unauthorized data exposure                | Mitigated by encryption & access controls                |
-| RISK‑02      | Open-source component vulnerabilities    | Managed via dependency scanning                         |
+| KPI-001       | Response time compliance                  | US‑001                                                    |
+| RISK-001      | Unauthorized data exposure                | Mitigated by encryption & access controls                |
+| RISK-002      | Open-source component vulnerabilities    | Managed via dependency scanning                         |
 
 ## Personas Definition
 

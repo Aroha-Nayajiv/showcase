@@ -92,6 +92,6 @@ Providing each stakeholder with precisely the access required reduces the attack
 | Product Owner (Clinical Lead) | Prioritization of functional requirements (FR‑001 – FR‑003) |
 | Security Lead | Verification of HIPAA safeguards (NFR‑001 – NFR‑003) and periodic risk assessments |
 | DevOps Lead | Air‑gap deployment validation, Docker‑Compose orchestration, dependency scanning |
-| Compliance Officer (ST‑05) | Quarterly audit preparation, review of audit log retention policy |
+| Compliance Officer (ST-005) | Quarterly audit preparation, review of audit log retention policy |
 
 Quarterly governance reviews will assess KPI attainment, risk mitigation effectiveness, and alignment with strategic objectives.

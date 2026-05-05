@@ -14,7 +14,7 @@
 |
 | PER-03 | Administrator Deploy, configure, and monitor the Docker Compose stack; manage encryption keys and role‑based access control in PostgreSQL. Full admin rights on the Docker host and PostgreSQL; can create/modify RBAC roles (admin, clinician, front desk). |
  Full admin rights on the Docker host and PostgreSQL; can create/modify RBAC roles (admin, clinician, front desk). |
- Must enforce air‑gap network isolation; maintain key rotation schedule; audit all container lifecycle events (RISK‑01, RISK‑03). |
+ Must enforce air‑gap network isolation; maintain key rotation schedule; audit all container lifecycle events (RISK-001, RISK-003). |
 |
 
 ## 2. Interaction Flows per Persona
@@ -44,8 +44,8 @@ the UI returns a clear error (`Unable to generate PDF – contact Administrator`
 * All external traffic uses TLS 1\.3 with strong cipher suites (HIPAA §164\.312(e)(1)).
 * Field‑level encryption satisfies 45 CFR 164\.312(a)(2)(iv) technical safeguard.
 * Immutable audit log meets NIST SP 800\-53 AU\-6 and HIPAA §164\.308(a)(1)(ii).
-* Air‑gap network isolation follows Docker best practices for on\-prem environments (RISK‑03).
-* Role‑based access control enforces least privilege per FR‑01 and FR‑03.
+* Air‑gap network isolation follows Docker best practices for on\-prem environments (RISK-003).
+* Role‑based access control enforces least privilege per FR-001 and FR-003.
 
 ### US\-001 – Demographic Capture (Front Desk Clerk)
 **Persona:** PER\-01
@@ -69,20 +69,20 @@ the UI returns a clear error (`Unable to generate PDF – contact Administrator`
 **Goal:** Deploy system securely and maintain key rotation.
 
 ## 3. Overview
-This document defines the product‑level expectations for the **PatientIntake** SaaS solution. It captures user‑value‑driven features, user stories, acceptance criteria, and MVP scope while ensuring traceability to functional requirements (FR‑001 – FR‑003), non‑functional requirements (NFR‑003), and key performance indicators (KPI‑01, KPI‑04). All content is scoped to the product phase – no low‑level design or implementation details are included.
+This document defines the product‑level expectations for the **PatientIntake** SaaS solution. It captures user‑value‑driven features, user stories, acceptance criteria, and MVP scope while ensuring traceability to functional requirements (FR‑001 – FR‑003), non‑functional requirements (NFR‑003), and key performance indicators (KPI-001, KPI-004). All content is scoped to the product phase – no low‑level design or implementation details are included.
 
 ---
 
 ## 4. User Stories (Product Backlog)
 | ID | Persona | Goal | Description |
 |----|--------|------|-------------|
-| **US-001** | Front Desk Clerk (PER‑01) | Capture demographic data securely | The clerk fills the patient intake form with name, DOB, address, and SSN. Upon submission the system validates required fields, encrypts PHI client‑side, stores ciphertext, and returns a success response within **200 ms** (KPI‑01). |
+| **US-001** | Front Desk Clerk (PER‑01) | Capture demographic data securely | The clerk fills the patient intake form with name, DOB, address, and SSN. Upon submission the system validates required fields, encrypts PHI client‑side, stores ciphertext, and returns a success response within **200 ms** (KPI-001). |
 | **US-002** | Front Desk Clerk (PER‑01) | Capture insurance information | The clerk enters insurer name, policy number (max 20 chars), and optional group ID. Invalid insurer triggers a validation error "Provider not recognized" and logs the attempt without persisting PHI (FR‑002). Policy numbers longer than 20 chars cause a truncation error; missing group ID is handled as optional per FR‑002. |
 | **US-003** | Clinician (PER‑02) | View patient summary read‑only | After authenticating as a clinician the user selects a patient record and clicks **View Summary**. The UI renders decrypted demographic and insurance data (server‑side decryption), creates an audit log entry of type **READ** with actor_id and timestamp (NFR‑003), and overlays a watermark "Confidential – Viewed by {clinician_id} at {timestamp}" on the PDF preview. |
 | **US-010** | Front Desk Clerk (PER‑01) | Start Docker Compose stack | The clerk runs a single command (`docker compose up -d`) to launch the intake web form without manual container wiring. All containers start within 30 seconds and health endpoint returns HTTP 200 (FR‑001). |
 | **US-011** | Administrator (PER‑03) | Load encryption keys before service start | The admin places encryption key files in `/run/secrets/` with mode 0400 owned by root. When `docker compose up` is executed the web service loads the keys successfully; logs contain "Encryption keys loaded" (FR‑002). |
 | **US-012** | Clinician (PER‑02) | Verify audit logging for reads | While the system runs with RBAC enabled, the clinician accesses a patient record via UI. An audit entry is written containing user ID, timestamp, record ID, and action "READ" (NFR‑003). |
-| **US-013** | Administrator (PER‑03) | Generate air‑gap deployment checklist | The admin runs `check_airgap.sh` which validates network isolation, firewall rules, and host hardening. Script outputs "PASS" and can be saved as PDF for auditors (RISK‑03 mitigation). |
+| **US-013** | Administrator (PER‑03) | Generate air‑gap deployment checklist | The admin runs `check_airgap.sh` which validates network isolation, firewall rules, and host hardening. Script outputs "PASS" and can be saved as PDF for auditors (RISK-003 mitigation). |
 | **US-014** | Front Desk Clerk (PER‑01) | Receive clear error on missing secrets | If Docker Compose fails due to a missing secret file, the CLI prints a concise error (`Missing secret file: /run/secrets/db_password`) and exits with non‑zero status; no containers remain running and an audit log records the failure (FR‑004). |
 
 ---
@@ -90,7 +90,7 @@ This document defines the product‑level expectations for the **PatientIntake**
 ### 5.2 Insurance Capture – US‑002
 | ID | Linked Requirement(s) | Given | When | Then |
 |----|-----------------------|-------|------|------|
-| **AC-003** | FR‑002, KPI‑04 | Valid insurer list loaded; TLS 1.3 active | Clerk enters an insurer not on the approved list and clicks **Submit** | System returns HTTP 400 with message "Provider not recognized", logs attempt without storing PHI, and does not create a patient record. |
+| **AC-003** | FR‑002, KPI-004 | Valid insurer list loaded; TLS 1.3 active | Clerk enters an insurer not on the approved list and clicks **Submit** | System returns HTTP 400 with message "Provider not recognized", logs attempt without storing PHI, and does not create a patient record. |
 | **AC-004** | FR‑002 | Policy number > 20 chars or missing group ID (optional) | Clerk submits form with overlong policy number or omits group ID | System returns HTTP 400 with specific error (`"Policy number exceeds maximum length"` or `"Group ID optional – omitted"`); audit log records VALIDATION_FAILURE; no PHI persisted. |
 | **AC-005** | FR‑002 | All insurance fields valid; TLS 1.3 active | Clerk clicks **Submit** | Each field encrypted client‑side, transmitted securely, stored as ciphertext; audit log entry records CREATE operation with actor_id, timestamp, and reference to FR‑002; background job (`curl` wrapper) is triggered to verify insurer API connectivity. |
 
@@ -117,7 +117,7 @@ This document defines the product‑level expectations for the **PatientIntake**
 ### 5.6 Air‑Gap Checklist – US‑013
 | ID | Linked Requirement(s) | Given | When |
 |----|-----------------------|-------|
-| **AC-014** | RISK‑03 | Administrator runs `check_airgap.sh` script Script validates no external network interfaces, verifies iptables rules block outbound traffic, confirms host OS patches applied; outputs "PASS"; result can be saved as PDF for auditors. |
+| **AC-014** | RISK-003 | Administrator runs `check_airgap.sh` script Script validates no external network interfaces, verifies iptables rules block outbound traffic, confirms host OS patches applied; outputs "PASS"; result can be saved as PDF for auditors. |
 
 ### 5.7 Secret Missing Error – US‑014
 | ID | Linked Requirement(s) |

@@ -83,7 +83,7 @@
 
 **Negative scenarios:**
 - Invalid policy number format → validation error; no data persisted.
-- Attempt to edit another clinician’s record → access denied (403) and audit log records unauthorized attempt (RISK‑01).
+- Attempt to edit another clinician’s record → access denied (403) and audit log records unauthorized attempt (RISK-001).
 
 ## Design Needs for Implementation (handed to Design)
 
@@ -146,18 +146,18 @@
 ### User Stories
 
 **US‑001 – Secure Demographic Capture**
-> **As** a *clinical staff* (ST‑01)  
+> **As** a *clinical staff* (ST-001)  
 > **I want** to enter patient demographic data into a web form that encrypts the data before storage  
 > **So that** patient information is protected in accordance with HIPAA §164.312(a)(2)(iv).
 
-*Acceptance Criteria* (traceability: **FR‑001**, **KPI-001**, **RISK‑01**):
+*Acceptance Criteria* (traceability: **FR‑001**, **KPI-001**, **RISK-001**):
 1. Given the web form is loaded over HTTPS, when the staff submits the form, then the payload is encrypted with AES‑256‑GCM before being written to PostgreSQL.
 2. The encryption key is wrapped by a master key stored in a hardware security module (HSM) or encrypted file; decryption failures trigger AC‑KM‑001.
 3. Response time for the audit log write is <200 ms (KPI-001).
 4. All encryption operations are logged with operation = ENCRYPTION_SUCCESS.
 
 **US‑002 – Insurance Validation**
-> **As** a *patient* (ST‑02)  
+> **As** a *patient* (ST-002)  
 > **I want** the system to validate my insurance number against a reference service before submission  
 > **So that** only valid policies are stored.
 
@@ -166,22 +166,22 @@
 2. Invalid numbers produce an inline error message without exposing internal details.
 
 **US‑003 – Immutable Audit Logging**
-> **As** a *compliance officer* (ST‑03)  
+> **As** a *compliance officer* (ST-003)  
 > **I want** every read/write operation on patient data to be recorded immutably with role information  
 > **So that** I can demonstrate compliance during audits.
 
-*Acceptance Criteria* (traceability: **FR‑003**, **KPI-003**, **RISK‑01**):
+*Acceptance Criteria* (traceability: **FR‑003**, **KPI-003**, **RISK-001**):
 1. All INSERT/UPDATE/SELECT statements generate an entry in `audit_log` with columns: `timestamp`, `operation`, `user_id`, `role`, `hash_chain`.
-2. The hash chain links each entry to the previous one using SHA‑512; any mismatch raises an alert to ST‑03.
+2. The hash chain links each entry to the previous one using SHA‑512; any mismatch raises an alert to ST-003.
 3. Entries older than 7 years are archived to read‑only storage but never deleted.
 4. Audit log write latency ≤200 ms (KPI-001).
 
 **US‑004 – PDF Intake Summary Generation**
-> **As** a *clinical staff* (ST‑01)  
+> **As** a *clinical staff* (ST-001)  
 > **I want** an offline PDF summary of the patient intake form that includes a watermark and timestamp  
 > **So that** I can print and store it securely without internet access.
 
-*Acceptance Criteria* (traceability: **FR‑005**, **FR‑007**, **KPI-004**, **RISK‑01**):
+*Acceptance Criteria* (traceability: **FR‑005**, **FR‑007**, **KPI-004**, **RISK-001**):
 1. Given a completed intake record, when the staff clicks “Generate PDF”, then wkhtmltopdf creates a PDF using only local resources.
 2. The PDF contains a visible watermark “Confidential – Patient Intake” and a timestamp of generation.
 3. The PDF file is stored in an encrypted volume; access requires the same role-based permissions as the source record.
@@ -189,14 +189,14 @@
 5. PDF generation completes within 500 ms on typical hardware (performance target).
 
 **US‑005 – Air‑Gap Enforcement Validation**
-> **As** an *IT operations* engineer (ST‑04)  
+> **As** an *IT operations* engineer (ST-004)  
 > **I want** automated checks that confirm no container can resolve external DNS or reach the internet  
 > **So that** the air‑gapped environment remains isolated.
 
-*Acceptance Criteria* (traceability: **FR‑008**, **RISK‑03**):
+*Acceptance Criteria* (traceability: **FR‑008**, **RISK-003**):
 1. A health check script runs hourly; it attempts `nslookup google.com` inside each container and expects NXDOMAIN.
 2. Network traffic capture shows zero outbound packets on ports 80/443 after startup.
-3. Any violation triggers an alert to ST‑04 and logs `AIRGAP_VIOLATION`.
+3. Any violation triggers an alert to ST-004 and logs `AIRGAP_VIOLATION`.
 
 ## MVP Scope
 
@@ -365,8 +365,8 @@ Docker bypasses UFW by default. You must secure the `DOCKER-USER` chain to preve
 7. Confirm the capture file contains **zero packets**. Any outbound traffic constitutes an air-gap violation and must be investigated before proceeding.
 
 #### 7.5 Persist and Document
-8. Document any exceptions required for internal monitoring (e.g., health‑check endpoints on `10.x.x.x`). Keep exceptions minimal and approved by the System Administrator (ST‑04).
-9. Record all firewall changes in the project change log repository. Every change must follow the change management process and include ST‑04 approval.
+8. Document any exceptions required for internal monitoring (e.g., health‑check endpoints on `10.x.x.x`). Keep exceptions minimal and approved by the System Administrator (ST-004).
+9. Record all firewall changes in the project change log repository. Every change must follow the change management process and include ST-004 approval.
 
 #### 7.5 Log Retention and Backup
 12. Retain firewall and audit logs per compliance policy (minimum 7 years per KPI-003).
@@ -374,7 +374,7 @@ Docker bypasses UFW by default. You must secure the `DOCKER-USER` chain to preve
 14. Test restoration from log backups quarterly and verify integrity using SHA‑256 hash verification.
 15. Store backups on encrypted offline media; maintain an inventory of backup media locations with strict access controls.
 16. Log all backup retrieval actions. Destroy expired media securely per the data disposal policy.
-17. Ensure all steps comply with RISK‑01 mitigation strategies throughout this process.
+17. Ensure all steps comply with RISK-001 mitigation strategies throughout this process.
 
 ## Patient Intake Feature Specification
 
@@ -393,7 +393,7 @@ Docker bypasses UFW by default. You must secure the `DOCKER-USER` chain to preve
 | **FR‑009** | Conduct quarterly disaster‑recovery drills with full restore on an air‑gap host. |
 
 #### US‑001: Capture Demographic Data
-*As a **Clinical Staff (ST‑01)** I want to enter patient demographic information so that the system records accurate patient records.*
+*As a **Clinical Staff (ST-001)** I want to enter patient demographic information so that the system records accurate patient records.*
 
 **Acceptance Criteria**
 1. **Given** the staff is authenticated,
@@ -407,7 +407,7 @@ Docker bypasses UFW by default. You must secure the `DOCKER-USER` chain to preve
    **Then** inline validation messages are shown and submission is blocked.
 
 #### US‑002: Capture Insurance Information
-*As a **Clinical Staff (ST‑01)** I need to record insurance details so that billing can be processed.*
+*As a **Clinical Staff (ST-001)** I need to record insurance details so that billing can be processed.*
 
 **Acceptance Criteria**
 1. Form includes insurer name, policy number, group number.
@@ -415,7 +415,7 @@ Docker bypasses UFW by default. You must secure the `DOCKER-USER` chain to preve
 3. Successful submission creates encrypted record (**NFR‑005**) and logs the event (**NFR‑003**, **KPI-003**).
 
 #### US‑003: Store Medical History Securely
-*As a **Clinical Staff (ST‑01)** I want to add medical history so that clinicians have context for care.*
+*As a **Clinical Staff (ST-001)** I want to add medical history so that clinicians have context for care.*
 
 **Acceptance Criteria**
 1. History is stored in a separate encrypted column.
@@ -423,7 +423,7 @@ Docker bypasses UFW by default. You must secure the `DOCKER-USER` chain to preve
 3. Audit log entry created on each create/update (**NFR‑003**, **KPI-003**).
 
 #### US‑004: Generate PDF Intake Summary
-*As a **Patient (ST‑02)** I want to receive a PDF summary of my submitted information so I have a personal record.*
+*As a **Patient (ST-002)** I want to receive a PDF summary of my submitted information so I have a personal record.*
 
 **Acceptance Criteria**
 1. After successful form submission, the system generates a PDF (**FR‑005**) containing all captured fields.
@@ -432,7 +432,7 @@ Docker bypasses UFW by default. You must secure the `DOCKER-USER` chain to preve
 4. Generation process is logged for audit (**NFR‑003**, **KPI-004**).
 
 #### US‑005: API Specification for Intake Submission
-*As a **System Administrator (ST‑04)** I need an API endpoint so that external systems can submit intake data programmatically.*
+*As a **System Administrator (ST-004)** I need an API endpoint so that external systems can submit intake data programmatically.*
 
 **API Endpoint**: `POST /api/v1/intake`
 
@@ -461,7 +461,7 @@ Docker bypasses UFW by default. You must secure the `DOCKER-USER` chain to preve
 *Audit*: Each request creates an audit log entry (**NFR‑003**, **KPI-003**) .
 
 #### US‑006: Log Retention & Offline Storage
-*As a **Compliance Officer (ST‑03)** I need logs older than 90 days moved to offline storage so we meet retention policy (**NFR‑002**) .*
+*As a **Compliance Officer (ST-003)** I need logs older than 90 days moved to offline storage so we meet retention policy (**NFR‑002**) .*
 
 **Acceptance Criteria**
 1. System automatically archives Hive logs older than 90 days to encrypted offline storage bucket.
@@ -469,7 +469,7 @@ Docker bypasses UFW by default. You must secure the `DOCKER-USER` chain to preve
 3. Retention process runs nightly; success/failure recorded in monitoring dashboard (**KPI-002**).
 
 #### US‑007: Quarterly Disaster Recovery Drill
-*As a **System Administrator (ST‑04)** I must perform a full restore from backup on an air‑gap host quarterly (**FR‑009**) to validate recovery procedures.*
+*As a **System Administrator (ST-004)** I must perform a full restore from backup on an air‑gap host quarterly (**FR‑009**) to validate recovery procedures.*
 
 **Acceptance Criteria**
 1. Backup of database and file storage is taken weekly.

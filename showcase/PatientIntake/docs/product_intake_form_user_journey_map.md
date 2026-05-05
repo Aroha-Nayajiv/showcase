@@ -33,7 +33,7 @@
 |----|------|-----------|-----------------|----------|
 | US-001 | Patient | enter my demographic, insurance, and medical history into a structured web form that encrypts each field at rest and in transit | my protected health information (PHI) is stored securely and complies with HIPAA §164.312(a)(2)(iv) | High |
 | US-002 | Front Desk Clerk | submit a completed intake form on behalf of the patient and receive immediate confirmation that the record is stored with role‑based write permission | the clinic can begin clinical workflow without delay while ensuring only authorized staff can create records (FR‑001) | High |
-| US-003 | Clinician | retrieve a patient's intake record and view a PDF summary that includes a staff watermark and an access timestamp | I can review accurate clinical information while audit logs capture the read operation for compliance (FR‑003, FR‑010, KPI‑03) | High |
+| US-003 | Clinician | retrieve a patient's intake record and view a PDF summary that includes a staff watermark and an access timestamp | I can review accurate clinical information while audit logs capture the read operation for compliance (FR‑003, FR‑010, KPI-003) | High |
 | US-004 | Admin | generate an immutable audit log entry for every create, read, update, or delete operation on intake records and export the log for quarterly compliance review | auditors can verify that all PHI handling complies with NFR‑003 and HIPAA audit requirements | Medium |
 | US-005 | Front Desk Clerk | receive validation errors when required fields are missing or when encryption of a field fails before submission | data quality is guaranteed and no partially encrypted records enter the database (NFR‑001) | Medium |
 

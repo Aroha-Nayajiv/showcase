@@ -13,11 +13,11 @@ The PatientIntake system will provide a HIPAA‑compliant web‑based intake wor
 ### 3. Stakeholder Analysis
 | Stakeholder ID | Role / Concern | Primary Need | Risk if Unmet |
 |----------------|----------------|--------------|----------------|
-| **ST‑01** | Clinician | Immediate access to accurate patient history | Delayed treatment decisions |
-| **ST‑02** | Patient | Secure submission of personal health information | Data breach leading to loss of trust |
-| **ST‑03** | Administrator | Manage user permissions and system health | Misconfiguration causing downtime |
-| **ST‑04** | Front‑Desk Staff | Fast intake processing without re‑keying data | Inefficient workflow increasing wait times |
-| **ST‑05** | Compliance Officer | Verify auditability and HIPAA adherence | Non‑compliance penalties |
+| **ST-001** | Clinician | Immediate access to accurate patient history | Delayed treatment decisions |
+| **ST-002** | Patient | Secure submission of personal health information | Data breach leading to loss of trust |
+| **ST-003** | Administrator | Manage user permissions and system health | Misconfiguration causing downtime |
+| **ST-004** | Front‑Desk Staff | Fast intake processing without re‑keying data | Inefficient workflow increasing wait times |
+| **ST-005** | Compliance Officer | Verify auditability and HIPAA adherence | Non‑compliance penalties |
 
 ### 6. Risk Assessment
 | Risk ID | Description | Likelihood | Impact | Concrete Mitigation Actions |

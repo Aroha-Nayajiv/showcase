@@ -50,7 +50,7 @@ These mechanisms guarantee graceful degradation while preserving audit integrity
 ---
 
 ## 6. Introduction
-This document defines the concrete technical contracts required to implement the PatientIntake system in the design phase. It focuses on the Data Model artifact, providing an Entity‑Relationship diagram, API endpoint specifications, data‑model tables, error taxonomy, and service boundaries. All definitions trace back to the project requirements (**FR‑001 – FR‑003**, **NFR‑001 – NFR‑003**, **RISK‑01 – RISK‑03**) and comply with HIPAA technical safeguard mandates.
+This document defines the concrete technical contracts required to implement the PatientIntake system in the design phase. It focuses on the Data Model artifact, providing an Entity‑Relationship diagram, API endpoint specifications, data‑model tables, error taxonomy, and service boundaries. All definitions trace back to the project requirements (**FR‑001 – FR‑003**, **NFR‑001 – NFR‑003**, **RISK-001 – RISK-003**) and comply with HIPAA technical safeguard mandates.
 
 ## 7. Data Model Overview (ER Diagram)
 *(ER diagram omitted for brevity – referenced in separate visual artifact)*

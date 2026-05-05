@@ -1,9 +1,9 @@
 # PDF Intake Summary Specification
                 
-### 1. Front Desk Clerk (ST‑01)
+### 1. Front Desk Clerk (ST-001)
 - **Primary Goal:** Capture patient demographic, insurance, and medical‑history data quickly and accurately at the point of entry.
 - **Key Tasks:**
-  1. Log in to the intake workstation using unique credentials (NIST AC‑2).
+  1. Log in to the intake workstation using unique credentials (NIST AC-002).
   2. Open the Patient Intake Form and enter required fields (name, DOB, address, insurance policy number, etc.).
   3. Verify that each field shows a lock icon indicating field‑level encryption in transit (TLS 1.3) and at rest (AES‑256 per field).
   4. Submit the form; the system records an audit log entry (FR‑003) with `action=CREATE`, `actor=FrontDesk`, timestamp.
@@ -15,7 +15,7 @@
   - Network interruption before submission should trigger a client‑side retry and retain entered data locally encrypted.
   - Attempt to generate PDF without proper role must display an error "Insufficient permissions – contact administrator."
 
-### 2. Clinician (ST‑02)
+### 2. Clinician (ST-002)
 - **Primary Goal:** Review patient intake information and PDF summary to make clinical decisions while ensuring data privacy.
 - **Key Tasks:**
   1. Authenticate via multi‑factor login (username + OTP) as required by HIPAA § 164.312(a)(2)(iv).
@@ -29,7 +29,7 @@
   - Expired session while viewing PDF should automatically log out and require re‑authentication before any further export.
   - Corrupted PDF generation must present a fallback message "PDF generation failed – please retry" and create an audit entry with `action=ERROR`.
 
-### 3. Compliance Officer (ST‑03)
+### 3. Compliance Officer (ST-003)
 - **Primary Goal:** Ensure that all PDF generation activities comply with HIPAA, internal policies, and audit requirements.
 - **Key Tasks:**
   1. Log in with read‑only audit privileges.
@@ -55,9 +55,9 @@
 ## User Story Table
 | ID   | Persona (Role) | Description |
 |------|-----------------|-------------|
-| US‑001 | Front Desk Clerk (ST‑01) | Enter patient demographics, insurance details, and medical history into a structured web form that encrypts each field at rest and in transit |
-| US‑002 | Clinician (ST‑02) | Retrieve a previously submitted intake record and view decrypted data after successful role‑based authentication |
-| US‑003 | Compliance Officer (ST‑03) | Generate an audit log entry for every create, read, update, or delete operation on intake records and verify that the log entry is immutable and timestamped |
+| US‑001 | Front Desk Clerk (ST-001) | Enter patient demographics, insurance details, and medical history into a structured web form that encrypts each field at rest and in transit |
+| US‑002 | Clinician (ST-002) | Retrieve a previously submitted intake record and view decrypted data after successful role‑based authentication |
+| US‑003 | Compliance Officer (ST-003) | Generate an audit log entry for every create, read, update, or delete operation on intake records and verify that the log entry is immutable and timestamped |
 
 ### AC‑002 – Network Resilience on Form Submission (US‑001)
 **Given** the clerk has entered valid data but network connectivity is lost before the request reaches the server,
@@ -224,11 +224,11 @@ The system shall generate a secure, auditable PDF intake summary for each patien
 | ST-03| Compliance Officer  | Verifies that every PDF export is auditable, watermarked, and timestamped according to HIPAA audit requirements. |
 
 ### US-001: Generate HIPAA‑compliant PDF Intake Summary
-**As** a **Clinical Staff (ST‑01)**
+**As** a **Clinical Staff (ST-001)**
 **I want** to generate a PDF summary of a patient’s intake form that includes a watermark and timestamp
 **So that** the document meets HIPAA audit requirements and can be stored securely.
 
-*Traceability*: FR‑001, FR‑003, FR‑007, NFR‑001, NFR‑003, RISK‑01
+*Traceability*: FR‑001, FR‑003, FR‑007, NFR‑001, NFR‑003, RISK-001
 
 #### Acceptance Criteria
 1. **Given** a completed intake form with all mandatory demographic fields populated (per FR‑001)
@@ -239,14 +239,14 @@ The system shall generate a secure, auditable PDF intake summary for each patien
    **Then** it is encrypted at rest (per NFR‑001) and an immutable audit log entry is created (per NFR‑003).
 3. **Given** the user lacks the “Compliance Officer” role
    **When** they attempt to view the PDF audit details
-   **Then** access is denied and an audit entry records the denied attempt (per RISK‑01).
+   **Then** access is denied and an audit entry records the denied attempt (per RISK-001).
 
 ### US-002: View Audit Trail for Generated PDFs
-**As** a **Compliance Officer (ST‑03)**
+**As** a **Compliance Officer (ST-003)**
 **I want** to view an immutable audit trail for each generated PDF
 **So that** I can verify compliance with HIPAA logging requirements.
 
-*Traceability*: FR‑003, NFR‑003, RISK‑01
+*Traceability*: FR‑003, NFR‑003, RISK-001
 
 ## 7. Detailed Schema Definitions
 
@@ -276,7 +276,7 @@ The system shall generate a secure, auditable PDF intake summary for each patien
 2. **Insufficient Storage** – Export aborted; system logs AU‑002 with reason code `STORAGE_LOW`.
 3. **Key Management Failure** – Export unavailable; alert sent to Ops team; audit entry records failure reason `KEY_UNAVAILABLE`.
 4. **Unauthorized Role Attempt** – Immediate denial; audit entry records attempted access with status `DENIED`.
-5. **Tampered PDF Detection** – On subsequent verification, mismatch triggers `RISK‑01` escalation workflow.
+5. **Tampered PDF Detection** – On subsequent verification, mismatch triggers `RISK-001` escalation workflow.
 
 ## 10. Testable Acceptance Criteria (Gherkin)
 gherkin
@@ -299,5 +299,5 @@ Scenario: Export blocked due to missing mandatory fields
     And no PDF is generated
 
 ## 11. KPI & Risk Alignment
-*KPIs*: KPI‑01 (response time <200 ms for export), KPI‑03 (audit log generation for every submission), KPI‑04 (PDF export security compliance).
-*Risks*: RISK‑01 (unauthorized data exposure), RISK‑02 (open‑source component vulnerabilities) – mitigated by encryption at rest and immutable logging.
+*KPIs*: KPI-001 (response time <200 ms for export), KPI-003 (audit log generation for every submission), KPI-004 (PDF export security compliance).
+*Risks*: RISK-001 (unauthorized data exposure), RISK-002 (open‑source component vulnerabilities) – mitigated by encryption at rest and immutable logging.

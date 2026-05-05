@@ -26,7 +26,7 @@
 | US-002 | Clinician        | View and edit existing patient intake records that I am assigned to | I can provide timely care while maintaining auditability of all changes | High     |
 | US-003 | Administrator    | Assign role‑based permissions and audit log retention policies | The system enforces least‑privilege access and satisfies NFR‑003 audit logging requirement | High     |
 | US-004 | Front Desk Clerk | Export a PDF summary of a patient's intake record with a watermark and timestamp | Authorized staff can share a compliant document while preserving provenance | High     |
-| US-005 | Administrator | Revoke or modify user roles in case of staff turnover or security incidents | Access rights remain current, reducing risk of unauthorized data exposure (RISK‑01) | Medium    |
+| US-005 | Administrator | Revoke or modify user roles in case of staff turnover or security incidents | Access rights remain current, reducing risk of unauthorized data exposure (RISK-001) | Medium    |
 
 ### 2. Acceptance Criteria
 
@@ -99,8 +99,8 @@ High‑priority stories (US‑001 & US‑002) directly enable core HIPAA‑requi
 
 ## Metrics & Success Criteria
 
-* **Access Control Accuracy** – ≥ 99.9 % of permission checks pass in automated tests (KPI‑02).
-* **Encryption Verification** – All stored fields must be encrypted; automated test validates no plaintext in DB snapshots (KPI‑01).
-* **Audit Log Completeness** – 100 % of create/read/update/delete operations generate an audit entry (KPI‑03).
-* **PDF Export Compliance** – Every exported PDF contains correct watermark and timestamp; manual spot‑check of 10 random exports shows 0 violations (KPI‑04).
-* **User Acceptance** – Front Desk staff complete intake within 2 minutes 95 % of the time (KPI‑01).
+* **Access Control Accuracy** – ≥ 99.9 % of permission checks pass in automated tests (KPI-002).
+* **Encryption Verification** – All stored fields must be encrypted; automated test validates no plaintext in DB snapshots (KPI-001).
+* **Audit Log Completeness** – 100 % of create/read/update/delete operations generate an audit entry (KPI-003).
+* **PDF Export Compliance** – Every exported PDF contains correct watermark and timestamp; manual spot‑check of 10 random exports shows 0 violations (KPI-004).
+* **User Acceptance** – Front Desk staff complete intake within 2 minutes 95 % of the time (KPI-001).

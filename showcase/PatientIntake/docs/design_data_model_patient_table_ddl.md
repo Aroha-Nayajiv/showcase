@@ -1,5 +1,5 @@
 # Patient Record Table DDL
-
+                
 ## Patient Record Table DDL
 
 ### 1. Overview
@@ -120,8 +120,10 @@ BEGIN
         current_user_id(),
         NULL,
         row_to_json((SELECT * FROM patient_records WHERE patient_id = p_patient_id))
+    );
     RETURN QUERY SELECT * FROM patient_records WHERE patient_id = p_patient_id;
-END;\$\$ LANGUAGE plpgsql SECURITY DEFINER;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 Clients should query `log_patient_read()` instead of directly selecting from the table to ensure every read is captured.
 
@@ -148,60 +150,98 @@ BEGIN
     ELSIF TG_OP = 'UPDATE' THEN
         INSERT INTO patient_audit_log(
             patient_id, operation, performed_by, old_data, new_data)
-        VALUES (OLD.patient_id, TG_OP, current_user_id(), row_to_json(OLD), row_to_json(NEW));\mathbf{RETURN} NEW;
+        VALUES (OLD.patient_id, TG_OP, current_user_id(), row_to_json(OLD), row_to_json(NEW));
+        RETURN NEW;
     ELSIF TG_OP = 'DELETE' THEN
         INSERT INTO patient_audit_log(
             patient_id, operation, performed_by, old_data)
         VALUES (OLD.patient_id, TG_OP, current_user_id(), row_to_json(OLD));
         RETURN OLD;
     END IF;
-END;\$\$ LANGUAGE plpgsql;
+END;
+$$ LANGUAGE plpgsql;
 
 sql
 CREATE TRIGGER trg_audit_patient_records
 AFTER INSERT OR UPDATE OR DELETE ON patient_records
 FOR EACH ROW EXECUTE FUNCTION audit_patient_records();
 
-The audit table now includes a foreign key to `patient_records` and captures the `SELECT` operation via the view‑based function.
+The audit table now includes a foreign key to `patient_records` and captures the `SELECT` operation via the view-based function.
 
 ### 9. API Contracts for Patient Record Service
+
 #### 9.1 Create Patient Record (`POST /api/v1/patients`)
 *Request Body* (`application/json`):
 
+```json
 {
   "first_name": "string",
   "last_name": "string",
   "date_of_birth": "YYYY-MM-DD",
-  "ssN": "string",                     // plain text; will be encrypted by DB trigger
+  "ssn": "string",
   "insurance_provider": "string",
   "insurance_policy_number": "string",
-  "medical_history": "string"          // optional plain text; encrypted by trigger
+  "medical_history": "string"
 }
+```
 
-success response (`201 Created`):
+*Success response* (`201 Created`):
 
+```json
 {
   "patient_id": "uuid",
-  "created_at": "ISO8601 timestamp"\}
-and error responses (`400`, `409`, `500`) with standard error payload `{ "code": "ERR_XXX", "message": "..." }`.​
+  "created_at": "ISO8601 timestamp"
+}
+```
+
+*Error responses*: `400`, `409`, `500` with standard error payload `{ "code": "ERR_XXX", "message": "..." }`.
+
 #### 9.2 Retrieve Patient Record (`GET /api/v1/patients/{patient_id}`)
-success response (`200 OK`):
-defers to view‑based read logging; payload contains decrypted fields after server‑side decryption.​
+*Success response* (`200 OK`) — defers to view-based read logging; payload contains decrypted fields after server-side decryption:
+
+```json
 {
-  "patient_id": "uuid",​"first_name": "...",​"last_name": "...",​"date_of_birth": "YYYY-MM-DD",​"ssN": "decrypted string",​"insurance_provider": "...",​"insurance_policy_number": "decrypted string",​"medical_history": "decrypted string"​}​
-and error responses (`404`, `403`, `500`).​
+  "patient_id": "uuid",
+  "first_name": "...",
+  "last_name": "...",
+  "date_of_birth": "YYYY-MM-DD",
+  "ssn": "decrypted string",
+  "insurance_provider": "...",
+  "insurance_policy_number": "decrypted string",
+  "medical_history": "decrypted string"
+}
+```
+
+*Error responses*: `404`, `403`, `500`.
+
 #### 9.3 Update Patient Record (`PATCH /api/v1/patients/{patient_id}`)
-similar request body as create – only supplied fields are updated; triggers re‑encrypt changed columns.​#### 9.4 Delete Patient Record (`DELETE /api/v1/patients/{patient_id}`)
-success response (`204 No Content`). All deletions are logged by the audit trigger.​#### 9.5 List Patients (`GET /api/v1/patients`)
-supports pagination and filtering; each row retrieval goes through `log_patient_read()` ensuring read audit entries.​#### 9.6 Error Handling Conventions
-All endpoints return a JSON error object:​
-{ "code": "ERR_<MODULE>_<NUMBER>", "message": "Human readable description" }​
-and appropriate HTTP status codes.​#### 9.7 Security Controls (API Layer)​- Mutual TLS enforced.​- JWT access tokens contain role claim (`admin`, `clinician`, `front_desk`).​- Authorization middleware maps token role to PostgreSQL role via `SET ROLE` before issuing queries.​​### 10. Compliance Mapping & Traceability
+Similar request body as create — only supplied fields are updated; triggers re-encrypt changed columns.
+
+#### 9.4 Delete Patient Record (`DELETE /api/v1/patients/{patient_id}`)
+*Success response*: `204 No Content`. All deletions are logged by the audit trigger.
+
+#### 9.5 List Patients (`GET /api/v1/patients`)
+Supports pagination and filtering; each row retrieval goes through `log_patient_read()` ensuring read audit entries.
+
+#### 9.6 Error Handling Conventions
+All endpoints return a JSON error object:
+
+```json
+{ "code": "ERR_<MODULE>_<NUMBER>", "message": "Human readable description" }
+```
+
+#### 9.7 Security Controls (API Layer)
+- Mutual TLS enforced.
+- JWT access tokens contain role claim (`admin`, `clinician`, `front_desk`).
+- Authorization middleware maps token role to PostgreSQL role via `SET ROLE` before issuing queries.
+
+### 10. Compliance Mapping & Traceability
+
 | Requirement ID | Description | Design Element |
- |---|---|---|
- | FR-001 | Secure demographic capture | Encrypted columns `first_name`, `last_name` stored in clear text but PIHI protected via RLS; audit logging of writes |
- | FR-002 | Secure insurance information capture | Encrypted columns `insurance_policy_number`, `ssN` |
- | FR-003 | Secure medical history storage | `medical_history_plain` encrypted into `medical_history_encrypted` |
- | NFR-003 | Mandatory audit logging of all CRUD operations | Audit table `patient_audit_log`, RLS policies, read‑audit view |
- | NFR-001 | Response time <200 ms for form submissions | API contract includes async processing guidelines (not shown here) |
- | KPI‑01 | Response time compliance | Measured via monitoring of API latency ​All elements have been cross‑referenced to ensure traceability.​ |
+|---|---|---|
+| FR-001 | Secure demographic capture | `first_name`, `last_name` stored in clear text, protected by RLS policies (not column-level encryption); all writes audited |
+| FR-002 | Secure insurance information capture | `insurance_policy_number`, `ssn` encrypted via `pgp_sym_encrypt` |
+| FR-003 | Secure medical history storage | `medical_history_plain` encrypted into `medical_history_encrypted`; plain text wiped by trigger |
+| NFR-003 | Mandatory audit logging of all CRUD operations | Audit table `patient_audit_log`, RLS policies, read-audit view |
+| NFR-001 | Response time <200 ms for form submissions | API contract includes async processing guidelines |
+| KPI-001 | Response time compliance | Measured via Prometheus monitoring of API latency |

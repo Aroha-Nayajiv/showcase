@@ -48,23 +48,23 @@ Reception personnel who captures patient demographics, insurance information, an
 # Prioritized User Story Table
 | ID | Persona | Description | Business Value / KPI Alignment | MVP Priority |
 |----|---------|-------------|---------------------------------|---------------|
-| US-001 | Front‑Desk Clerk (ST-03) | Create a new patient intake record via the encrypted web form | Satisfies **FR‑001** (secure demographic capture) & **NFR‑003** (audit logging). Aligns with **KPI‑01** (response time <200 ms). | 1 |
-| US-002 | Clinician (ST-02) | View a patient's completed intake record and PDF summary | Enables care delivery; ties to **FR‑002**, **KPI‑03** (audit log generation). | 2 |
-| US-003 | Admin (ST-01) | Configure role‑based permissions and audit‑log retention policies | Ensures least‑privilege access; mitigates **RISK‑01**, **RISK‑03**. Aligns with **KPI‑02** (system uptime). | 1 |
-| US-004 | Front‑Desk Clerk (ST-03) | Edit a patient's demographic fields before submission is finalized | Reduces downstream correction cost; supports data quality. Aligns with **KPI‑05** (test coverage targets). | 3 |
-| US-005 | Clinician (ST-02) | Export a PDF intake summary with watermark and timestamp | Provides legally‑trackable document; fulfills **FR‑005**, **KPI‑04** (PDF export security compliance). |
+| US-001 | Front‑Desk Clerk (ST-03) | Create a new patient intake record via the encrypted web form | Satisfies **FR‑001** (secure demographic capture) & **NFR‑003** (audit logging). Aligns with **KPI-001** (response time <200 ms). | 1 |
+| US-002 | Clinician (ST-02) | View a patient's completed intake record and PDF summary | Enables care delivery; ties to **FR‑002**, **KPI-003** (audit log generation). | 2 |
+| US-003 | Admin (ST-01) | Configure role‑based permissions and audit‑log retention policies | Ensures least‑privilege access; mitigates **RISK-001**, **RISK-003**. Aligns with **KPI-002** (system uptime). | 1 |
+| US-004 | Front‑Desk Clerk (ST-03) | Edit a patient's demographic fields before submission is finalized | Reduces downstream correction cost; supports data quality. Aligns with **KPI-005** (test coverage targets). | 3 |
+| US-005 | Clinician (ST-02) | Export a PDF intake summary with watermark and timestamp | Provides legally‑trackable document; fulfills **FR‑005**, **KPI-004** (PDF export security compliance). |
 
 # Backlog Prioritization Rationale
 1. **Core Data Capture (US-001)** – Highest priority because without a secure intake form the system cannot collect PHI; directly satisfies **FR‑001**, **NFR‑003**, and performance target **NFR‑001**.
-2. **Admin Permission Management (US-003)** – Required early to enforce least‑privilege access; mitigates **RISK‑01** (unauthorized data exposure) and **RISK‑03** (audit log gaps).
-3. **Clinician Record Access (US-002)** – Enables care delivery; ties to **FR‑002**, **KPI‑03**.
-4. **PDF Export (US-005)** – Provides legally‑trackable hand‑off; fulfills **FR‑005**, **KPI‑04**.
+2. **Admin Permission Management (US-003)** – Required early to enforce least‑privilege access; mitigates **RISK-001** (unauthorized data exposure) and **RISK-003** (audit log gaps).
+3. **Clinician Record Access (US-002)** – Enables care delivery; ties to **FR‑002**, **KPI-003**.
+4. **PDF Export (US-005)** – Provides legally‑trackable hand‑off; fulfills **FR‑005**, **KPI-004**.
 5. **Front‑Desk Edit (US-004)** – Valuable but lower priority; can be deferred to post‑MVP iteration.
 
 # Risk Mitigation Summary
-* **RISK‑01** mitigated by strict RBAC enforced at UI and service layers.
-* **RISK‑02** addressed by using only vetted open‑source libraries listed in the dependency manifest.
-* **RISK‑03** covered by immutable append‑only audit log with daily rotation.
+* **RISK-001** mitigated by strict RBAC enforced at UI and service layers.
+* **RISK-002** addressed by using only vetted open‑source libraries listed in the dependency manifest.
+* **RISK-003** covered by immutable append‑only audit log with daily rotation.
 
 # Overview
 The following user stories define the login and data‑access flows for each role in the PatientIntake system. They are scoped to the product phase and focus exclusively on access‑control behavior, audit‑log verification, and security edge cases required for HIPAA compliance.
@@ -73,4 +73,4 @@ The following user stories define the login and data‑access flows for each rol
 * High priority stories (**US‑001**, **US‑002**) enable core intake workflow; without secure login and record access the system cannot capture PHI.
 * Medium priority story (**US‑003**) supports governance and auditability required for regulatory compliance but can be iteratively enhanced after MVP launch.
 
-All user stories are traceable to functional requirements **FR‑001 – FR‑003**, non‑functional requirement **NFR‑003**, and KPIs **KPI‑01 – KPI‑04**, as well as risks **RISK‑01 – RISK‑03**.
+All user stories are traceable to functional requirements **FR‑001 – FR‑003**, non‑functional requirement **NFR‑003**, and KPIs **KPI-001 – KPI-004**, as well as risks **RISK-001 – RISK-003**.

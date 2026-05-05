@@ -60,7 +60,7 @@ they receive 409 Conflict with details of the latest version.
 - **Audit Log Schema**: Immutable append‑only table with columns `event_id`, `timestamp_utc`, `actor_role`, `action`, `resource_id`, `hash`, `digital_signature`. Retention aligned with NIST AU‑6.
 - **PDF Generation Service Contract**: Input JSON payload (`record_id`, `requester_role`, `requester_name`), output file path, required watermark format `{role}:{name}` and ISO 8601 timestamp.
 - **RBAC Matrix Document**: Detailed permission matrix linking each PER‑xx role to CRUD operations on each data element.
-- **Performance Monitoring**: Metrics for response time (KPI‑01 <200 ms) and audit‑log write latency (target ≤ 50 ms).
+- **Performance Monitoring**: Metrics for response time (KPI-001 <200 ms) and audit‑log write latency (target ≤ 50 ms).
 
 ---
 
@@ -133,15 +133,15 @@ Errors: 502 for generation failure, 403 for unauthorized role.
 ### Performance Monitoring Metrics
 | Metric                     | Target               |
 |----------------------------|----------------------|
-| API response time          | ≤ 200 ms (KPI‑01)    |
+| API response time          | ≤ 200 ms (KPI-001)    |
 | Audit log write latency    | ≤ 50 ms              |
 | PDF generation duration     | ≤ 1 s                |
 
 ---
 
 ## Priority Rationale
-1. **US‑001 (P1)** delivers core end‑to‑end intake flow required for patient care and directly satisfies FR‑001 and KPI‑01.
+1. **US‑001 (P1)** delivers core end‑to‑end intake flow required for patient care and directly satisfies FR‑001 and KPI-001.
 2. **US‑002 (P2)** ensures clinicians can access records and export PDFs while providing auditable trails—critical for HIPAA compliance (NFR‑003).
 3. **US‑003 (P3)** gives administrators governance over roles and logs, enabling compliance audits and rapid incident response.
 
-These priorities align with regulatory mandates (HIPAA §164.312(a)(2)(iv), NIST SP 800‑53 AC‑2 & AU‑6) and business value of delivering a secure, usable intake experience before scaling.
+These priorities align with regulatory mandates (HIPAA §164.312(a)(2)(iv), NIST SP 800‑53 AC-002 & AU‑6) and business value of delivering a secure, usable intake experience before scaling.

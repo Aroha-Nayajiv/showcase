@@ -1,15 +1,15 @@
 # Feature Specification for Secure Intake Form
 
 ## Overview
-The Secure Patient Intake Form is the first point of interaction for three distinct user groups that must each satisfy HIPAA‑mandated safeguards while delivering a smooth experience. These personas were derived from the stakeholder list (ST‑01 Clinical staff, ST‑02 Patients, ST‑03 Compliance officers) and from the functional requirements FR‑001 – FR‑003 that define data capture, encryption, role‑based access, and audit logging. By articulating the motivations, constraints, and success criteria for each role we give Design a concrete human‑centered context that can be translated directly into UI flows, validation rules, and accessibility requirements.
+The Secure Patient Intake Form is the first point of interaction for three distinct user groups that must each satisfy HIPAA‑mandated safeguards while delivering a smooth experience. These personas were derived from the stakeholder list (ST-001 Clinical staff, ST-002 Patients, ST-003 Compliance officers) and from the functional requirements FR‑001 – FR‑003 that define data capture, encryption, role‑based access, and audit logging. By articulating the motivations, constraints, and success criteria for each role we give Design a concrete human‑centered context that can be translated directly into UI flows, validation rules, and accessibility requirements.
 
 ---
 
 ## Personas
 | ID | Name | Role | Description | Primary Goals | Pain Points | Security & Compliance Considerations | Success Metrics |
 |----|------|------|-------------|----------------|--------------|--------------------------------------|----------------|
-| PER‑01 | Front‑Desk Clerk | Front Desk | Administrative staff responsible for initial patient registration and insurance verification. | • Capture all required fields accurately within 2 minutes per patient (KPI‑01). • Ensure data is encrypted in transit (TLS 1.3) and at rest (field‑level AES‑256) per FR‑001 and NFR‑001. • Receive immediate visual confirmation of successful submission and audit logging. | High volume periods can lead to rushed entry and validation errors; limited technical training on encryption mechanisms. | Must never see raw unencrypted PHI after submission; UI masks data post‑submission. Every create operation triggers an immutable audit log entry (FR‑004) recording user ID, timestamp, and operation type. | ≥ 98 % of submissions pass client‑side validation without correction. | Zero instances of unencrypted PHI stored on local disk (quarterly audit). |
-| PER‑02 | Clinician | Clinician | Reviews completed intake forms to assess patient history before providing care. Access is read‑only for most fields but can add clinical notes. | • Retrieve a patient's intake record within 1 second (KPI‑01) while maintaining confidentiality. • Verify PDF summary reflects latest encrypted data and includes a watermark with clinician name and access timestamp. | • Flag missing or inconsistent information for re‑capture by front desk. | Slow decryption or network latency interrupts workflow; unclear visual cues for tampered/out‑of‑sync records. | Access limited to records where clinician’s role matches patient’s care team (RBAC – FR‑002). Every read operation creates an audit log entry (FR‑004) capturing user ID and timestamp to satisfy AU‑6 control. | ≥ 99 % of read operations meet response time target; no unauthorized read events in monthly audit reports. |
+| PER‑01 | Front‑Desk Clerk | Front Desk | Administrative staff responsible for initial patient registration and insurance verification. | • Capture all required fields accurately within 2 minutes per patient (KPI-001). • Ensure data is encrypted in transit (TLS 1.3) and at rest (field‑level AES‑256) per FR‑001 and NFR‑001. • Receive immediate visual confirmation of successful submission and audit logging. | High volume periods can lead to rushed entry and validation errors; limited technical training on encryption mechanisms. | Must never see raw unencrypted PHI after submission; UI masks data post‑submission. Every create operation triggers an immutable audit log entry (FR‑004) recording user ID, timestamp, and operation type. | ≥ 98 % of submissions pass client‑side validation without correction. | Zero instances of unencrypted PHI stored on local disk (quarterly audit). |
+| PER‑02 | Clinician | Clinician | Reviews completed intake forms to assess patient history before providing care. Access is read‑only for most fields but can add clinical notes. | • Retrieve a patient's intake record within 1 second (KPI-001) while maintaining confidentiality. • Verify PDF summary reflects latest encrypted data and includes a watermark with clinician name and access timestamp. | • Flag missing or inconsistent information for re‑capture by front desk. | Slow decryption or network latency interrupts workflow; unclear visual cues for tampered/out‑of‑sync records. | Access limited to records where clinician’s role matches patient’s care team (RBAC – FR‑002). Every read operation creates an audit log entry (FR‑004) capturing user ID and timestamp to satisfy AU‑6 control. | ≥ 99 % of read operations meet response time target; no unauthorized read events in monthly audit reports. |
 | PER‑03 | Compliance Officer | Compliance Officer | Audits system activity to ensure ongoing HIPAA compliance and prepares reports for internal governance and external regulators. | • Generate audit reports listing all CRUD actions for a given period with immutable timestamps. • Verify every PDF export includes required watermark and access timestamp (FR‑003). | • Confirm encryption keys are rotated per policy and no plaintext PHI is stored on disk. | Large volume of log entries makes manual review time‑consuming; needs assurance encryption meets technical safeguard standards (45 CFR 164.312). | Read‑only access to audit logs; cannot modify logs (AU‑6). Must export logs in tamper‑evident format for external audit. | Ability to produce a complete audit report for any date range within 5 minutes; zero findings of unencrypted PHI in quarterly compliance scans. |
 
 ---
@@ -54,9 +54,9 @@ All user stories now include explicit Given/When/Then scenarios aligned with fun
 ## Traceability Matrix
 | Persona / Role | Linked Requirements | KPIs |
 |----------------|--------------------|------|
-| Front‑Desk Clerk | FR‑001, FR‑004, NFR‑001 | KPI‑01 (response time), KPI‑03 (audit log generation) |
-| Clinician | FR‑002, FR‑003, NFR‑001 | KPI‑01 (response time), KPI‑02 (system availability) |
-| Compliance Officer | FR‑004, NFR‑003 | KPI‑03 (audit log completeness), KPI‑04 (PDF export compliance) |
+| Front‑Desk Clerk | FR‑001, FR‑004, NFR‑001 | KPI-001 (response time), KPI-003 (audit log generation) |
+| Clinician | FR‑002, FR‑003, NFR‑001 | KPI-001 (response time), KPI-002 (system availability) |
+| Compliance Officer | FR‑004, NFR‑003 | KPI-003 (audit log completeness), KPI-004 (PDF export compliance) |
 
 ---
 
@@ -121,7 +121,7 @@ All user stories now include explicit Given/When/Then scenarios aligned with fun
 ### AC‑010 – US‑003 Large Export Performance (Edge)
 **Given** the audit log contains more than **10 000 entries** for the selected range;
 **When** **Generate Report** is requested;
-**Then** the system paginates results internally but provides a complete downloadable CSV; performance remains under **2 seconds per 1 000 rows**, satisfying **KPI‑01**, and progress feedback is shown to the user.
+**Then** the system paginates results internally but provides a complete downloadable CSV; performance remains under **2 seconds per 1 000 rows**, satisfying **KPI-001**, and progress feedback is shown to the user.
 
 ### Verify Insurance Endpoint
 
@@ -152,18 +152,18 @@ Integration tests must verify end‑to‑end encryption flow from browser to dat
 Coverage target: ≥85 % of statements across modules.
 
 ---
-*All artifacts trace back to functional requirements FR‑001 – FR‑008, non‑functional requirements NFR‑001 – NFR‑004, KPIs KPI‑01 – KPI‑04, and risks RISK‑01 – RISK‑05.*
+*All artifacts trace back to functional requirements FR‑001 – FR‑008, non‑functional requirements NFR‑001 – NFR‑004, KPIs KPI-001 – KPI-004, and risks RISK-001 – RISK-005.*
 
 # PatientIntake – Refined Feature Specification
 
 ## 1. Key Performance Indicators (KPI)
 | ID | Metric |
 |----|--------|
-| **KPI‑01** | % of form submissions completing within 200 ms. |
-| **KPI‑02** | System availability measured monthly (target 99.9 %). |
-| **KPI‑03** | Success rate of audit‑query operations within 300 ms. |
-| **KPI‑04** | PDF export compliance – watermark present on 100 % of exported PDFs. |
-| **KPI‑05** | Test coverage ≥ 80 % for form validation, encryption handling and audit logging. |
+| **KPI-001** | % of form submissions completing within 200 ms. |
+| **KPI-002** | System availability measured monthly (target 99.9 %). |
+| **KPI-003** | Success rate of audit‑query operations within 300 ms. |
+| **KPI-004** | PDF export compliance – watermark present on 100 % of exported PDFs. |
+| **KPI-005** | Test coverage ≥ 80 % for form validation, encryption handling and audit logging. |
 
 ---
 
@@ -245,7 +245,7 @@ CREATE TABLE audit_log (
 
 ## 6. Failure & Edge Cases (Illustrative)
 1. **Encryption Failure** – Server returns HTTP 400 `ENCRYPTION_REQUIRED`; client shows inline validation.
-2. **Unauthorized Export Attempt** – Server returns HTTP 403 `EXPORT_NOT_AUTHORIZED`; logs under `RISK‑02`.
+2. **Unauthorized Export Attempt** – Server returns HTTP 403 `EXPORT_NOT_AUTHORIZED`; logs under `RISK-002`.
 s3. **Audit Log Tampering Detection** – Any DELETE/UPDATE attempt triggers a security event in `security_events` table and alerts PER‑03.
 4. **PDF Generation Service Down** – Returns user-friendly error per AC‑005; logs `AUDIT_ERROR`.
 5. **Malformed Query Syntax** – Returns validation error per AC‑007; logs `AUDIT_QUERY_ERROR` without DB read.
@@ -258,7 +258,7 @@ s3. **Audit Log Tampering Detection** – Any DELETE/UPDATE attempt triggers a s
 * Expanded acceptance criteria for all user stories to include Given/When/Then format and performance limits.
 * Mapped each user story and feature to corresponding KPI and risk IDs for traceability.
 * Clarified encryption algorithm and key management details as requested.
-* Included explicit test coverage KPI (**KPI‑05**) and noted where unit/integration tests are required (form validation, encryption handling, audit logging).
+* Included explicit test coverage KPI (**KPI-005**) and noted where unit/integration tests are required (form validation, encryption handling, audit logging).
 * Ensured no technical design leaks beyond required specifications; kept focus on product‐level artifacts.
 
 ---
@@ -297,7 +297,7 @@ Each audit log entry is a JSON object with the following fields:
   "details_hash": "string"         // SHA‑256 of the changed payload (if applicable)
 }
 
-The log is written to the `audit_log` table with append‑only semantics and is retained for at least 7 years per RISK‑01.
+The log is written to the `audit_log` table with append‑only semantics and is retained for at least 7 years per RISK-001.
 
 ### US-002: As a Patient, I want to upload my insurance card so that verification can occur automatically.
 **Acceptance Criteria**

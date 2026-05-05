@@ -73,7 +73,7 @@ The Patient Intake initiative delivers a HIPAA‑compliant, open‑source patien
 | Define functional requirements (FR‑001 … FR‑005) | Front‑Desk Staff | Administrator | Clinician, Compliance Officer, Patient Representative |
 | Design RBAC model and encryption policy (NFR‑001 … NFR‑004) | Administrator | Administrator | Compliance Officer, Security Lead |
 | Draft patient consent language and privacy notice | Compliance Officer | Compliance Officer | Legal Counsel, Patient Representative |
-| Validate workflow timings and usability thresholds (KPI‑01) | Clinician & Front‑Desk Staff | Administrator |
+| Validate workflow timings and usability thresholds (KPI-001) | Clinician & Front‑Desk Staff | Administrator |
 | Approve final scope and sign‑off package | Administrator | Executive Sponsor |
 
 ## 14. Narrative Justification
@@ -138,7 +138,7 @@ Overall, this analysis delivers a clear, auditable blueprint that aligns stakeho
 ## Compliance Alignment
 The above controls map directly to HIPAA Security Rule:
 * **§164.312(a)(2)(iv) – Encryption** – satisfied by NFR‑004 and field‑level encryption in FR‑001/FR‑002.
-* **§164.308(a)(1)(ii) – Audit Controls** – satisfied by RISK‑04 immutable logging and FR‑004 access control.
+* **§164.308(a)(1)(ii) – Audit Controls** – satisfied by RISK-004 immutable logging and FR‑004 access control.
 All mitigation actions are recorded in the risk register and reviewed each sprint.
 
 ## Deployment & Operational Constraints (Inception Scope)

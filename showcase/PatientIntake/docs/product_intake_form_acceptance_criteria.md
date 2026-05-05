@@ -12,7 +12,7 @@ The following personas are derived directly from the project brief and the asset
   3. Generate a PDF summary for patient hand‑off.
 - **Access Rights:** Read‑write on patient records; can export PDFs with watermark and timestamp.
 - **HIPAA Controls:** Must authenticate via unique user ID (45 CFR 164.312(a)(2)(i)), and all read/write actions are logged (45 CFR 164.312(b)(1)).
-- **Success Metrics:** <200 ms response time for record retrieval (KPI‑01) and 99.9 % audit‑log completeness (KPI‑02).
+- **Success Metrics:** <200 ms response time for record retrieval (KPI-001) and 99.9 % audit‑log completeness (KPI-002).
 
 ### PER-02: Front Desk Operator
 - **Primary Goal:** Capture accurate demographic and insurance information at point of entry.
@@ -22,7 +22,7 @@ The following personas are derived directly from the project brief and the asset
   3. Verify successful submission via on‑screen confirmation.
 - **Access Rights:** Create‑only on new intake records; read‑only on previously submitted forms for verification purposes.
 - **HIPAA Controls:** Must ensure encryption of each field using open‑source libraries (e.g., libsodium) before storage (45 CFR 164.312(a)(2)(iv)). All submissions generate an immutable audit entry (FR‑002).
-- **Success Metrics:** Form submission latency <200 ms (KPI‑01) and 100 % of submissions encrypted at field level.
+- **Success Metrics:** Form submission latency <200 ms (KPI-001) and 100 % of submissions encrypted at field level.
 
 ### PER-03: Compliance Officer (Auditor)
 - **Primary Goal:** Verify that all intake activities comply with HIPAA technical safeguards and internal policies.
@@ -74,7 +74,7 @@ These personas provide a concrete foundation for downstream design specification
 |---------------|----------------|---------------|
 | Encryption Mechanism | Field‑level AES‑256 keys derived from a master key stored in an HSM | FR‑001, FR‑002, NFR‑001 |
 | Audit Log Schema | Fields: `event_type`, `actor_id`, `timestamp`, `record_id`, `payload_hash`. Immutable storage retained ≥7 years | FR‑002, NFR‑003 |
-| PDF Generation Pipeline | wkhtmltopdf ≥ 0.12.6; watermark overlay; filename `patient_<id>_intake_<YYYYMMDD>.pdf` | FR‑003, KPI‑03 |
+| PDF Generation Pipeline | wkhtmltopdf ≥ 0.12.6; watermark overlay; filename `patient_<id>_intake_<YYYYMMDD>.pdf` | FR‑003, KPI-003 |
 | RBAC Matrix | Mapping of PER‑01/02/03 to CRUD permissions on intake entity; aligns with FR‑001–FR‑003 & NFR‑003 | FR‑001–FR‑003 |
 | Error Handling UX | Inline validation messages; retry dialogs for network failures; audit logging of denied actions | NFR‑002 |
 

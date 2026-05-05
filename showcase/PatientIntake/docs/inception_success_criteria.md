@@ -27,27 +27,27 @@ The PatientIntake system will enable healthcare providers to capture complete pa
 1. **FR-001 – Secure Demographic Capture**  
 *Description*: All demographic fields (name, DOB, address, phone) must be encrypted at rest using AES‑304 and transmitted over TLS 1\.3.
 *Acceptance Criteria*: Automated security scan reports encryption on each field; penetration test validates no clear‑text exposure.
-*Owner*: Patient (ST‑02) & Front‑Desk Staff (ST‑01).
+*Owner*: Patient (ST-002) & Front‑Desk Staff (ST-001).
 
 2. **FR-002 – Encrypted Insurance Information**  
-*Description*: Insurance provider name, policy number, and eligibility data must be stored encrypted and only readable by Clinician (ST‑03) and Administrator (ST‑04).
+*Description*: Insurance provider name, policy number, and eligibility data must be stored encrypted and only readable by Clinician (ST-003) and Administrator (ST-004).
 *Acceptance Criteria*: Role‑based query returns masked data for unauthorized roles; audit log records each access attempt.
-*Owner*: Front‑Desk Staff (ST‑01) & Administrator (ST‑04).
+*Owner*: Front‑Desk Staff (ST-001) & Administrator (ST-004).
 
 3. **FR-003 – Medical History Form**  
 *Description*: Capture up to 20 structured medical‑history items; each item encrypted individually.
 *Acceptance Criteria*: Database audit shows field‑level encryption metadata for every item; clinicians can decrypt when authorized.
-*Owner*: Patient (ST‑02) & Clinician (ST‑03).
+*Owner*: Patient (ST-002) & Clinician (ST-003).
 
 4. **FR-004 – PDF Intake Summary Generation**  
 *Description*: Authorized staff can export a PDF that includes a dynamic watermark (staff name) and an access timestamp embedded in the file metadata.
 *Acceptance Criteria*: Exported PDFs contain the correct watermark and timestamp verified by an automated script; access logged in audit trail.
-*Owner*: Clinician (ST‑03), Administrator (ST‑04), Compliance Officer (ST‑05).
+*Owner*: Clinician (ST-003), Administrator (ST-004), Compliance Officer (ST-005).
 
 5. **FR-005 – Audit Log Recording**  
 *Description*: Every create, read, update, delete (CRUD) operation must generate an immutable log entry containing user ID, timestamp, operation type, and affected record ID.
 *Acceptance Criteria*: Log entries are append‑only; tamper detection alerts on any modification attempt; retention ≥ 7 years.
-*Owner*: Administrator (ST‑04) & Compliance Officer (ST‑05).
+*Owner*: Administrator (ST-004) & Compliance Officer (ST-005).
 
 ### Risk Assessment
 | Risk ID   | Description                                                            | Likelihood | Impact   | Mitigation Strategy                                                                                 | Owner          |

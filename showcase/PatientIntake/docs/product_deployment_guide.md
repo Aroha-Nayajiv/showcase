@@ -42,7 +42,7 @@ The following personas capture the core human actors who will interact with the 
 | Clinician | PER-02 | Login → Search → View PDF → Append Notes → Logout | Read‑only RBAC, immutable audit log, watermarked PDFs |
 | Patient | PER-03 | Access portal via token → Download PDF → Verify | One‑time token, encrypted download link, audit logging |
 
-These personas provide the necessary context for designers to define UI flows, security controls, and deployment configurations that satisfy FR‑001 through FR‑009, NFR‑001 through NFR‑003, and associated KPIs (KPI‑01 to KPI‑04).
+These personas provide the necessary context for designers to define UI flows, security controls, and deployment configurations that satisfy FR‑001 through FR‑009, NFR‑001 through NFR‑003, and associated KPIs (KPI-001 to KPI-004).
 
 ---
 

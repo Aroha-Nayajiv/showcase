@@ -19,15 +19,15 @@
 |---------|----------|--------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | AC-001  | US-001 | The front‑desk user is authenticated via secure workstation credentials and the intake form is loaded. | The user fills all mandatory fields and clicks **Submit**. | The system encrypts each field at rest and in transit (FR‑001), stores the record, shows a confirmation screen with a unique transaction ID, and creates an immutable audit log entry (FR‑003). |
 | AC-002  | US-001 | All mandatory fields are populated but one required field is left blank. | The user attempts to submit the form. | Real‑time validation highlights the missing field with an inline error message; submission is blocked until corrected (FR‑001). |
-| AC-003  | US-002 | A clinician is logged in with multi‑factor authentication and has read/write access to a patient record under their care (FR‑001). | The clinician selects **Export PDF Summary**. | The generated PDF contains the clinician’s name watermark and a timestamp (FR‑003), is delivered within 500 ms (performance NFR‑001), and the export action is recorded in the audit log (KPI‑03). |
-| AC-004  | US-002 | The clinician attempts to export a PDF for a patient not assigned to them. | The export request is issued. | The system blocks the export, returns an authorization error, and logs a warning entry in the audit log (RISK‑01). |
+| AC-003  | US-002 | A clinician is logged in with multi‑factor authentication and has read/write access to a patient record under their care (FR‑001). | The clinician selects **Export PDF Summary**. | The generated PDF contains the clinician’s name watermark and a timestamp (FR‑003), is delivered within 500 ms (performance NFR‑001), and the export action is recorded in the audit log (KPI-003). |
+| AC-004  | US-002 | The clinician attempts to export a PDF for a patient not assigned to them. | The export request is issued. | The system blocks the export, returns an authorization error, and logs a warning entry in the audit log (RISK-001). |
 | AC-005  | US-003 | The compliance officer accesses the read‑only audit dashboard with appropriate role (FR‑003). | The officer runs a **Compliance Report** for a selected date range. | The report lists all read/write events, includes encryption key rotation timestamps, highlights any missing encryption metadata, completes within 200 ms (NFR‑001), and can be exported as a PDF with a “Compliance Review” watermark (FR‑003). |
-| AC-006  | US‑003 | Encryption keys are rotated daily per policy. | A record is created after a key rotation event. | The system uses the latest active key for encryption, logs the key identifier in the audit entry, and the compliance officer can view the key usage in the report (RISK‑02). |
+| AC-006  | US‑003 | Encryption keys are rotated daily per policy. | A record is created after a key rotation event. | The system uses the latest active key for encryption, logs the key identifier in the audit entry, and the compliance officer can view the key usage in the report (RISK-002). |
 
 ## Encryption Key Management
 * Keys are stored in a hardened vault accessible only to privileged services.
 * Automatic rotation occurs every 24 hours; rotation events are logged with `keyId` and timestamp.
-* Access to keys requires dual‑approval workflow for any manual override (supporting RISK‑02).
+* Access to keys requires dual‑approval workflow for any manual override (supporting RISK-002).
 
 ### PER-01 Front Desk Operator
 **Role:** First point of contact; creates new intake records on behalf of patients.
@@ -135,7 +135,7 @@
 
 4. **Patient (PER‑04)**
    - Interacts through a secure HTTPS web portal.
-   - All form fields are encrypted client‑side before transmission; encryption keys managed per NIST SP 800‑53 AC‑2.
+   - All form fields are encrypted client‑side before transmission; encryption keys managed per NIST SP 800‑53 AC-002.
    - After submission receives a confirmation page containing a unique submission ID and timestamp (recorded in audit log as `FORM_SUBMIT`).
    - Permissions: Read‑only on static informational pages; Create on `intake_submissions` table (field‑level encryption applied).
    - Actions: `CREATE_SUBMISSION`, `FORM_VIEW`.

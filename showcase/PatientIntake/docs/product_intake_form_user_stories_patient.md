@@ -3,7 +3,7 @@
 ## Personas for Patient Intake Form (Product – Step 1)
 
 ### 1. Overview
-The intake form is the first point of interaction between the health‑care organization and the patient's protected health information (PHI). To guarantee that the form meets HIPAA technical safeguards, it must be designed around the concrete roles that will create, review, and export the data. This section identifies each role, documents its responsibilities, and defines the access rights that must be enforced by the system. The personas are derived directly from the stakeholder list in the project brief (ST‑01 Clinical staff, ST‑02 Patient, ST‑03 Compliance Officer) and are aligned with the functional requirements FR‑001 through FR‑003.
+The intake form is the first point of interaction between the health‑care organization and the patient's protected health information (PHI). To guarantee that the form meets HIPAA technical safeguards, it must be designed around the concrete roles that will create, review, and export the data. This section identifies each role, documents its responsibilities, and defines the access rights that must be enforced by the system. The personas are derived directly from the stakeholder list in the project brief (ST-001 Clinical staff, ST-002 Patient, ST-003 Compliance Officer) and are aligned with the functional requirements FR‑001 through FR‑003.
 
 #### PER‑01 (Front Desk Clerk)
 * **AC‑PER‑001** – Successful record creation

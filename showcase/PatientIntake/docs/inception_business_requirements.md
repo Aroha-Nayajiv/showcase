@@ -58,9 +58,9 @@ The PatientIntake system will enable healthcare providers to capture patient dem
 | RISK-05 | Schedule slippage due to resource constraints in an on‑premises environment lacking cloud elasticity. | M / M Establish two‑sprint buffer in project plan; secure dedicated hardware resources early; track capacity utilization weekly via dashboard visible to PMO. |
 
 # 8. Narrative Summary
-1. **Compliance Focus** – Risks RISK‑01 and RISK‑04 directly affect HIPAA compliance. Mitigations reference specific technical safeguards (encryption at rest and in transit) and audit‑log retention requirements, ensuring that any breach can be detected and reported within mandated timeframes.
-2. **Security Emphasis** – RISK‑02 addresses open‑source supply‑chain risk through proactive vulnerability management. Signed Docker images and immutable infrastructure reduce attack surface introduced by misconfiguration (RISK‑03).
-3. **Delivery Assurance** – RISK‑05 acknowledges realistic constraint of on‑prem deployment without cloud auto‑scaling. Buffer periods and capacity monitoring mitigate risk of missed milestones while preserving the open‑source only mandate.
+1. **Compliance Focus** – Risks RISK-001 and RISK-004 directly affect HIPAA compliance. Mitigations reference specific technical safeguards (encryption at rest and in transit) and audit‑log retention requirements, ensuring that any breach can be detected and reported within mandated timeframes.
+2. **Security Emphasis** – RISK-002 addresses open‑source supply‑chain risk through proactive vulnerability management. Signed Docker images and immutable infrastructure reduce attack surface introduced by misconfiguration (RISK-003).
+3. **Delivery Assurance** – RISK-005 acknowledges realistic constraint of on‑prem deployment without cloud auto‑scaling. Buffer periods and capacity monitoring mitigate risk of missed milestones while preserving the open‑source only mandate.
 Each mitigation is actionable, measurable, and assigned to a clear owner who will report status in the weekly steering committee meeting. The risk register will be reviewed bi‑weekly throughout the project lifecycle to ensure emerging threats are captured promptly.
 
 # 9. Operational Constraints Summary

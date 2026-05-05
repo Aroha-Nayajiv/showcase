@@ -25,7 +25,7 @@ The system is organized as a set of four containerized micro‑services orchestr
 - **Transport Security**: All inbound/outbound traffic uses mTLS with certificates rotated every 90 days (mitigates *RISK-001*).
 - **At‑Rest Encryption**: Sensitive columns (`ssn`, `address`, `medical_history`) are encrypted via PostgreSQL's `pgcrypto` extension; keys are never exposed to application code.
 - **RBAC**: Roles (`admin`, `clinician`, `front_desk`) are enforced in **auth** and propagated as JWT claims (FR‑001).
-- **Audit Logging**: Every CRUD operation triggers an immutable log entry (`operation`, `actor`, `timestamp`, `resource_id`). Logs are append‑only, retained for 7 years (*KPI‑02*).
+- **Audit Logging**: Every CRUD operation triggers an immutable log entry (`operation`, `actor`, `timestamp`, `resource_id`). Logs are append‑only, retained for 7 years (*KPI-002*).
 
 ### 5. Deployment & Isolation
 Docker Compose defines three isolated networks:
@@ -35,7 +35,7 @@ Docker Compose defines three isolated networks:
 Each service includes `restart: unless-stopped` and health‑checks to guarantee high availability (*NFR‑002*). An air‑gap script disables external DNS resolution and configures a local registry mirror, complying with the “no external cloud dependencies” clause.
 
 ### 6. Scalability & Performance
-Each micro‑service can be scaled horizontally via Docker Compose’s `scale` command or migrated to Kubernetes without architectural changes. Benchmarks target **<200 ms average response time** for `/intake` under 100 concurrent users (*KPI‑01*). Load testing is performed with Locust and integrated into CI pipelines.
+Each micro‑service can be scaled horizontally via Docker Compose’s `scale` command or migrated to Kubernetes without architectural changes. Benchmarks target **<200 ms average response time** for `/intake` under 100 concurrent users (*KPI-001*). Load testing is performed with Locust and integrated into CI pipelines.
 
 ### 7. Compliance Traceability
 All design decisions reference asset IDs:

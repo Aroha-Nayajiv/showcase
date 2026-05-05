@@ -47,11 +47,11 @@ The **PatientIntake** system will enable health‑care organizations to capture 
 ### Functional Requirements (Traceable IDs)
 | ID | Requirement Summary |
 |----|--------------------|
-| FR-001 | Secure demographic capture via web form; fields encrypted at rest using AES‑256; submission returns HTTP 200 within 200 ms for ≥ 95 % of transactions (KPI‑01) |
-| FR-002 | Insurance information collection with validation against configurable lookup service; encrypted storage verified by decryption test; ≥ 99 % valid entries accepted without error (KPI‑02) |
-| FR-003 | Medical history entry with optional free‑text notes; each note encrypted individually; audit log records a write event for each submission; log entry count matches submission count 100 % (KPI‑03) |
+| FR-001 | Secure demographic capture via web form; fields encrypted at rest using AES‑256; submission returns HTTP 200 within 200 ms for ≥ 95 % of transactions (KPI-001) |
+| FR-002 | Insurance information collection with validation against configurable lookup service; encrypted storage verified by decryption test; ≥ 99 % valid entries accepted without error (KPI-002) |
+| FR-003 | Medical history entry with optional free‑text notes; each note encrypted individually; audit log records a write event for each submission; log entry count matches submission count 100 % (KPI-003) |
 | FR-004 | Role‑based access control for data view and edit; Admin can CRUD all records; Clinician can view/update assigned patients; Front‑Desk can create records but cannot view PHI after creation; all access attempts logged (FR‑003) |
-| FR-005 "PDF intake summary generation with watermark and timestamp" | Authorized staff can generate a PDF that includes dynamic watermark containing staff name and timestamp; PDF stored encrypted at rest; download event logged; generation succeeds within 1 s for ≥ 90 % of requests (KPI‑04) |
+| FR-005 "PDF intake summary generation with watermark and timestamp" | Authorized staff can generate a PDF that includes dynamic watermark containing staff name and timestamp; PDF stored encrypted at rest; download event logged; generation succeeds within 1 s for ≥ 90 % of requests (KPI-004) |
 
 ## Stakeholder Analysis
 
@@ -84,7 +84,7 @@ These alignments ensure that every functional component directly supports a meas
 | RISK-05 | Failure to meet HIPAA administrative safeguards during onboarding of new staff or third‑party contractors. | M | M | • Implement a formal onboarding checklist covering role‑based provisioning, security awareness training, and signed Business Associate Agreements. • Conduct quarterly access right audits. | • Revoke privileges within 24 hours of role change. | HR Manager |
 
 ## Key Observations
-1. **Likelihood Distribution** – The most probable risks are RISK‑01 (unauthorized disclosure) and RISK‑02/03 (software and configuration issues), reflecting the open‑source stack and containerized deployment model.
+1. **Likelihood Distribution** – The most probable risks are RISK-001 (unauthorized disclosure) and RISK-002/03 (software and configuration issues), reflecting the open‑source stack and containerized deployment model.
 2. **Impact Alignment** – All listed risks carry High impact on patient privacy or regulatory compliance, justifying aggressive mitigation tactics.
 3. **Ownership Clarity** – Each mitigation is assigned to a specific functional owner, ensuring accountability and measurable follow‑up during quarterly risk reviews.
 

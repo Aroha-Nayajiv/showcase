@@ -106,10 +106,10 @@
 * Access control checks role permissions before export.
 
 ## 6. Non‑Functional Thresholds & KPIs
-* **KPI‑01:** Form submission response time ≤ 200 ms (NFR‑001).
-* **KPI‑03:** Audit log write latency ≤ 50 ms (NFR‑003).
+* **KPI-001:** Form submission response time ≤ 200 ms (NFR‑001).
+* **KPI-003:** Audit log write latency ≤ 50 ms (NFR‑003).
 * TLS 1.3 mandatory for all transport; JWT tokens signed with RS256; token expiry ≤ 15 minutes.
-* System availability target ≥ 99.9 % (KPI‑02).
+* System availability target ≥ 99.9 % (KPI-002).
 
 ---
-*Traceability:* All artifacts reference FR‑001 (secure demographic capture), FR‑002 (insurance handling), FR‑003 (audit logging), NFR‑001 (encryption), NFR‑003 (audit logging), KPI‑01 (response time), KPI‑03 (audit log latency).
+*Traceability:* All artifacts reference FR‑001 (secure demographic capture), FR‑002 (insurance handling), FR‑003 (audit logging), NFR‑001 (encryption), NFR‑003 (audit logging), KPI-001 (response time), KPI-003 (audit log latency).

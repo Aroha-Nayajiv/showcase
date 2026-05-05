@@ -8,7 +8,7 @@
   - All HTTP traffic is terminated at the API gateway using TLS 1.3 (project‑wide policy).
   - Client‑side field‑level encryption is performed with libsodium (`crypto_secretbox_easy`) before transmission; encrypted payloads are Base64‑encoded.
   - UI enforces HIPAA‑compliant password policy (minimum 12 characters, mixed case, special characters) and multi‑factor authentication via Auth0.
-- **Compliance Mapping**: UI validation aligns with HIPAA §164.312(a)(2)(iv) and NIST SP 800‑53 AC‑2.
+- **Compliance Mapping**: UI validation aligns with HIPAA §164.312(a)(2)(iv) and NIST SP 800‑53 AC-002.
 
 ## 2. API Gateway
 - **Component**: Kong 2.8 configured as reverse‑proxy and authentication hub.
@@ -18,7 +18,7 @@
   - `POST /api/v1/auth/login` → Auth Service
 - **Security Controls**:
   - Enforces TLS 1.3 for all inbound/outbound traffic.
-  - Rate limiting: 100 requests/min per IP (aligned with NIST SP 800‑53 AC‑12).
+  - Rate limiting: 100 requests/min per IP (aligned with NIST SP 800‑53 AC-012).
   - JWT validation using RSA‑256 keys stored in HashiCorp Vault.
 - **Audit Logging**: Kong plugin writes request/response metadata to the Audit Log Service with immutable timestamps and hash chaining for tamper evidence.
 
@@ -36,7 +36,7 @@
   - Triggers audit events for every create/read operation (NFR‑003).
 - **Security Controls**:
   - Input validation against OpenAPI schema to prevent injection attacks.
-  - Role‑based access control enforced via JWT claims (ST‑01 Clinical staff, ST‑03 Compliance officer).
+  - Role‑based access control enforced via JWT claims (ST-001 Clinical staff, ST-003 Compliance officer).
 
 ## 4. Data Layer
 - **Database**: PostgreSQL 15 running in a separate Docker container, encrypted at rest with Transparent Data Encryption (TDE) using AES‑256.
@@ -51,28 +51,28 @@
   - Generates PDF from HTML template containing patient intake data.
   - Applies watermark (`Confidential – Hospital Name`) and timestamp using PyPDF2.
   - PDF is digitally signed with an X.509 certificate stored in HashiCorp Vault.
-- **Compliance**: Meets KPI‑04 for PDF export security and FR‑007 for watermarking.
+- **Compliance**: Meets KPI-004 for PDF export security and FR‑007 for watermarking.
 
 ## 6. Audit Log Service
 - **Technology**: Elastic Stack (Elasticsearch, Logstash, Kibana) for centralized logging.
 - **Ingestion**:
   - Receives logs from Kong, FastAPI services, and database triggers via Logstash pipelines.
   - Each log entry includes immutable timestamp, SHA‑256 hash of payload, and digital signature.
-- **Retention**: Logs retained for 7 years to satisfy regulatory audit requirements (RISK‑04).
+- **Retention**: Logs retained for 7 years to satisfy regulatory audit requirements (RISK-004).
 
 ## 7. Deployment & Operations
 - **Container Orchestration**: Docker Compose for local/on‑prem deployment; each service defined in its own compose file with network isolation.
 - **CI/CD Pipeline**: GitHub Actions runs unit tests (FR‑004), integration tests covering encryption handling, and security scans (OWASP ZAP).
-- **Monitoring**: Prometheus scrapes metrics; Grafana dashboards track KPI‑01 response time (<200 ms) and KPI‑02 uptime (99.9%).
+- **Monitoring**: Prometheus scrapes metrics; Grafana dashboards track KPI-001 response time (<200 ms) and KPI-002 uptime (99.9%).
 - **Disaster Recovery**: Automated failover scripts replicate containers across two physical hosts; health checks restart unhealthy containers instantly.
 
 ## 8. Compliance & Risk Management
 - **Regulatory Alignment**: HIPAA, GDPR (where applicable), and local health authority guidelines.
 - **Risk Controls**:
-  - RISK‑01 mitigated by end‑to‑end encryption and strict access controls.
-  - RISK‑02 addressed through regular dependency vulnerability scanning (Dependabot).
-  - RISK‑03 avoided by using immutable infrastructure patterns and automated configuration validation (Terraform + Checkov).
-- **Audit Readiness**: All artifacts (requirements FR‑001…FR‑010, KPIs KPI‑01…KPI‑05, NFRs NFR‑001…NFR‑006) are traceable via a centralized requirements matrix stored in Confluence.
+  - RISK-001 mitigated by end‑to‑end encryption and strict access controls.
+  - RISK-002 addressed through regular dependency vulnerability scanning (Dependabot).
+  - RISK-003 avoided by using immutable infrastructure patterns and automated configuration validation (Terraform + Checkov).
+- **Audit Readiness**: All artifacts (requirements FR‑001…FR‑010, KPIs KPI-001…KPI-005, NFRs NFR‑001…NFR‑006) are traceable via a centralized requirements matrix stored in Confluence.
 
 ---
 *This architecture satisfies all functional requirements (FR‑001…FR‑010), non‑functional requirements (NFR‑001…NFR‑006), key performance indicators, and risk mitigation strategies defined for the patient intake system.*
@@ -126,9 +126,9 @@ This document defines the technical design for the **PatientIntake** SaaS servic
 |--------------|-------------|--------------------------------------------------------|--------------------------------------------------------|-----------|
 | ERR-001-VAL   | 400         | Request payload validation failed (missing field or malformed JSON)   | "The submitted data is incomplete or incorrectly formatted."   | No        |
 | ERR-002-AUTH   | 401         | Authentication token missing or expired               | "Please log in again to continue."                     | Yes       |
-|-ERR-003-FORBID|403          |-User lacks required role for the operation            |-"You do not have permission to perform this action."|-No        |
-|-ERR-004-NOTFOUND|404        |-Requested intake record does not exist                |-"The requested record could not be found."            |-No        |
-|-ERR-005-SERVER|500          |-Unexpected server error during processing             |-"An internal error occurred. Please try again later."|-Yes       |
+| ERR-003-FORBID | 403         | User lacks required role for the operation             | "You do not have permission to perform this action."   | No        |
+| ERR-004-NOTFOUND | 404       | Requested intake record does not exist                 | "The requested record could not be found."             | No        |
+| ERR-005-SERVER | 500         | Unexpected server error during processing              | "An internal error occurred. Please try again later."  | Yes       |
 
 ## 12. Service Boundaries
 | Service Name            | Responsibility                                                                                 | Dependencies                                 |
@@ -136,7 +136,7 @@ This document defines the technical design for the **PatientIntake** SaaS servic
 | IntakeService (SVC-001)   | Handles creation and retrieval of intake records; validates schemas; encrypts fields before persisting.| PostgreSQL DB, libsodium encryption library, AuthService |
 | PDFService (SVC-002)      | Generates PDF from stored record, applies watermark and timestamp.| wkhtmltopdf (open source), IntakeService   |
 | AuthService (SVC-003)    | Issues and validates JWT Bearer tokens; enforces RBAC per role definitions.| LDAP directory, JWT library                 |
-|-AuditLogService (SVC‑004)| -Consumes audit events (IntakeCreated, IntakeAccessed, PdfGenerated) and writes immutable logs.| PostgreSQL audit schema                     |
+| AuditLogService (SVC‑004) | Consumes audit events (IntakeCreated, IntakeAccessed, PdfGenerated) and writes immutable logs. | PostgreSQL audit schema                     |
 
 ## 13. Integration Points & Failure Handling
 * **Database Write** – If PostgreSQL is unavailable the API returns `ERR‑005‑SERVER` with a `Retry‑After: 30` header; client may retry up to three times.
@@ -146,9 +146,9 @@ This document defines the technical design for the **PatientIntake** SaaS servic
 
 ## 14. Security & Compliance
 * TLS 1.3 enforced for all inbound/outbound traffic.
-* Field‑level encryption using AES‑256‑GCM; keys rotated quarterly per **FR‑010**.
+* Field‑level encryption using AES‑256‑GCM; master keys rotated every 90 days, per-field DEKs rotated every 30 days per **FR‑010**.
 * RBAC enforced via AuthService roles (`admin`, `clinician`, `front_desk`) matching the `created_by_role` attribute.
-* Immutable audit logging meets **NFR‑003** and supports **KPI‑03**.
+* Immutable audit logging meets **NFR‑003** and supports **KPI-003**.
 
 ## 15. Traceability Matrix
 | Requirement ID | Description                                 | Implemented By                               |
@@ -162,9 +162,5 @@ This document defines the technical design for the **PatientIntake** SaaS servic
 
 ## 16. Open Issues / Knowledge Gaps
 
-{
-  "knowledge_gaps": [
-    "Exact HIPAA § 164.312(a)(2)(iv) technical safeguard requirements for encryption key management",
-    "PostgreSQL row-level security performance characteristics at >10M audit log rows"
-  ]
-}
+- Exact HIPAA § 164.312(a)(2)(iv) technical safeguard requirements for encryption key management need formal legal review.
+- PostgreSQL row-level security performance characteristics at >10M audit log rows require load testing before production deployment.

@@ -9,7 +9,7 @@
 |----|-------|------|------|
 | AC-001 | The front‑desk workstation is on the internal network and the clerk is authenticated as ST‑001. | The clerk submits the demographic form with all required fields filled. | The system stores each field encrypted with per‑field AES‑256 keys, shows a success toast, and creates an audit log entry "DEMOGRAPHIC_CREATE" with user ID and timestamp. |
 | AC-002 | TLS termination proxy is active and presents a valid certificate. | The clerk clicks "Submit" while the network experiences a transient packet loss. | The client retries automatically up to three times; on final success the same encrypted storage behavior occurs; if all retries fail, the UI shows "Submission failed – please retry later" and no partial data is persisted nor logged. |
-| AC-003 | The clerk has entered a valid insurance provider name and policy number matching `^[A-Z0-9]{8,12}$`. | The clerk submits the insurance section of the form. | Each insurance field is encrypted at rest; an audit log entry "INSURANCE_CREATE" is recorded; the system returns a confirmation number within 150 ms (KPI‑01). |
+| AC-003 | The clerk has entered a valid insurance provider name and policy number matching `^[A-Z0-9]{8,12}$`. | The clerk submits the insurance section of the form. | Each insurance field is encrypted at rest; an audit log entry "INSURANCE_CREATE" is recorded; the system returns a confirmation number within 150 ms (KPI-001). |
 | AC-004 | TLS 1.3 is enforced end‑to‑end. | The clerk attempts submission over an insecure HTTP connection. | The server rejects the request with HTTP 400, logs "INSECURE_CONNECTION_ATTEMPT", and no PHI is processed. |
 
 ## 2. Clinician (Role ID: ST-002)
@@ -33,7 +33,7 @@ Every privileged operation is logged with admin ID, operation type, affected obj
 ---
 
 ## Overview
-This document defines the Minimum‑Viable‑Product (MVP) capabilities required before the **PatientIntake** system can be deployed in an on‑premise, air‑gapped environment while remaining fully HIPAA‑compliant. It focuses on user‑value artifacts – user stories, acceptance criteria, priority rankings, design needs and deployment checklist – and ties every element to existing functional requirements (FR‑001 – FR‑009), non‑functional requirements (NFR‑001 – NFR‑003), KPIs (KPI‑01 – KPI‑05), risks (RISK‑01 – RISK‑05) and stakeholder identifiers (ST‑01 – ST‑05).
+This document defines the Minimum‑Viable‑Product (MVP) capabilities required before the **PatientIntake** system can be deployed in an on‑premise, air‑gapped environment while remaining fully HIPAA‑compliant. It focuses on user‑value artifacts – user stories, acceptance criteria, priority rankings, design needs and deployment checklist – and ties every element to existing functional requirements (FR‑001 – FR‑009), non‑functional requirements (NFR‑001 – NFR‑003), KPIs (KPI-001 – KPI-005), risks (RISK-001 – RISK-005) and stakeholder identifiers (ST-001 – ST-005).
 
 ## Design Needs (for Design Team)
 - **Encryption Algorithm Specification**: AES‑256‑GCM with per‑field IVs stored alongside ciphertext.
@@ -92,7 +92,7 @@ This document defines the Minimum‑Viable‑Product (MVP) capabilities required
 | 1 | US-001 | Front Desk Clerk (**ST-01**) | Submit a fully encrypted patient intake form | Data captured securely and audit‑logged before clinician review | 5 |
 | 2 | US-002 | Clinician (**ST-02**) | Retrieve a patient's encrypted medical history after successful authentication | Enables care delivery while preserving confidentiality | 5 |
 | 3 | US-003 | Compliance Officer (**ST-03**) | Generate a PDF intake summary with watermark and timestamp for audit review | Verifies export complies with HIPAA audit requirements and traceability | 4 |
-| 4 | US-004 | Admin (**ST-04**) | Run the Docker Compose deployment in an air‑gapped environment using the provided checklist | System launched without external network exposure, meeting RISK‑03 mitigation | 3 |
+| 4 | US-004 | Admin (**ST-04**) | Run the Docker Compose deployment in an air‑gapped environment using the provided checklist | System launched without external network exposure, meeting RISK-003 mitigation | 3 |
 | 5 | US-005 | Front Desk Clerk (**ST-01**) | View deployment status dashboard after each release | Confirms all pre‑deployment security controls passed before patients use the form | 2 |
 
 ## Change Impact Note
@@ -113,7 +113,7 @@ No public interfaces were altered; only documentation artifacts were enriched. N
 - If any field fails validation, an inline error is shown and no data is persisted.
 - If the TLS handshake fails, the submission is blocked and an error page is displayed.
 
-**Traceability:** FR‑001, FR‑006, NFR‑001 (response time), NFR‑002 (encryption), KPI‑01.
+**Traceability:** FR‑001, FR‑006, NFR‑001 (response time), NFR‑002 (encryption), KPI-001.
 
 ### US-003: Compliance Officer Exports Patient Record as PDF
 **Persona:** Compliance Officer (role: `compliance_officer`) – ensures auditability and regulatory reporting.
@@ -126,7 +126,7 @@ No public interfaces were altered; only documentation artifacts were enriched. N
 - If PDF generation fails (e.g., missing template), an error is logged and a retry option is offered.
 - If the officer’s session expires during generation, the process aborts and a re‑authentication prompt appears.
 
-**Traceability:** FR‑007, NFR‑003 (audit logging), KPI‑04.
+**Traceability:** FR‑007, NFR‑003 (audit logging), KPI-004.
 
 ### US-004: Admin Deploys Application in Air‑Gapped Environment
 **Persona:** Administrator (role: `admin`) – responsible for secure deployment of the SaaS solution on-premises.
@@ -139,7 +139,7 @@ No public interfaces were altered; only documentation artifacts were enriched. N
 - If any container fails health check, the compose process aborts, logs the failure reason, and rolls back any started containers.
 - If host OS version mismatches required base image version, a clear incompatibility warning is emitted.
 
-**Traceability:** FR‑009, KPI‑02 (health‑check), NFR‑004 (deployment isolation).
+**Traceability:** FR‑009, KPI-002 (health‑check), NFR‑004 (deployment isolation).
 
 ## Persona Definitions
 | Role ID | Role Name | Description |

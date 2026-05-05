@@ -97,7 +97,7 @@ All log entries are written to a dedicated PostgreSQL table `audit_log` with app
 - Sanitization library: OWASP Java HTML Sanitizer (or equivalent).
 
 #### 5.x Performance Acceptance Criteria
-- PDF generation latency ≤ 200 ms for average record size (<2 MB) – measured over 10 k transactions (KPI‑01).
+- PDF generation latency ≤ 200 ms for average record size (<2 MB) – measured over 10 k transactions (KPI-001).
 - System response time for any API call ≤ 200 ms under load of 100 concurrent users.
 
 #### 5.x Audit Log Completeness
@@ -115,7 +115,7 @@ All log entries are written to a dedicated PostgreSQL table `audit_log` with app
 3️⃣ **Given** the encryption service is unavailable
    **When** the Clinician initiates export
    **Then** the system returns “PDF generation temporarily unavailable – try later” and logs `outcome=FAILURE` with error code `ERR_ENCRYPTION_UNAVAILABLE`.
-4️⃣ **Performance:** The PDF generation completes within 200 ms for records <2 MB (KPI‑01).
+4️⃣ **Performance:** The PDF generation completes within 200 ms for records <2 MB (KPI-001).
 
 ### US-002 – Front Desk Clerk Export PDF
 **Role:** Front Desk Clerk

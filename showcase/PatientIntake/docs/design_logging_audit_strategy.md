@@ -178,7 +178,7 @@ components:
 ### 8. Key Management & Rotation
 Master key rotation interval: **90 days**; per‑field keys rotate every **30 days**.
 Rotation is automated via Vault's periodic secrets engine; services fetch the latest key on each request cache miss.
-Old keys are retained for decryption of existing records for a grace period of **7 days** before secure deletion.																																												 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	   	   	   	   	   	   	   	   	   	   	    *Note*: This satisfies **FR‑010**, **NFR‑003**, and aligns with **KPI‑03** (successful audit log generation).
+Old keys are retained for decryption of existing records for a grace period of **7 days** before secure deletion.																																												 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	 	   	   	   	   	   	   	   	   	   	   	    *Note*: This satisfies **FR‑010**, **NFR‑003**, and aligns with **KPI-003** (successful audit log generation).
 
 ### 9. Failure Handling & Fallback
 - If Vault is unavailable, API gateway returns HTTP 503 with message "Encryption service unavailable – please retry later"; no request is processed to avoid plaintext exposure.
