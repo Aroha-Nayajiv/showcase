@@ -69,8 +69,8 @@
 | Encryption at rest & transit | NFR‑001 |
 | Audit log immutability | NFR‑003 |
 | PDF watermark compliance | NFR‑004 (derived from compliance policy) |
-| Availability target <200 ms response time | KPI‑01 |
-| Successful audit log generation per submission | KPI‑03 |
+| Availability target <200 ms response time | KPI-001 |
+| Successful audit log generation per submission | KPI-003 |
 
 ---
 *All content adheres to SAAS domain constraints: multi‑tenant isolation is enforced by role‑based access controls; data at rest encryption satisfies SOC 2 & HIPAA requirements; horizontal scalability considerations are implicit in API design.*
@@ -91,7 +91,7 @@
 * Field‑level encryption algorithm: AES‑256‑GCM; keys derived per field from a master key stored in an HSM.
 * Every successful write must create an immutable audit log entry containing user_id, role, timestamp, operation, and record_id (FR‑003).
 * UI must display real‑time validation messages for required fields and format constraints.
-* Performance metrics for each submission must be captured for KPI‑01 (average response ≤200 ms).
+* Performance metrics for each submission must be captured for KPI-001 (average response ≤200 ms).
 
 ## Personas
 
@@ -150,10 +150,10 @@
 > **I want** to enter patient demographic data into a web form that encrypts the data before storage  
 > **So that** patient information is protected in accordance with HIPAA §164.312(a)(2)(iv).
 
-*Acceptance Criteria* (traceability: **FR‑001**, **KPI‑01**, **RISK‑01**):
+*Acceptance Criteria* (traceability: **FR‑001**, **KPI-001**, **RISK‑01**):
 1. Given the web form is loaded over HTTPS, when the staff submits the form, then the payload is encrypted with AES‑256‑GCM before being written to PostgreSQL.
 2. The encryption key is wrapped by a master key stored in a hardware security module (HSM) or encrypted file; decryption failures trigger AC‑KM‑001.
-3. Response time for the audit log write is <200 ms (KPI‑01).
+3. Response time for the audit log write is <200 ms (KPI-001).
 4. All encryption operations are logged with operation = ENCRYPTION_SUCCESS.
 
 **US‑002 – Insurance Validation**
@@ -161,7 +161,7 @@
 > **I want** the system to validate my insurance number against a reference service before submission  
 > **So that** only valid policies are stored.
 
-*Acceptance Criteria* (traceability: **FR‑002**, **KPI‑01**):
+*Acceptance Criteria* (traceability: **FR‑002**, **KPI-001**):
 1. Given a valid insurance number format, when the form is submitted, then the system performs a synchronous lookup against the offline reference table and returns success/failure within 200 ms.
 2. Invalid numbers produce an inline error message without exposing internal details.
 
@@ -170,18 +170,18 @@
 > **I want** every read/write operation on patient data to be recorded immutably with role information  
 > **So that** I can demonstrate compliance during audits.
 
-*Acceptance Criteria* (traceability: **FR‑003**, **KPI‑03**, **RISK‑01**):
+*Acceptance Criteria* (traceability: **FR‑003**, **KPI-003**, **RISK‑01**):
 1. All INSERT/UPDATE/SELECT statements generate an entry in `audit_log` with columns: `timestamp`, `operation`, `user_id`, `role`, `hash_chain`.
 2. The hash chain links each entry to the previous one using SHA‑512; any mismatch raises an alert to ST‑03.
 3. Entries older than 7 years are archived to read‑only storage but never deleted.
-4. Audit log write latency ≤200 ms (KPI‑01).
+4. Audit log write latency ≤200 ms (KPI-001).
 
 **US‑004 – PDF Intake Summary Generation**
 > **As** a *clinical staff* (ST‑01)  
 > **I want** an offline PDF summary of the patient intake form that includes a watermark and timestamp  
 > **So that** I can print and store it securely without internet access.
 
-*Acceptance Criteria* (traceability: **FR‑005**, **FR‑007**, **KPI‑04**, **RISK‑01**):
+*Acceptance Criteria* (traceability: **FR‑005**, **FR‑007**, **KPI-004**, **RISK‑01**):
 1. Given a completed intake record, when the staff clicks “Generate PDF”, then wkhtmltopdf creates a PDF using only local resources.
 2. The PDF contains a visible watermark “Confidential – Patient Intake” and a timestamp of generation.
 3. The PDF file is stored in an encrypted volume; access requires the same role-based permissions as the source record.
@@ -319,50 +319,57 @@ and note that all network traffic stays within the internal bridge; no external 
 
 ### 7. Harden Host Firewall (Air‑Gap Enforcement)
 
-Apply the following checklist to lock down the host and enforce air‑gap isolation.
+Apply the following checklist to lock down the host and enforce air‑gap isolation, while properly accounting for Docker's `iptables` behavior.
 
-#### 7.1 Block Outbound Connections
-1. Reset firewall to deny‑all default:
+#### 7.1 Configure Docker-UFW Integration
+Docker bypasses UFW by default. You must secure the `DOCKER-USER` chain to prevent containers from exposing published ports to the internet.
+1. Add the following to `/etc/ufw/after.rules` to force Docker traffic through UFW:
    ```bash
-   sudo ufw default deny outgoing
+   *filter
+   :DOCKER-USER - [0:0]
+   -A DOCKER-USER -j RETURN -s 10.0.0.0/8
+   -A DOCKER-USER -j RETURN -s 172.16.0.0/12
+   -A DOCKER-USER -j RETURN -s 192.168.0.0/16
+   -A DOCKER-USER -p tcp -m tcp --dport 80 -j RETURN
+   -A DOCKER-USER -p tcp -m tcp --dport 443 -j RETURN
+   -A DOCKER-USER -j DROP
+   COMMIT
+   ```
+
+#### 7.2 Block Outbound Connections
+2. Reset UFW to a deny-all default and allow standard HTTP/HTTPS:
+   ```bash
    sudo ufw default deny incoming
+   sudo ufw default deny outgoing
+   sudo ufw allow 80/tcp
+   sudo ufw allow 443/tcp
    ```
-2. Allow only inbound HTTPS and HTTP on the host:
-   ```bash
-   sudo ufw allow in 443/tcp
-   sudo ufw allow in 80/tcp
-   ```
-3. Allow loopback and inter‑container traffic on the Docker bridge:
-   ```bash
-   sudo ufw allow in on docker0
-   ```
-4. Enable the firewall:
+3. Enable the firewall:
    ```bash
    sudo ufw enable
+   sudo systemctl restart docker
    ```
 
-#### 7.2 Lock Down DNS
-5. Configure `/etc/resolv.conf` to point only to an internal DNS server (e.g., `nameserver 10.0.0.1`). Remove any public resolvers (`8.8.8.8`, `1.1.1.1`).
-6. Verify resolution of external domains fails from within each container:
+#### 7.3 Lock Down DNS
+4. Configure `/etc/resolv.conf` to point only to an internal DNS server (e.g., `nameserver 10.0.0.1`). Remove any public resolvers (`8.8.8.8`, `1.1.1.1`).
+5. Verify resolution of external domains fails from within each container:
    ```bash
    docker exec patientintake_web nslookup google.com && echo "FAIL: external DNS resolves" || echo "PASS"
-   docker exec patientintake_db  nslookup google.com && echo "FAIL: external DNS resolves" || echo "PASS"
    ```
 
-#### 7.3 Verify Zero Outbound Traffic
-7. Run a 60‑second packet capture after all containers are started:
+#### 7.4 Verify Zero Outbound Traffic
+6. Run a packet capture targeting outgoing packets specifically originating from the host's subnet to external public IPs:
    ```bash
-   sudo tcpdump -i eth0 -c 100 'dst port 80 or dst port 443' -w /tmp/airgap_verify.pcap
+   sudo tcpdump -i eth0 -c 100 'src net 10.0.0.0/8 and not dst net 10.0.0.0/8 and (tcp dst port 80 or tcp dst port 443)' -w /tmp/airgap_verify.pcap
    ```
-8. Confirm the capture file contains **zero packets**. Any outbound traffic constitutes a violation and must be investigated before proceeding.
+7. Confirm the capture file contains **zero packets**. Any outbound traffic constitutes an air-gap violation and must be investigated before proceeding.
 
-#### 7.4 Persist and Document
-9. Ensure firewall rules survive reboot: `sudo ufw enable` writes persistent rules to `/etc/ufw/`.
-10. Document any exceptions required for internal monitoring (e.g., health‑check endpoints on `10.x.x.x`). Keep exceptions minimal and approved by the System Administrator (ST‑04).
-11. Record all firewall changes in the project change log repository. Every change must follow the change management process and include ST‑04 approval.
+#### 7.5 Persist and Document
+8. Document any exceptions required for internal monitoring (e.g., health‑check endpoints on `10.x.x.x`). Keep exceptions minimal and approved by the System Administrator (ST‑04).
+9. Record all firewall changes in the project change log repository. Every change must follow the change management process and include ST‑04 approval.
 
 #### 7.5 Log Retention and Backup
-12. Retain firewall and audit logs per compliance policy (minimum 7 years per KPI‑03).
+12. Retain firewall and audit logs per compliance policy (minimum 7 years per KPI-003).
 13. Encrypt logs at rest using AES‑256; rotate encryption keys per the documented security schedule.
 14. Test restoration from log backups quarterly and verify integrity using SHA‑256 hash verification.
 15. Store backups on encrypted offline media; maintain an inventory of backup media locations with strict access controls.
@@ -394,7 +401,7 @@ Apply the following checklist to lock down the host and enforce air‑gap isolat
    **Then** the form displays fields for name, DOB, address, phone.
 2. **Given** all mandatory fields are filled with valid data,
    **When** the staff clicks *Submit*,
-   **Then** the data is persisted encrypted at rest (**NFR‑005**) and an audit log entry is created (**NFR‑003**, **KPI‑03**).
+   **Then** the data is persisted encrypted at rest (**NFR‑005**) and an audit log entry is created (**NFR‑003**, **KPI-003**).
 3. **Given** invalid data is entered,
    **When** the staff attempts submission,
    **Then** inline validation messages are shown and submission is blocked.
@@ -405,7 +412,7 @@ Apply the following checklist to lock down the host and enforce air‑gap isolat
 **Acceptance Criteria**
 1. Form includes insurer name, policy number, group number.
 2. Validation ensures policy number matches insurer format.
-3. Successful submission creates encrypted record (**NFR‑005**) and logs the event (**NFR‑003**, **KPI‑03**).
+3. Successful submission creates encrypted record (**NFR‑005**) and logs the event (**NFR‑003**, **KPI-003**).
 
 #### US‑003: Store Medical History Securely
 *As a **Clinical Staff (ST‑01)** I want to add medical history so that clinicians have context for care.*
@@ -413,7 +420,7 @@ Apply the following checklist to lock down the host and enforce air‑gap isolat
 **Acceptance Criteria**
 1. History is stored in a separate encrypted column.
 2. Access is restricted to users with *Medical_History_Read* permission (**NFR‑005**, **NFR‑006**).
-3. Audit log entry created on each create/update (**NFR‑003**, **KPI‑03**).
+3. Audit log entry created on each create/update (**NFR‑003**, **KPI-003**).
 
 #### US‑004: Generate PDF Intake Summary
 *As a **Patient (ST‑02)** I want to receive a PDF summary of my submitted information so I have a personal record.*
@@ -422,7 +429,7 @@ Apply the following checklist to lock down the host and enforce air‑gap isolat
 1. After successful form submission, the system generates a PDF (**FR‑005**) containing all captured fields.
 2. PDF includes a watermark and timestamp (**FR‑006**, **FR‑007**) complying with security policy.
 3. PDF is stored securely and a download link is presented to the patient.
-4. Generation process is logged for audit (**NFR‑003**, **KPI‑04**).
+4. Generation process is logged for audit (**NFR‑003**, **KPI-004**).
 
 #### US‑005: API Specification for Intake Submission
 *As a **System Administrator (ST‑04)** I need an API endpoint so that external systems can submit intake data programmatically.*
@@ -451,7 +458,7 @@ Apply the following checklist to lock down the host and enforce air‑gap isolat
 **Response (201 Created)** includes `location` header pointing to the generated PDF summary.
 *Security*: OAuth2 Bearer token required; payload encrypted in transit (**NFR‑005**) and validated against schema.
 *Rate limiting*: 100 requests per minute per client.
-*Audit*: Each request creates an audit log entry (**NFR‑003**, **KPI‑03**) .
+*Audit*: Each request creates an audit log entry (**NFR‑003**, **KPI-003**) .
 
 #### US‑006: Log Retention & Offline Storage
 *As a **Compliance Officer (ST‑03)** I need logs older than 90 days moved to offline storage so we meet retention policy (**NFR‑002**) .*
@@ -459,7 +466,7 @@ Apply the following checklist to lock down the host and enforce air‑gap isolat
 **Acceptance Criteria**
 1. System automatically archives Hive logs older than 90 days to encrypted offline storage bucket.
 2. Archived logs are immutable and searchable for audit purposes.
-3. Retention process runs nightly; success/failure recorded in monitoring dashboard (**KPI‑02**).
+3. Retention process runs nightly; success/failure recorded in monitoring dashboard (**KPI-002**).
 
 #### US‑007: Quarterly Disaster Recovery Drill
 *As a **System Administrator (ST‑04)** I must perform a full restore from backup on an air‑gap host quarterly (**FR‑009**) to validate recovery procedures.*
@@ -469,4 +476,4 @@ Apply the following checklist to lock down the host and enforce air‑gap isolat
 2. Every quarter a restore is executed on a separate isolated environment.
 3. Restoration completes within 4 hours and passes verification tests.
 4. Results are logged; any failures trigger an incident ticket.
-5. Drill outcome is reported to compliance officer (**KPI‑02**, **KPI‑03**) .
+5. Drill outcome is reported to compliance officer (**KPI-002**, **KPI-003**) .
