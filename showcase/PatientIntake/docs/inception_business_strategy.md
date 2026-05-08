@@ -29,38 +29,38 @@ The PatientIntake project aims to deliver a HIPAA-compliant, open-source patient
 ## 4. Alignment with Project Objectives
 Each stakeholder’s primary need directly maps to one of the five high-level objectives (OBJ‑001 – OBJ‑005). By satisfying these objectives the project will meet its strategic goals: HIPAA compliance, open-source cost containment, high availability, automated security hygiene, and user adoption.
 
-### FR\-001 – Structured Patient Data Capture
+### FR-001 – Structured Patient Data Capture
 * **Description:** The system shall present a web form that collects patient demographics, insurance information, and medical history in predefined fields.
 * **Acceptance Criteria:**
   - All mandatory fields validated client-side; submission creates a record with a unique `patient_intake_id`.
   - Form completion rate ≥90 % in usability testing.
   - Data persisted only after successful encryption step.
 
-### FR\-002 – Field-Level Encryption at Rest
-* **Description:** All PHI fields shall be encrypted using AES\-256\-GCM before persisting to PostgreSQL.
+### FR-002 – Field-Level Encryption at Rest
+* **Description:** All PHI fields shall be encrypted using AES-256-GCM before persisting to PostgreSQL.
 * **Acceptance Criteria:**
   - Encryption keys stored in HashiCorp Vault with rotation policy every 90 days.
   - Penetration test confirms raw database dumps contain no readable PHI.
 
-### FR\-003 – Transport Encryption in Transit
+### FR-003 – Transport Encryption in Transit
 * **Description:** All client-to-server communication shall use TLS 1.2+ with forward secrecy.
 * **Acceptance Criteria:**
   - HTTPS enforced via strict transport security headers.
   - Automated scans verify no mixed-content or weak cipher suites.
 
-### FR\-004 – Role-Based Access Control & Audit Logging
+### FR-004 – Role-Based Access Control & Audit Logging
 * **Description:** Implement RBAC tiers (Patient read-only, Front Desk operator, Clinician read/write, Admin full) and generate immutable audit logs for every read/write operation.
 * **Acceptance Criteria:**
   - Access checks enforced at API gateway level.
   - Audit log entries contain timestamp, user ID, action type, and hash of payload.
   - Logs stored on write-once storage retaining ≥7 years.
 
-### FR\-005 – PDF Generation & Secure Export
+### FR-005 – PDF Generation & Secure Export
 * **Description:** Generate a PDF intake summary per patient; authorized staff may export it with a visible watermark and export timestamp.
 * **Acceptance Criteria:**
   - PDF includes patient ID, generation timestamp, and watermark "Confidential – Authorized Use Only".
   - Export action creates an audit log entry linking PDF hash to user ID.
-  - PDFs are stored encrypted at rest using the same AES\-256 key hierarchy.
+  - PDFs are stored encrypted at rest using the same AES-256 key hierarchy.
 
 ## 5. Risk Assessment
 | Risk ID   | Description  | Likelihood (H/M/L)   | Impact (H/M/L)   | Mitigation Strategy|

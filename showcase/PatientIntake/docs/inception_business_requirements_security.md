@@ -126,7 +126,7 @@ Each functional requirement links to at least one stakeholder, risk mitigation, 
 * FR‑001 → ST‑001, ST‑002; mitigates RISK‑004; supports KPI‑001.
 * FR‑002 → ST‑004; mitigates RISK‑001; supports KPI‑003.
 * FR‑008 → ST‑004; mitigates RISK‑001 & RISK‑005; supports KPI‑003.
-* FR\-009 → ST\-004; mitigates RISK\-002; supports KPI\-006.
+* FR-009 → ST-004; mitigates RISK-002; supports KPI-006.
 
 ## Appendices
 

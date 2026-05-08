@@ -20,29 +20,29 @@
 
 *Compliance Mapping*: Supports HIPAA §164.312(e) (audit controls), NIST AC-002 (account management), and FR‑004 (PDF watermarking).
 
-### 6\. Edge\-Case Scenarios
+### 6. Edge-Case Scenarios
 
-1\. Network Interruption — If TLS connection drops during form submission, client retries automatically up to three times; after third failure UI shows "Submission failed – please verify network connectivity".
-2\. Key Rotation Failure — If automatic rotation of AES keys (scheduled nightly) fails, system logs a critical error, continues using current key, raises alert in monitoring dashboard; subsequent submissions remain encrypted.
-3\. Audit Log Saturation — When WORM volume reaches 95 % capacity, system blocks further write operations and alerts admin; read operations remain available.
-4\. Unauthorized Physical Access — If a non\-authorized device attempts to connect to Docker Compose network, Docker's built-in firewall rejects connection and records event in audit log with source MAC address.
+1. Network Interruption — If TLS connection drops during form submission, client retries automatically up to three times; after third failure UI shows "Submission failed – please verify network connectivity".
+2. Key Rotation Failure — If automatic rotation of AES keys (scheduled nightly) fails, system logs a critical error, continues using current key, raises alert in monitoring dashboard; subsequent submissions remain encrypted.
+3. Audit Log Saturation — When WORM volume reaches 95 % capacity, system blocks further write operations and alerts admin; read operations remain available.
+4. Unauthorized Physical Access — If a non-authorized device attempts to connect to Docker Compose network, Docker's built-in firewall rejects connection and records event in audit log with source MAC address.
 
-### 7\. Success Metrics
+### 7. Success Metrics
 
 *Encryption Verification* — 100 % of stored patient fields must be encrypted with AES–26; verified by automated checksum comparison against plaintext test data.
-*Access Control Enforcement* — Zero false\-positive authorizations; measured by penetration testing attempts that should be denied.
+*Access Control Enforcement* — Zero false-positive authorizations; measured by penetration testing attempts that should be denied.
 *Audit Log Completeness* — Every CRUD operation appears in log; coverage ≥ 99 .9 % as measured by log replay scripts.
-*Air\-Gap Integrity* — No outbound network traffic observed from any container during normal operation; validated by network monitoring tools.
+*Air-Gap Integrity* — No outbound network traffic observed from any container during normal operation; validated by network monitoring tools.
 
-### 8\. MVP Scope Prioritization
+### 8. MVP Scope Prioritization
 
 The MVP focuses on three core capabilities that must be operational before broader rollout:
 
-1\. Secure Web\-Form Submission — Collection of patient demographics, insurance information, and medical history with field\-level encryption in transit and at rest.
-2\. PDF Generation & Secure Export — Role\-based generation of tamper\-evident PDF/A\-2b summaries encrypted at rest and streamed over TLS 1\.3.
-3\. Immutable Audit Logging — End\-to\-end logging of all CRUD operations with WORM storage and automated retention for 7 years.
+1. Secure Web-Form Submission — Collection of patient demographics, insurance information, and medical history with field-level encryption in transit and at rest.
+2. PDF Generation & Secure Export — Role-based generation of tamper-evident PDF/A-2b summaries encrypted at rest and streamed over TLS 1.3.
+3. Immutable Audit Logging — End-to-end logging of all CRUD operations with WORM storage and automated retention for 7 years.
 
-These capabilities satisfy HIPAA technical safeguards while remaining deployable in an air\-gapped SaaS environment.
+These capabilities satisfy HIPAA technical safeguards while remaining deployable in an air-gapped SaaS environment.
 
 ## User Stories
 

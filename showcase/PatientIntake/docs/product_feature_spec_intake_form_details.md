@@ -68,7 +68,7 @@ All three personas are bound by the same overarching security controls:
 |------------|-----------|--------------|
 | US‑001 | FR‑002 (session timeout), FR‑004 (audit logging), FR‑009 (log retention) | NFR‑002 (certificate rotation), NFR‑003 (AES‑256 at rest) |
 | US‑002 | FR‑004 (audit logging), FR‑009 (log retention) | NFR‑003 (encryption), NFR‑005 (PDF watermark) |
-| US‑003 | FR‑002 (TLS enforcement), FR‑004 (audit logging) | NFR‑001 (TLS 1.3), NFR\-003 (encryption) |
+| US‑003 | FR‑002 (TLS enforcement), FR‑004 (audit logging) | NFR‑001 (TLS 1.3), NFR-003 (encryption) |
 
 ---
 *All identifiers referenced above exist in the project asset registry.*

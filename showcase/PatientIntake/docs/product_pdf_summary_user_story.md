@@ -22,9 +22,9 @@
 - **PER-03 (Admin):** System administrator responsible for audit compliance and access control.
 
 ### Security & Compliance Notes
-- PDFs stored encrypted at rest using AES\u201126 via pgcrypto column-level encryption.
-- All transport uses TLS\u00a01\.3 with automated weekly certificate rotation.
-- Audit log entries are immutable and retained for 7 years (NFR\u2011\u201003).
+- PDFs stored encrypted at rest using AES‑256 via pgcrypto column-level encryption.
+- All transport uses TLS 1.3 with automated weekly certificate rotation.
+- Audit log entries are immutable and retained for 7 years (NFR‑003).
 - Role‑based access enforced via PostgreSQL Row‑Level Security policies.
 
 ### Overview
@@ -40,31 +40,17 @@ This specification defines the user stories, acceptance criteria, and supporting
 | AC-003 | Patient record is **incomplete**. | Clinician clicks **Export PDF**. | System displays error “Cannot export incomplete record.”, does not generate a PDF; audit log records `outcome: FAILURE` with reason `INCOMPLETE_RECORD`. |
 | AC-004 | Session token is expired or invalid. | Clinician initiates export. | System redirects to login page; no PDF generated; audit log records `outcome: FAILURE` with reason `AUTH_EXPIRED`. |
 
-#### US‑002 – Front‑Desk Preview
-| ID     | Given| When  | Then |
-|--------|-----------------------------|--------------|-----------|
-| AC-005 Front‑Desk staff authenticated (role *front‑desk*) with view permission; sensitive fields (SSN, insurance) are flagged as **redacted** in UI. |
- Staff selects **Generate Preview PDF**. |
- | System creates a PDF that **excludes** redacted fields, applies watermark “Preview – Internal Use Only”, includes a timestamp (no digital signature), displays the PDF in‑browser (no download button), and logs `outcome: SUCCESS`. |
-| AC-006 Redaction flags are missing or mis‑configured for a patient record. |
- Staff attempts preview generation. |
- | System aborts export and shows “Redaction configuration error.”; audit log records `outcome: FAILURE` with reason `REDACTION_ERROR`. |
+#### US‑2 – Front‑Desk Preview
+| ID | Given | When | Then |
+|--------|-------|------|------|
+| AC-005 | Front‑Desk staff authenticated (role *front‑desk*) with view permission; sensitive fields (SSN, insurance) are flagged as **redacted** in UI. | Staff selects **Generate Preview PDF**. | System creates a PDF that **excludes** redacted fields, applies watermark "Preview – Internal Use Only", includes a timestamp (no digital signature), displays the PDF in‑browser (no download button), and logs `outcome: SUCCESS`. |
+| AC-006 | Redaction flags are missing or mis‑configured for a patient record. | Staff attempts preview generation. | System aborts export and shows "Redaction configuration error."; audit log records `outcome: FAILURE` with reason `REDACTION_ERROR`. |
 
-#### US‑003 – Compliance Verification
-| ID     > Given< When  < Then |
----
-| AC-007 |
-Compliance officer authenticated (role *compliance_officer*) and accesses **Export Log Dashboard**.
-|
-Officer selects an export event to view details.
-|
-System displays PDF metadata: watermark text, timestamp, digital signature verification status (valid/invalid), and the corresponding audit‑log entry. Officer may download the original PDF; download action is logged with `outcome: SUCCESS`. |
-| AC-008 |
-Digital signature verification fails for a selected PDF.
-|
-Officer views details.
-|
-System shows warning “Signature invalid – possible tampering.”; audit log records `outcome: FAILURE` with reason `SIGNATURE_INVALID`. |
+#### US‑3 – Compliance Verification
+| ID | Given | When | Then |
+|--------|-------|------|------|
+| AC-007 | Compliance officer authenticated (role *compliance_officer*) and accesses **Export Log Dashboard**. | Officer selects an export event to view details. | System displays PDF metadata: watermark text, timestamp, digital signature verification status (valid/invalid), and the corresponding audit‑log entry. Officer may download the original PDF; download action is logged with `outcome: SUCCESS`. |
+| AC-008 | Digital signature verification fails for a selected PDF. | Officer views details. | System shows warning "Signature invalid – possible tampering."; audit log records `outcome: FAILURE` with reason `SIGNATURE_INVALID`. |
 
 ### API Endpoints (Design‑Level Reference)
 > For full endpoint specifications see `design_api_specification` artifact.

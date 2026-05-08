@@ -150,8 +150,8 @@ And audit logs capture key creation timestamps, rotation events, and any decrypt
 |------------|---------------------------|----------|--------|----------|
 | US‑001 | FR‑002, FR‑003 | NFR‑002 (client encryption), NFR‑001 (performance ≤2 min) | KPI‑001 (system availability) | RISK‑001 (data breach) |
 | US‑002 | FR‑006 (deployment consistency) | NFR‑003 (audit log completeness) | KPI‑002 (zero security incidents first 90 days) | RISK‑002 (regulatory non‑compliance) |
-| US\-003 | FR\-004 (PDF watermark) | NFR\-003 (audit trail), NFR\-001 (response time ≤1 s) | KPI\-003 (audit compliance passed) | RISK\-001 (data breach) |
-| US\-004 | FR\-002 (TLS), FR\-006 (deployment) | NFR\-002 (key rotation automation), NFR\-003 (audit log) | KPI\-003 (audit compliance passed) | RISK\-006 (key management failure) |
+| US-003 | FR-004 (PDF watermark) | NFR-003 (audit trail), NFR-001 (response time ≤1 s) | KPI-003 (audit compliance passed) | RISK-001 (data breach) |
+| US-004 | FR-002 (TLS), FR-006 (deployment) | NFR-002 (key rotation automation), NFR-003 (audit log) | KPI-003 (audit compliance passed) | RISK-006 (key management failure) |
 
 ### 7. Test Coverage Mapping to Drivers
 | Driver | Covered by Story(s) |
@@ -159,7 +159,7 @@ And audit logs capture key creation timestamps, rotation events, and any decrypt
 | Security validation – TLS 1.3 & AES 256 | US‑001, US‑004 |
 | Performance thresholds – form ≤2 min, API ≤1 s | US‑001, US‑003 |
 | Usability – WCAG 2.1 AA & clear messages | US‑001 |
-| Compliance – audit log retention & reporting | US‑002, US\-003, US\-004 |
+| Compliance – audit log retention & reporting | US‑002, US-003, US-004 |
 
 ### 8. Additional Test Cases Not Explicitly Mapped Above
 1. **Negative TLS version test:** Attempt submission over TLS 1.2 – expect rejection logged as security event.

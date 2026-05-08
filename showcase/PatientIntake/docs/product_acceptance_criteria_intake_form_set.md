@@ -124,9 +124,10 @@ The following personas capture all human actors who will interact with the patie
 4. **Access Control Model**
    - Roles stored in table `app_roles` (`role_name`, `description`).
    - Row‑Level Security policies:
-     sql
+```sql
      CREATE POLICY front_desk_pdf_policy ON pdfs
        USING (current_setting('app.current_role') = 'front_desk' AND patient_id = current_setting('app.current_patient'));
+```
      
    - Session tokens are JWTs signed with RSA‑2048; expiration 30 min; revocation list checked on each request.
 5. **Error Messaging Conventions**

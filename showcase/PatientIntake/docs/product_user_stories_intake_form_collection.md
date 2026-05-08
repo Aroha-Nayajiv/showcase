@@ -40,11 +40,11 @@
 |------------------|----------|----------------------------|-------------|
 | /api/v1/tenants/{tenant_id}/intake/personal        | POST     | Patient (OIDC)             | Submit personal details; validates TLS 1.3; payload encrypted client‑side using AES‑256‑GCM before storage. |
 | /api/v1/tenants/{tenant_id}/intake/insurance       | POST     | Patient (OIDC)             | Submit insurance provider and policy number; performs Luhn check; stores ciphertext only. |
-| /api/v1/tenants/{tenant_id}/intake/medical-history  | POST     :   Patient (OIDC)             :   Submit medical history entries; each field encrypted client‑side before DB write. |
-| /api/v1/tenants/{tenant_id}/intake/{record_id}/flag-missing   | POST     :   FrontDesk                 :   Mark record as Incomplete; creates audit entry `action=flag_missing`. |
-| /api/v1/tenants/{tenant_id}/intake/{record_id}/approve        :   POST     :   FrontDesk                 :   Mark record as Complete; audit `action=approve`. |
-| /api/v1/tenants/{tenant_id}/intake/{record_id}/export/pdf    :   GET      :   Clinician                 :   Generate encrypted PDF/A‑2b with watermark & timestamp; stream over TLS 1.3. |
-| /api/v1/tenants/{tenant_id}/audit-log                :   GET      :   Admin                     :   Retrieve immutable audit log entries filtered by date range; includes HMAC_SHA256 hash for integrity verification. |
+| /api/v1/tenants/{tenant_id}/intake/medical-history  | POST     |   Patient (OIDC)             |   Submit medical history entries; each field encrypted client‑side before DB write. |
+| /api/v1/tenants/{tenant_id}/intake/{record_id}/flag-missing   | POST     |   FrontDesk                 |   Mark record as Incomplete; creates audit entry `action=flag_missing`. |
+| /api/v1/tenants/{tenant_id}/intake/{record_id}/approve        |   POST     |   FrontDesk                 |   Mark record as Complete; audit `action=approve`. |
+| /api/v1/tenants/{tenant_id}/intake/{record_id}/export/pdf    |   GET      |   Clinician                 |   Generate encrypted PDF/A‑2b with watermark & timestamp; stream over TLS 1.3. |
+| /api/v1/tenants/{tenant_id}/audit-log                |   GET      |   Admin                     |   Retrieve immutable audit log entries filtered by date range; includes HMAC_SHA256 hash for integrity verification. |
 
 ## 5. Traceability Matrix
 

@@ -29,7 +29,7 @@
 |--------------|----------------------|
 | PER-001      | FR-001, FR-003, FR-004 |
 | PER-002      | FR-001, FR-002, FR-004 |
-| PER-003      |	FR-001, FR-002, FR-003, FR-004, FR-005 |	|	|	|	|	|	|	|	|	|	|	|	|	|	||	| table continues... |
+| PER-003      | FR-001, FR-002, FR-003, FR-004, FR-005 |
 
 ## Secure Patient Intake Feature Specification
 
@@ -71,12 +71,9 @@
 **US-005 – PDF integrity verification on external workstation**
 *Persona*: Clinician
 *Goal*: Ensure exported PDF has tamper‑evidence.
-*
-Given*: the clinician copies the exported PDF to an external USB on a non‑air‑gapped workstation,
-*
-When*: the file is opened in Adobe Reader,
-*
-Then*: the embedded digital signature validates against internal CA and any tampering triggers "Document has been altered" warning, satisfying HIPAA integrity requirement.
+*Given*: the clinician copies the exported PDF to an external USB on a non‑air‑gapped workstation,
+*When*: the file is opened in Adobe Reader,
+*Then*: the embedded digital signature validates against internal CA and any tampering triggers "Document has been altered" warning, satisfying HIPAA integrity requirement.
 
 ### Acceptance Criteria Summary
 | AC ID | User Story | Scenario Description |
@@ -99,7 +96,8 @@ Then*: the embedded digital signature validates against internal CA and any tamp
   | Role               | Read                         | Export PDF |
   |--------------------|----------|------------|
   | Front Desk Staff   | Own‑clinic patients only     | ❌          |
-  | Clinician          | Own‑clinic patients only     | ✅ | │ Admin              │ All clinics                  │ ✅          |
+  | Clinician          | Own‑clinic patients only     | ✅          |
+  | Admin              | All clinics                  | ✅          |
 
 - PostgreSQL Row‑Level Security (RLS) policies enforce `clinic_id = current_setting('app.current_clinic')`.
 
@@ -117,17 +115,20 @@ Stored in immutable append‑only table `audit_log` with retention policy of **7
 - Use **WeasyPrint >= 53**.
 - Watermark text configurable via env var `PDF_WATERMARK` (default "Confidential – Exported by Clinician").
 - UTC ISO‑8601 timestamp embedded in footer.
-\- Output format **PDF/A‑2b** for long‑term preservation.
+- Output format **PDF/A‑2b** for long‑term preservation.
 
 #### 5. Error Handling Conventions
 | HTTP Status | User‑Visible Message| Logged Operation |
 |-------------|------------------|-------------------|
 | 200         | Success (PDF streamed) | EXPORT_PDF        |
 | 403         | "You do not have permission to view this record."   or "Export not authorized."   | READ_DENIED / EXPORT_DENIED |
-| 500         │ Generic error message; alert ops team                │ INTERNAL_ERROR    |
+| 500         | Generic error message; alert ops team                | INTERNAL_ERROR    |
 
 ### Test Cases – MVP Core
-| Test ID | Related AC | Description  | Expected Result |
-|----------|--------------|--------------------|-----------------
-?
-?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?\?|\??\??\??\??\??\??\??\??\??\??\??\??\??\??\??|\???|\???|\???|\???|\???|\???|\???|\???|\???|\???|\???|\???|\???|\???|\???|\???|\???|\???|\???|\???||---||---||---|||​ ​ ​ ​ ​ ​ ​ ​ ​ ​ ​ ...
+| Test ID | Related AC | Description | Expected Result |
+|---------|------------|-------------|-----------------|
+| TC-001 | AC-003 | Front desk staff reads patient intake form for own clinic | Decrypted form displayed; audit log READ success |
+| TC-002 | AC-004 | Front desk staff attempts cross-clinic record access | HTTP 403; audit log READ_DENIED |
+| TC-003 | AC-005 | Clinician exports PDF for authorized patient | PDF with watermark and timestamp streamed over TLS 1.3; audit log EXPORT_PDF success |
+| TC-004 | AC-006 | Clinician exports PDF for unauthorized patient | HTTP 403; no PDF generated; audit log EXPORT_DENIED |
+| TC-005 | AC-007 | Exported PDF integrity verified on external workstation | Digital signature validates; tampering triggers warning |

@@ -8,7 +8,7 @@
 
 ### Design Needs (for downstream Design phase)
 - **Audit‑log table schema** (PostgreSQL example):
-  sql
+```sql
   CREATE TABLE audit_log (
       id UUID PRIMARY KEY,
       tenant_id UUID NOT NULL,
@@ -19,6 +19,7 @@
       payload_hash TEXT NOT NULL,
       CONSTRAINT fk_tenant FOREIGN KEY (tenant_id) REFERENCES tenants(id)
   );
+```
   
   The table is append‑only; rows are never updated or deleted.
 - **Encryption key management** – use HashiCorp Vault in HA mode; keys are rotated automatically every 30 days and accessed via TLS 1.3‑protected API (see FR‑002).

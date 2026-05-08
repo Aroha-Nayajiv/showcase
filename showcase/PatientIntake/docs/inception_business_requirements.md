@@ -56,6 +56,6 @@ Authorized staff may generate a PDF summary of a patient’s intake data. The PD
 |----------------|-----------|
 | OBJ-001        | Achieve 100 % PHI encryption at rest and in transit across all tenants                    |
 | OBJ-002        | Reduce average intake processing time to <2 minutes per patient through automated capture    |
-| OBJ-003        │ Ensure 99.9 % availability of patient records during clinic hours                           │ │ OBJ-004        │ Maintain immutable audit logs for 7 years meeting HIPAA retention requirements               │ │ OBJ-005        │ Pass external HIPAA/SOC 2 audit with zero critical findings                           │ |
+| OBJ-003        | Ensure 99.9 % availability of patient records during clinic hours                           | | OBJ-004        | Maintain immutable audit logs for 7 years meeting HIPAA retention requirements               | | OBJ-005        | Pass external HIPAA/SOC 2 audit with zero critical findings                           | |
 
 *Note: Objective identifiers have been added to the project asset registry.*

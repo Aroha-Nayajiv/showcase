@@ -98,7 +98,7 @@ The Docker Compose file defines three primary services: `web` (NGINX + Envoy sid
 | RISK‑002 | Unauthorized access due to misconfigured RBAC | Low (L) | High (H) | Automated RBAC policy validation tests; quarterly manual review |
 | RISK‑003 | Failure to meet audit retention in air‑gap environment | Medium (M) | Medium (M) | Use immutable WORM storage; schedule quarterly compliance verification |
 | RISK‑004 | Deployment delays from missing offline images | Low (L) | Medium (M) | Pre‑packaged image tarballs validated via SHA256 checksum before installation |
-| RISK\-005 | Performance degradation under peak load | Medium (M) | Medium (M) | Define horizontal scaling guidelines in Docker Compose; run automated load tests before release |
+| RISK-005 | Performance degradation under peak load | Medium (M) | Medium (M) | Define horizontal scaling guidelines in Docker Compose; run automated load tests before release |
 
 ## 7. Governance Sign‑off
 The charter will be presented to the Project Governance Board comprising the Administrator, Compliance Officer, Security Lead, and Architecture Lead. **Approval criteria:**

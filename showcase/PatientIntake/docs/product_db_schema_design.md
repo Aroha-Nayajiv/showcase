@@ -188,7 +188,7 @@ The Patient Intake feature enables front‑desk clerks, clinicians, administrato
 * Row‑level security policies enforce tenant isolation.
 
 ### 5.4 Audit Log Schema
-sql
+```sql
 CREATE TABLE audit_log (
     log_id UUID PRIMARY KEY,
     actor_role TEXT NOT NULL,
@@ -199,6 +199,7 @@ CREATE TABLE audit_log (
     outcome TEXT NOT NULL,
     hash_chain BYTEA NOT NULL -- SHA‑256 chaining value
 );
+```
 
 * Retention period: 7 years (per NFR‑003).
 * Append‑only storage; updates prohibited.
@@ -227,8 +228,8 @@ CREATE TABLE audit_log (
 |------------|------------------|
 | US‑001 / AC‑001–AC‑004 | FR‑001, FR‑002, FR‑003, FR‑004, FR‑005 |
 | US‑002 / AC‑005–AC‑006 | FR‑003, FR‑004 |
-| US‑003 | FR­-001, FR­-002 |
-| US­-004 / AC­-007 | NFR­-003, KPI­-001 |
+| US‑003 | FR-001, FR-002 |
+| US-004 / AC-007 | NFR-003, KPI-001 |
 
 ---
 *All content aligns with HIPAA functional requirements (FR‑002, FR‑003) and SaaS domain constraints such as multi‑tenant isolation and high availability.*

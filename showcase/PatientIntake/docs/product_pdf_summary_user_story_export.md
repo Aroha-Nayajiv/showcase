@@ -1,4 +1,4 @@
-# Export Secure PDF Summary","description":"Narrative describing clinician workflow to export patient PDFs.","content":"As a clinician I need to request a PDF summary of a patient's intake record so that I can print or share it securely with other providers while ensuring HIPAA compliance. The story includes steps to authenticate via SSO
+# Export Secure PDF Summary
 
 ## Export Secure PDF Summary – Clinician Workflow
 

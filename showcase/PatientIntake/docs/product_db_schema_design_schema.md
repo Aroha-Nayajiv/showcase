@@ -79,17 +79,17 @@ The following user stories define the functional intent of the PostgreSQL databa
 
 **Acceptance Criteria**
 1. **AC‑007**: Given a front‑desk user, when completing the intake form, then all PHI fields are stored using pgcrypto column encryption with AES‑256 GCM.
-2. **AC\-008**: The form validates required fields before submission and returns user-friendly error messages.
-3. **AC\-009**: Successful submission creates an audit log entry with operation “INSERT”, table name “patients”, and includes the user ID.
+2. **AC-008**: The form validates required fields before submission and returns user-friendly error messages.
+3. **AC-009**: Successful submission creates an audit log entry with operation “INSERT”, table name “patients”, and includes the user ID.
 
-### US-004 | Compliance Officer (PER\-01)
+### US-004 | Compliance Officer (PER-01)
 **Goal:** Query an immutable audit log of every read/write operation on PHI tables and verify that each entry includes user ID, timestamp, and operation type.
-**Rationale:** Demonstrates compliance with KPI\-003 (audit log completeness) and supports periodic HIPAA audits.
+**Rationale:** Demonstrates compliance with KPI-003 (audit log completeness) and supports periodic HIPAA audits.
 
 **Acceptance Criteria**
-1. **AC\-010**: Given any authorized query, when retrieving audit logs, then results are ordered by timestamp descending and include fields `user_id`, `operation`, `table_name`, `ts`, `success`.
-2. **AC\-011**: The audit log table is append‑only; attempts to UPDATE or DELETE rows are rejected with error “Immutable log”.
-3. **AC\-012**: A materialized view `daily_audit_summary` aggregates counts per role and is refreshed hourly for KPI dashboards.
+1. **AC-010**: Given any authorized query, when retrieving audit logs, then results are ordered by timestamp descending and include fields `user_id`, `operation`, `table_name`, `ts`, `success`.
+2. **AC-011**: The audit log table is append‑only; attempts to UPDATE or DELETE rows are rejected with error “Immutable log”.
+3. **AC-012**: A materialized view `daily_audit_summary` aggregates counts per role and is refreshed hourly for KPI dashboards.
 
 ## Design Needs (to be handed off to Design)
 
@@ -107,7 +107,7 @@ The following user stories define the functional intent of the PostgreSQL databa
    Include fallback deny policy `USING (false)`.
 
 3. **Audit Log Schema – Table definition:**
-sql
+```sql
 CREATE TABLE audit_log (
     id SERIAL PRIMARY KEY,
     user_id TEXT NOT NULL,
@@ -117,11 +117,12 @@ CREATE TABLE audit_log (
     success BOOLEAN NOT NULL,
     details JSONB
 );
+```
 
 Ensure immutable storage via append‑only configuration.
 
 4. **PDF Export Metadata Table**
-sql
+```sql
 CREATE TABLE pdf_exports (
     id SERIAL PRIMARY KEY,
     patient_id INT REFERENCES patients(id),
@@ -130,6 +131,7 @@ CREATE TABLE pdf_exports (
     file_path TEXT NOT NULL,
     watermark TEXT NOT NULL
 );
+```
 
 5. **Indexing Requirements**
    - Index on `audit_log.ts` for KPI reporting.

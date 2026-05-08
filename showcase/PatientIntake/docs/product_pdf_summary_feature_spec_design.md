@@ -73,18 +73,18 @@
 | NFR‑011 | Horizontal Scalability | The PDF generation microservice is stateless behind an API gateway; auto‑scaling policies add instances when average CPU >70 % or request latency >2 s. |
 | NFR‑012 | High Availability | Deploy services across at least three availability zones; use health checks and failover routing to ensure ≥99.9 % uptime. |
 | NFR‑013 | Monitoring & Alerting | Export Prometheus metrics for request latency, error rates, and key rotation status; alerts fire on latency >3 s for >5 % of requests or on key rotation failures. |
-| NFR\-014 | Rate Limiting & DDoS Protection | Apply token bucket rate limiting per tenant (max 100 requests/second) at the edge gateway; integrate with cloud WAF for DDoS mitigation. |
-| NFR\-015 | Disaster Recovery | Daily encrypted backups stored in geographically separate region; recovery time objective ≤4 hours. |
+| NFR-014 | Rate Limiting & DDoS Protection | Apply token bucket rate limiting per tenant (max 100 requests/second) at the edge gateway; integrate with cloud WAF for DDoS mitigation. |
+| NFR-015 | Disaster Recovery | Daily encrypted backups stored in geographically separate region; recovery time objective ≤4 hours. |
 
 ### 5. Traceability Matrix
 | Artifact ID | Description | Linked Requirement(s) |
 |------------|-------------|----------------------|
 | US-001 | Patient form submission over TLS 1.3 | FR‑002, NFR‑002, KPI‑003 |
 | US-001 (TLS fallback) | Patient TLS 1.2 fallback handling | FR‑002, NFR‑002, RISK‑001 |
-| US-002 | Front Desk Clerk PDF generation | FR‑004, NFR\-010, KPI‑001 |
+| US-002 | Front Desk Clerk PDF generation | FR‑004, NFR-010, KPI‑001 |
 | US-003 | PDF generation error handling | FR‑004, RISK‑003 |
-| US-004 | Clinician secure PDF view | FR\-004, NFR\-012 |
-| US-005 | Compliance audit log completeness | FR\-004, KPI\-003 |
+| US-004 | Clinician secure PDF view | FR-004, NFR-012 |
+| US-005 | Compliance audit log completeness | FR-004, KPI-003 |
 
 ### 6. Open Knowledge Gaps
 * Exact HIPAA § 164.312(a)(2)(iv) technical safeguard requirements for encryption key management in a multi‑tenant SaaS environment.
@@ -133,7 +133,7 @@ This specification defines the **PDF Summary Generation** capability for the **P
 - Embedded in PDF metadata field `CreationDate` and visible footer.
 
 ### 11.3 Audit Log Schema (Product‑Level Table)
-sql
+```sql
 CREATE TABLE pdf_audit (
     event_id UUID PRIMARY KEY,
     tenant_id TEXT NOT NULL,
@@ -145,6 +145,7 @@ CREATE TABLE pdf_audit (
     pdf_hash BYTEA NOT NULL,
     CONSTRAINT fk_tenant FOREIGN KEY (tenant_id) REFERENCES tenants(id)
 );
+```
 
 Retention enforced by scheduled job respecting FR‑009 (7 years).
 
@@ -160,7 +161,8 @@ Retention enforced by scheduled job respecting FR‑009 (7 years).
 ## 12. Acceptance Summary
 The refined specification now:
 1. Provides complete Given/When/Then acceptance criteria for each user story.
-2. Adds SaaS multi‑tenant isolation and scalability details required for cloud deployment.\q3. Links every story and design element to explicit requirement IDs for traceability.
+2. Adds SaaS multi‑tenant isolation and scalability details required for cloud deployment.
+3. Links every story and design element to explicit requirement IDs for traceability.
 4. Addresses all reviewer feedback regarding missing SaaS considerations and traceability gaps.
 5. Retains all original content while expanding where needed.
 

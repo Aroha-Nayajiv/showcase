@@ -65,7 +65,7 @@ The following section defines the four core personas that interact with the **Pa
 
 ### Consolidated RBAC Permissions Matrix
 | Persona | Read Access | Write Access | Export Capability | Audit Logging |
-|---------|-------------------|--------------|
+|---------|-------------|--------------|-------------------|---------------|
 | Patient | Own record only (`patient:self`) | Create own record; edit limited fields (`patient:update`) | ❌ (request only) | Record view logged with patient ID |
 | Front‑Desk Staff | All records (`intake:read`) | Demographic & insurance fields (`intake:write`) | ✅ PDF with watermark & timestamp (`pdf:export`) | Export action includes staff ID & purpose |
 | Clinician | All records (`clinical:read`) | Clinical fields only (`clinical:write`) | ✅ PDF with clinician ID watermark (`pdf:export`) | Edit actions capture before/after values |

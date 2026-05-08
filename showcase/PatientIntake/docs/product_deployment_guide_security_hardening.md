@@ -133,19 +133,19 @@
 |--------|--------|
 | KPI-001 | System availability ≥ 99.9 % during business hours. |
 | KPI-002 | Zero security incidents in first 90 days. |
-| KPI­003* *Audit log completeness ≥ 100 % for all operations.* |
+| KPI-003 | Audit log completeness ≥ 100 % for all operations. |
 
 # Security Hardening Checklist (SAAS Context)
 
 1. Verify that all external traffic terminates at an Nginx reverse proxy configured for TLS 1.3 only; disable TLS 1.0/1.1.
 2. Ensure every column storing PHI is encrypted at rest using column‑level AES‑256 encryption managed by PostgreSQL pgcrypto.
-3  Enable PostgreSQL row‑level security policies that enforce least‑privilege access per role.
-4  Deploy HashiCorp Vault in sealed mode; store master encryption key; rotate every 90 days automatically via cron job inside Docker container.
-5  Configure audit log collection using pgaudit extension; pipe logs to an immutable file system mounted with `chattr +i`.
-6  Run Trivy vulnerability scan on all Docker images before each release; remediate any CVE ≥ 7 severity.
-7  Harden Docker host OS: disable root login over SSH, enforce firewall rules allowing only internal network traffic on ports 443/80.
-8  Validate PDF generation produces PDF/A‑2b compliant files; test that watermark text appears on every page.
-9  Perform penetration test focusing on injection vectors in web form fields; ensure input sanitization prevents XSS/SQLi.
-10  Document air‑gap deployment steps: offline image pull via `docker save`, transfer via encrypted USB stick, load images locally using `docker load`, start stack with `docker compose up -d`.
+3. Enable PostgreSQL row‑level security policies that enforce least‑privilege access per role.
+4. Deploy HashiCorp Vault in sealed mode; store master encryption key; rotate every 90 days automatically via cron job inside Docker container.
+5. Configure audit log collection using pgaudit extension; pipe logs to an immutable file system mounted with `chattr +i`.
+6. Run Trivy vulnerability scan on all Docker images before each release; remediate any CVE ≥ 7 severity.
+7. Harden Docker host OS: disable root login over SSH, enforce firewall rules allowing only internal network traffic on ports 443/80.
+8. Validate PDF generation produces PDF/A‑2b compliant files; test that watermark text appears on every page.
+9. Perform penetration test focusing on injection vectors in web form fields; ensure input sanitization prevents XSS/SQLi.
+10. Document air‑gap deployment steps: offline image pull via `docker save`, transfer via encrypted USB stick, load images locally using `docker load`, start stack with `docker compose up -d`.
 
 All items above are traceable to FR‑001 through FR‑005 and KPI‑001–KPI‑003.

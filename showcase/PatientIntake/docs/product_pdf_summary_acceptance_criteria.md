@@ -137,18 +137,14 @@ And any missing entry triggers an alert flagged as KPI‑003 deviation
 
 ## Acceptance Criteria
 
-| ID    | User Story | Given| When  | Then |
-|-------|-----------------|------------|
-| AC-001| US-001     | Patient accesses the intake URL over TLS 1.3 and browser supports Web Crypto API | Patient fills all required fields and clicks **Submit** Each field is encrypted with AES‑256‑GCM before persistence; server stores only ciphertext; TLS‑protected POST returns HTTP 201 with submission UUID.<br>**Negative cases:** Missing TLS → 400; No Web Crypto → server‑side encryption fallback; Payload >5 MB → 413 and event logged. |
-|
-| AC-002| US-001 | Patient has completed encrypted submission successfully | Patient attempts to view confirmation page via same session token Page shows masked confirmation number and message “Your information has been securely received.” No plaintext appears in HTML source or network trace.<br>**Negative cases:** Session token expired → redirect with “Session expired”; CSRF token missing → 403. |
-|
-| AC-003| US-002 | Front-desk clerk authenticated with role `front_desk` and valid session token | Clerk searches patient by MRN and selects **View Intake** System decrypts only authorized fields (demographics, insurance) and renders read‑only; audit log records READ event with timestamp and clerk ID.<br>**Negative cases:** Clerk attempts restricted clinical notes → UI hides section and logs UNAUTHORIZED_READ; Network latency >2 s → loading spinner shown but access check enforced before render. |
-|
-| AC-004| US-003 | Clinician authenticated with role `clinician` and has selected a patient record that passed prior checks | Clinician clicks **Export PDF Summary** Service generates PDF/A‑2b containing all allowed fields, embeds visible watermark “Confidential – Exported by `<ClinicianID>` on `<ISO‑8601 timestamp>`”, forces HTTPS download; file signed with internal X.509 certificate for integrity verification.<br>**Negative cases:** PDF generation fails → UI shows “Export failed – contact IT” and logs `PDF_ERROR`; Clinician lacks permission for certain fields → those fields omitted but watermark remains. |
-|
-| AC-005| US-004 | Admin authenticated with role `admin` and audit-log view mode enabled | Admin queries audit log for specific patient UUID over past 30 days System returns immutable list of events ([CREATE,READ,UPDATE,EXPORT]) each containing event type, actor ID, timestamp, source IP, cryptographic hash of original record version; response delivered over TLS 1.3 and read-only.<br>**Negative cases:** Query exceeds 10 000 rows → pagination enforced; Attempt to tamper via API → 403 and incident logged. |
-|
+| ID | User Story | Given | When | Then |
+|--------|------------|-------|------|------|
+| AC-001 | US-001 | Patient accesses the intake URL over TLS 1.3 and browser supports Web Crypto API | Patient fills all required fields and clicks **Submit** | Each field is encrypted with AES‑256‑GCM before persistence; server stores only ciphertext; TLS‑protected POST returns HTTP 201 with submission UUID. **Negative:** Missing TLS → 400; No Web Crypto → server‑side encryption fallback; Payload >5 MB → 413 and event logged. |
+| AC-002 | US-001 | Patient has completed encrypted submission successfully | Patient attempts to view confirmation page via same session token | Page shows masked confirmation number and message “Your information has been securely received.” No plaintext appears in HTML source or network trace. **Negative:** Session token expired → redirect with “Session expired”; CSRF token missing → 403. |
+| AC-003 | US-002 | Front-desk clerk authenticated with role `front_desk` and valid session token | Clerk searches patient by MRN and selects **View Intake** | System decrypts only authorized fields (demographics, insurance) and renders read‑only; audit log records READ event with timestamp and clerk ID. **Negative:** Clerk attempts restricted clinical notes → UI hides section and logs UNAUTHORIZED_READ. |
+| AC-004 | US-003 | Clinician authenticated with role `clinician` and has selected a patient record | Clinician clicks **Export PDF Summary** | Service generates PDF/A‑2b with watermark and timestamp, forces HTTPS download; file signed with X.509 certificate. **Negative:** PDF generation fails → UI shows “Export failed” and logs `PDF_ERROR`. |
+| AC-005 | US-004 | Admin authenticated with role `admin` and audit-log view mode enabled | Admin queries audit log for specific patient UUID over past 30 days | System returns immutable list of events with event type, actor ID, timestamp, source IP, cryptographic hash; response delivered over TLS 1.3. **Negative:** Query exceeds 10 000 rows → pagination enforced; Attempt to tamper via API → 403 and incident logged. |
+
 
 ## Edge‑Case & Failure Scenarios
 
@@ -165,7 +161,7 @@ And any missing entry triggers an alert flagged as KPI‑003 deviation
 | Integration – Form Submission Flow | US‑001 end-to-end submission | KPI‑001 (system availability) | AC‑001 latency ≤ 2 s under 100 concurrent users | Pass  |
 | Security – Role Access Checks | US‑002, US‑003, US‑004 | KPI‑002 (zero security incidents) | AC‑003, AC‑004, AC‑005 unauthorized attempts logged = 0 false negatives | Pass  |
 | Functional – PDF Export Validation | US‑003 PDF generation | KPI‑004 (PDF integrity) | Watermark present 100%; ISO‑8601 timestamp format ≥ 99%; signature verification success ≥ 99% | Pass  |
- | Audit Log Integrity Test | US‑004 log retrieval | KPI\-005 (audit log completeness) | Immutable entries ≥ 99.99% over 30 day retention; pagination works correctly | Pass  |
+ | Audit Log Integrity Test | US‑004 log retrieval | KPI-005 (audit log completeness) | Immutable entries ≥ 99.99% over 30 day retention; pagination works correctly | Pass  |
 
 ## Traceability
 

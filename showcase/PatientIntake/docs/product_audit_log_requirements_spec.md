@@ -22,7 +22,7 @@
 
 ### 3.1 Audit Log Schema
 
-sql
+```sql
 CREATE TABLE audit_log (
     log_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     patient_id UUID REFERENCES patients(patient_id),
@@ -38,6 +38,7 @@ CREATE TABLE audit_log (
     retention_period_years INT NOT NULL DEFAULT 7,
     timestamp_status VARCHAR(16) DEFAULT 'SYNCHRONIZED'
 );
+```
 
 * **Immutability** – Row‑level security policy denies UPDATE/DELETE on `audit_log`. A BEFORE INSERT trigger computes `hash_chain` as `SHA256(prev_hash || new_row_data)`. 
 * **Retention** – Partitioned by month; a nightly job moves partitions older than 7 years to WORM storage (e.g., AWS S3 Object Lock). 
@@ -46,8 +47,9 @@ CREATE TABLE audit_log (
 
 ### 3.2 Indexes for Performance
 
-sql
+```sql
 CREATE INDEX idx_audit_patient_ts ON audit_log(patient_id, timestamp DESC);
+```
 CREATE INDEX idx_audit_actor_op ON audit_log(actor_id, operation);
 
 These support fast compliance reporting and role‑based queries.

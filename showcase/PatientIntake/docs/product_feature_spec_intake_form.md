@@ -131,7 +131,7 @@ All public endpoints enforce per‑tenant rate limits (e.g., 200 requests/minute
 ### 8. Design Needs (to be defined by Design)
 1. **Field‑level encryption library** – open source choice (e.g., libsodium wrapper) and key rotation strategy aligned with **NFR‑002**, **FR‑011**, **NFR‑007**.
 2. **UI flow diagrams** for each persona covering error states listed in acceptance criteria and SaaS rate limiting feedback screens.
-3. **Audit‐log schema** – columns (`event_type`, `actor_id`, `timestamp_utc`, `object_id`, `change_hash`) with retention policy of 7 years (**NFR‑003**) and immutable signing (**FR‑004**, **KPI‑003`).
+3. **Audit‐log schema** – columns (`event_type`, `actor_id`, `timestamp_utc`, `object_id`, `change_hash`) with retention policy of 7 years (**NFR‑003**) and immutable signing (**FR‑004**, **KPI‑003**).
 4. **PDF generation pipeline** – library selection (WeasyPrint or PDFKit), watermark implementation details, digital signature format (PKCS#7).
 5. **TLS configuration profile** – cipher suites aligned with OpenSSL best practices for HIPAA and SOC 2; enforce TLS 1.3 minimum (**FR‑002**, **FR‑003**, **FR‑006**) .
 6. **Role‐based access control matrix** – mapping of PER‑01…PER‑04 to CRUD permissions on intake records and PDFs; includes multi‐tenant isolation rules (**FR‑011**, **NFR‑007**) .
@@ -142,49 +142,13 @@ All public endpoints enforce per‑tenant rate limits (e.g., 200 requests/minute
 ### 9. Security & Compliance Highlights
 - **In‐Transit Protection:** All HTTP traffic uses TLS 1.3 minimum; HSTS header set to max‐age 31536000 seconds.
 - **At‐Rest Protection:** Field‐level AES‑256‑GCM encryption with per‐field keys derived from a master key stored in an HSM or Docker secret; keys rotate quarterly (**NFR‐002**, **FR‐011**) .
-bsp;	   	   
-- **Audit Logging:** Immutable append‐only log written to PostgreSQL audit_log table; entries signed with RSA‐2048 private key to prevent tampering (**FR‐004**, **KPI‐003**) .
-- **PDF Hardening:** PDFs generated as PDF/A‑2b compliant files; watermark includes “Confidential – Patient Intake” plus UTC timestamp; digital signature validates integrity (**AC‐004**) .
-a - *Key Management:* RSA key pairs rotated quarterly; automated rotation scripts referenced in US‐004 acceptance criteria (**NFR‐002**) .
-a - *Multi‐Tenant Isolation:* Tenant scoped schemas + row level security enforce strict data segregation (**FR‐011**) .
-a - *Scalability:* Stateless services behind load balancer; database sharding based on tenant ID supports horizontal scaling (**NFR‐007**) .
-a - *Monitoring & Alerting:* Prometheus metrics exported; Grafana dashboards track SLA compliance; alerts on high error rates or latency breaches (**AC‐008**) .
-a - *Rate Limiting:* Per tenant request caps protect against abuse (**AC‐008**) .
-a - *Disaster Recovery:* Daily encrypted backups stored offsite; automated restore tests quarterly (**KPI‐001**) .
-a - *Compliance:* Aligns with HIPAA §164.312(a)(2)(iv), SOC 2 Security Trust Services Criteria, GDPR data protection principles where applicable (**KPI‐003**) .
-a - *Availability:* Target 99.9% uptime via redundant containers and health checks (**KPI‐001**) .
-a - *Performance:* Target sub‑200 ms API response time under load (**NFR‐007**) .
-a - *Audit Retention:* 7 years per regulatory requirement (**NFR‐003**) .
-a - *Encryption at Rest:* AES–256–GCM per field (**FR‐003**) .
-a - *TLS Configuration:* TLS 1.3 enforced across all services (**FR‐002**) .
-a - *Key Rotation Automation:* Scripts integrated into CI/CD pipeline (**NFR‐002**) .
-a - *Multi-Tenancy:* Tenant isolation enforced at DB layer (**FR‐011**) .
-a - *Scalability:* Horizontal scaling via container orchestration (**NFR‐007**) .
-a - *Monitoring:* Centralized logging via ELK stack; metrics via Prometheus (**AC‐008**) .
-a - *Rate Limiting:* Enforced per tenant (**AC‐008**) .
-a - *Backup Retention:* 30 day rolling window plus archive (…)
-a - *Disaster Recovery Testing:* Quarterly drills ensure RTO < 30 min (**KPI 001**) .
-a - *Compliance Reporting:* Automated generation of audit reports for regulators (**KPI 003**) .
-a - *Security Incident Response:* Defined playbook for breach handling (**KPI 002**) .
-a - *Data Residency:* All data stored within approved geographic region (**KPI 004**) .
-a - *Encryption Key Management:* HSM-backed master key rotation (**NFR 002**) .
-a - *Access Controls:* Zero Trust model enforced via RBAC (**NFR 001**) .
-a - *Logging:* Immutable logs stored in append-only tables (**FR 004**) .
-a - *Audit Trail Visibility:* UI for compliance officers to query logs (**KPI 003**) .
-a - *Performance Monitoring:* Real-time dashboards track latency (…)
-a - *Scalability Testing:* Load tests simulate peak tenant traffic (…)
-a - *Security Testing:* Penetration testing quarterly (…)
-a - *Compliance Audits:* External auditors verify controls annually (…)
-a - *Documentation:* Up-to-date runbooks maintained in Confluence (…)
-a - *Training:* Staff trained on security best practices annually (…)
-a - *Incident Logging:* All incidents recorded in ticketing system (…)
-a - *Change Management:* All config changes reviewed via pull request workflow (…)
-a - *Versioning:* Semantic versioning applied to API contracts (…)
-a - *Deprecation Policy:* Deprecated endpoints announced 90 days prior (…)
-a - *Testing Automation:* CI pipeline runs unit/integration tests on every commit (…)
-a - *Code Review:* Mandatory peer review for all changes (…)
-a - *Static Analysis:* SonarQube scans code base nightly (…)
-a - *Dependency Management:* Dependabot alerts enabled (…)
-a - *Container Hardening:* Minimal base images used; CVE scanning performed (…)
-a - *Network Segmentation:* Internal services isolated via Docker networks (…)
-a - *Secret Management:* Docker secrets store encryption keys securely (…)
+- **Audit Logging:** Immutable append‑only log written to PostgreSQL audit_log table; entries signed with RSA‑2048 private key to prevent tampering (**FR‑004**, **KPI‑003**).
+- **PDF Hardening:** PDFs generated as PDF/A‑2b compliant files; watermark includes "Confidential – Patient Intake" plus UTC timestamp; digital signature validates integrity (**AC‑004**).
+- **Key Management:** RSA key pairs rotated quarterly; automated rotation scripts referenced in US‑004 acceptance criteria (**NFR‑002**).
+- **Multi‑Tenant Isolation:** Tenant‑scoped schemas and row‑level security enforce strict data segregation (**FR‑011**).
+- **Scalability:** Stateless services behind load balancer; database sharding based on tenant ID supports horizontal scaling (**NFR‑007**).
+- **Monitoring & Alerting:** Prometheus metrics exported; Grafana dashboards track SLA compliance; alerts on high error rates or latency breaches (**AC‑008**).
+- **Rate Limiting:** Per‑tenant request caps protect against abuse (**AC‑008**).
+- **Disaster Recovery:** Daily encrypted backups stored offsite; automated restore tests quarterly (**KPI‑001**).
+- **Availability:** Target 99.9% uptime via redundant containers and health checks (**KPI‑001**).
+- **Audit Retention:** 7 years per regulatory requirement (**NFR‑003**).
