@@ -1,71 +1,104 @@
-# Inception Technology Strategy
+# Open-Source & Air-Gap Technology Strategy
 
 ## 1. Executive Summary
+This artifact defines the strategic mandate for the PatientIntake system to operate exclusively on open-source software (OSS) within a strictly air-gapped, on-premises environment. It establishes the selection criteria for OSS components based on HIPAA Security Rule alignment, defines the operational model for offline dependency management, and specifies the data import/export protocols required to maintain system integrity without external cloud dependencies.
 
-This document defines the technology strategy for the PatientIntake system, a HIPAA-compliant patient intake web application. The strategy mandates the exclusive use of open-source technologies to ensure cost efficiency, vendor independence, and alignment with the on-premises deployment model. The architecture is built around a structured web form for data capture, a local PostgreSQL database for secure storage, and Docker Compose for deterministic, air-gap capable deployment. This strategy explicitly maps the required open-source components to the project's functional and compliance requirements, establishing the foundational technical decisions for the Design and Development phases.
+### 2.1 Strategic Constraint
+The PatientIntake system is bound by a hard business constraint: **No proprietary software, SaaS dependencies, or external cloud services are permitted.** All components must be open-source, self-hosted, and capable of running in an isolated network environment.
 
-## 2. Open-Source Technology Stack Selection
+### 2.2 OSS Selection Criteria
+All selected technologies must satisfy the following criteria to ensure compliance, security, and maintainability:
 
-The following table defines the approved open-source technology stack. Each selection is justified by its ability to meet HIPAA compliance requirements, support on-premises deployment, and maintain a robust open-source ecosystem for long-term maintenance.
-
-| Component Category | Selected Technology | Justification & Strategic Fit |
+| Criterion | Requirement | Rationale |
 | :--- | :--- | :--- |
-| **Web Form Framework** | React (with TypeScript) | Industry-standard open-source library for building structured, accessible, and type-safe user interfaces. Enables robust client-side validation for patient demographics and medical history, reducing server load and improving user experience. |
-| **Backend API** | Python (FastAPI) | High-performance, open-source web framework. Native support for asynchronous operations and automatic API documentation (OpenAPI/Swagger). Strong ecosystem for data validation (Pydantic) and integration with PostgreSQL. |
-| **Primary Data Store** | PostgreSQL | The mandated relational database. Chosen for its ACID compliance, robust JSONB support for flexible medical history storage, and advanced security features (row-level security, encryption extensions). Fully open-source and suitable for on-premises deployment. |
-| **PDF Generation** | WeasyPrint | Open-source library for converting HTML/CSS to PDF. Allows for the generation of standardized, watermarked intake summaries using the same HTML templates as the web form, ensuring consistency and reducing maintenance overhead compared to binary PDF libraries. |
-| **Container Orchestration** | Docker Compose | The mandated deployment tool. Provides a declarative, single-file definition of the multi-container application (Web, API, DB). Essential for the air-gap requirement, as it allows the entire environment to be version-controlled and deployed without external cloud dependencies. |
-| **Encryption/Security** | OpenSSL / libsodium | Standard open-source cryptographic libraries. Used for implementing field-level encryption at rest and in transit (TLS 1.2+). Ensures compliance with HIPAA Security Rule 164.312(c) and (e) without relying on proprietary key management services. |
+| **License** | Permissive (MIT, Apache 2.0) or Copyleft (GPL, AGPL) with clear commercial usage rights. | Ensures legal compliance and avoids vendor lock-in. |
+| **HIPAA Alignment** | Must support field-level encryption, role-based access control (RBAC), and immutable audit logging. | Directly satisfies HIPAA Security Rule technical safeguards. |
+| **Air-Gap Capability** | Must function without external network calls (e.g., no telemetry, no auto-update checkers). | Ensures data sovereignty and compliance with air-gap operational model. |
+| **Community Support** | Active maintenance, documented security advisories, and available local deployment guides. | Ensures long-term viability and security patching in isolation. |
+| **Data Residency** | Must store all data locally (PostgreSQL) with no external data exfiltration. | Meets organizational data sovereignty requirements. |
 
-### 2.1 Docker Compose Architecture
+### 2.3 Prohibited Patterns
+- **Telemetry/Analytics:** No embedded analytics or usage tracking that transmits data externally.
+- **Auto-Updates:** No background processes that check for updates or download patches from the internet.
+- **Proprietary Extensions:** No use of proprietary plugins or extensions that require external licensing servers.
 
-The system is deployed as a set of interconnected services defined in a single `docker-compose.yml` file. This architecture ensures that all dependencies are explicitly declared and version-controlled.
+## 3. Air-Gap Operational Model
 
-*   **Frontend Service:** Serves the React application. Static files are served via a lightweight Nginx container.
-*   **Backend Service:** Runs the FastAPI application. Handles business logic, form validation, and encryption/decryption operations.
-*   **Database Service:** Runs PostgreSQL. Stores all patient data, audit logs, and user credentials. Data is persisted via a named Docker volume to ensure durability across container restarts.
+### 3.1 Definition
+The "Air-Gap" model requires that the PatientIntake system operates in a network segment with no direct connection to the public internet. All software updates, dependency installations, and data transfers must occur via secure, manual, or offline pipelines.
 
-### 2.2 Air-Gap Deployment Constraints
+### 3.2 Offline Dependency Management
+To maintain the open-source stack without external connectivity:
+1. **Dependency Mirroring:** A designated "Update Workstation" (connected to the internet) will periodically fetch the latest secure versions of all OSS dependencies (e.g., PostgreSQL, Python packages, Docker images) and store them in a local, air-gapped repository (e.g., local PyPI mirror, local Docker registry).
+2. **Secure Transfer:** Updates are transferred to the production environment via encrypted, tamper-evident media (e.g., encrypted USB drives) or a secure, one-way data diode.
+3. **Verification:** All transferred artifacts must be verified against cryptographic checksums (SHA-256) before installation to ensure integrity.
 
-The on-premises, air-gapped deployment model imposes strict constraints on technology selection and operational procedures:
+### 3.3 Update Pipeline
+1. **Patch Identification:** Security advisories are monitored on the Update Workstation.
+2. **Artifact Build:** New Docker images and dependency bundles are built locally.
+3. **Transfer:** Artifacts are moved to the air-gapped environment.
+4. **Deployment:** Docker Compose is used to update services with zero downtime, using named volumes to preserve data.
 
-1.  **No External Dependencies:** All Docker images must be built from scratch or from official open-source base images that are cached locally. No runtime pulls from public registries (e.g., Docker Hub) are permitted during deployment.
-2.  **Dependency Management:** The Software Bill of Materials (SBOM) for all containers must be generated during the build process. This SBOM is used to verify the integrity of the air-gapped environment against known CVEs using offline scanning tools.
-3.  **Patch Management:** Security patches and dependency updates must be applied in a connected development environment, tested, and then manually imported into the air-gapped production environment via secure, audited transfer mechanisms (e.g., encrypted USB drives or secure file transfer protocols over isolated networks).
-4.  **Monitoring:** Local monitoring tools (e.g., Prometheus/Grafana stack, deployed as additional Docker containers) must be used to track system health, as external cloud-based monitoring services are unavailable.
+### 4.1 Secure Data Export (PDF Intake Summary)
+Authorized staff (Admin, Clinician) can generate PDF intake summaries. To ensure integrity and traceability in an air-gapped environment:
+- **Watermarking:** Every exported PDF must include a dynamic watermark containing the user's identity, timestamp, and IP address.
+- **Audit Logging:** Every export event is logged in the PostgreSQL audit table with the user ID, timestamp, and file hash.
+- **Access Control:** Only users with the `Clinician` or `Admin` role can trigger the export. `Front Desk` and `Patient` roles are denied.
 
-## 3. Security & Compliance Technology Controls
+### 4.2 Data Import Protocol
+For initial data migration or bulk updates:
+- **Format:** CSV or JSON files, encrypted at rest using AES-256.
+- **Validation:** All imported data must pass schema validation and HIPAA compliance checks (e.g., no PII in non-encrypted fields) before ingestion.
+- **Audit Trail:** Import operations are logged as bulk transactions, with a summary of records processed and any errors encountered.
 
-### 3.1 Field-Level Encryption
+## 5. HIPAA Security Rule Mapping
 
-To comply with HIPAA Security Rule 164.312(c)(1) and (c)(2)(i), sensitive patient data (demographics, insurance, medical history) must be encrypted at the application level before being stored in PostgreSQL.
+The following table maps key HIPAA Security Rule technical safeguards to specific open-source configuration parameters or architectural patterns:
 
-*   **Strategy:** The Backend Service will handle encryption and decryption. Sensitive fields will be encrypted using AES-256-GCM (via OpenSSL or libsodium) before insertion into the database.
-*   **Key Management:** Encryption keys will be managed via a local Key Management Service (KMS) or environment variables injected into the Backend Service container. Key rotation policies will be defined in the Design phase.
-*   **Audit Trail:** All encryption/decryption operations will be logged in the audit trail to ensure traceability.
+| HIPAA Safeguard | Technical Implementation | OSS Component/Configuration |
+| :--- | :--- | :--- |
+| **Access Control (164.312(a)(1))** | Role-Based Access Control (RBAC) with least privilege. | PostgreSQL Row-Level Security (RLS) + Application-level RBAC. |
+| **Audit Controls (164.312(b))** | Immutable audit log of all read/write operations. | PostgreSQL `pgAudit` extension + Application-level logging. |
+| **Integrity (164.312(c)(1))** | Field-level encryption for PHI at rest and in transit. | PostgreSQL `pgcrypto` + TLS 1.3 for transit. |
+| **Transmission Security (164.312(e)(1))** | Encryption of PHI during transmission. | TLS 1.3 for all web traffic; no HTTP. |
+| **Person or Entity Authentication (164.312(d))** | Multi-factor authentication (MFA) for administrative access. | Application-level MFA (e.g., TOTP) for Admin/Clinician roles. |
 
-### 3.2 Role-Based Access Control (RBAC)
+## 6. Technology Stack Selection
 
-Access to the system will be enforced at both the application and database layers.
+### 6.1 Core Components
+- **Database:** PostgreSQL (with `pgcrypto` and `pgAudit` extensions).
+- **Deployment:** Docker Compose (for deterministic, isolated environments).
+- **Runtime:** Python (with `PYTHONUNBUFFERED=1` for logging integrity).
+- **Web Server:** Nginx (reverse proxy with TLS termination).
 
-*   **Application Layer:** The Backend Service will implement RBAC middleware to restrict access to API endpoints based on user roles (Admin, Clinician, Front Desk). Each user will have a unique identifier, and shared accounts are prohibited.
-*   **Database Layer:** PostgreSQL Row-Level Security (RLS) policies will be configured to ensure that users can only access data relevant to their role. For example, Front Desk staff may only create records, while Clinicians can read and update them.
+### 6.2 Justification
+- **PostgreSQL:** Industry-standard, robust, supports row-level security and encryption extensions, aligns with open-source mandate.
+- **Docker Compose:** Simplifies on-premises deployment, ensures environment consistency, supports air-gap deployment via image export/import.
+- **Field-Level Encryption:** Provides granular protection for PHI, ensuring that even if the database is compromised, specific fields remain unreadable without the encryption key.
 
-### 3.3 Audit Logging
+## 7. Governance and Accountability
 
-HIPAA Security Rule 164.312(b) requires full audit logs of all access to electronic protected health information (ePHI).
+| Role | Responsibility |
+| :--- | :--- |
+| **Project Sponsor** | Ultimate authority for budget and strategic alignment. |
+| **Product Owner** | Responsible for prioritizing requirements and accepting deliverables. |
+| **Technical Lead** | Responsible for architectural decisions and technical feasibility. |
+| **Compliance Officer** | Responsible for validating HIPAA compliance of the design and implementation. |
 
-*   **Implementation:** The Backend Service will log every read and write operation to a dedicated `audit_logs` table in PostgreSQL. Logs will include timestamps, user ID, action performed, and record ID.
-*   **Immutability:** Audit logs will be designed to be append-only and immutable to prevent tampering. Retention will be set to 6 years, as required by HIPAA.
+## 8. Knowledge Gaps
 
-## 4. Risk Management: Open-Source & On-Premises
+| Gap | Owner | Evidence Needed |
+| :--- | :--- | :--- |
+| **Specific Encryption Algorithm** | Compliance Officer | HIPAA Security Rule technical safeguard specifications or internal security policy. |
+| **Data Retention Period** | Compliance Officer | State/federal retention laws or internal data retention policy. |
+| **Hardware Requirements** | IT Operations | Performance benchmarks for expected patient volume and concurrent users. |
 
-## 5. Next Steps
+## 9. Approval and Sign-Off
 
-1.  **Design Phase:** Define specific encryption algorithms and key management procedures. Detail the API contracts and database schemas. Finalize the RBAC matrix.
-2.  **Development Phase:** Implement the React frontend, FastAPI backend, and PostgreSQL database. Integrate field-level encryption and audit logging.
-3.  **Testing Phase:** Validate access controls, encryption, and audit logging. Perform security scanning of the Docker images.
-4.  **Deployment Phase:** Deploy via Docker Compose with air-gap configuration. Document the air-gap setup guide.
-5.  **Operations Phase:** Conduct regular access reviews and audit log reviews. Monitor system health using local tools.
+| Role | Name | Date |
+| :--- | :--- | :--- |
+| **Prepared By** | Executor (Inception Phase) | [Current Date] |
+| **Reviewed By** | [To be defined by VP] | [Date] |
+| **Approved By** | [To be defined by VP] | [Date] |
 
-This technology strategy ensures that the PatientIntake system is built on a secure, compliant, and maintainable open-source foundation, fully aligned with the on-premises deployment and air-gap constraints.
+This strategy establishes the foundational constraints and operational model for the PatientIntake system, ensuring compliance with HIPAA and organizational data sovereignty requirements.
