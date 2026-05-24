@@ -1,81 +1,69 @@
-# HIPAA Compliance & Data Governance Framework
+# HIPAA Compliance & Regulatory Constraints
 
-## 1. HIPAA Privacy & Security Rule Mapping
+### 1.2 Business Objectives
+1. **Regulatory Compliance & Risk Mitigation**: Achieve and maintain full HIPAA Privacy and Security Rule compliance by enforcing field-level encryption for all PHI (demographics, insurance, medical history) at rest and in transit. This eliminates the risk of data breaches and associated regulatory fines.
+2. **Data Sovereignty & Operational Control**: Deploy exclusively on-premises using open-source technologies and Docker Compose. This ensures no external cloud dependencies, allowing the organization to maintain complete control over its sensitive patient data in an air-gapped environment.
+3. **Operational Efficiency & Accountability**: Replace manual or fragmented intake processes with a structured, automated web form. Implement granular Role-Based Access Control (RBAC) for Admin, Clinician, and Front Desk roles, coupled with a comprehensive audit log of every read/write operation to ensure full traceability and accountability.
+4. **Secure Data Export**: Enable authorized staff to generate watermarked, timestamped PDF intake summaries, ensuring that sensitive data is only accessible to verified personnel and that all exports are logged for compliance review.
 
-This section maps the PatientIntake system's functional requirements to specific HIPAA Security Rule (45 CFR Part 164, Subpart C) controls. The mapping ensures that every technical control implemented in the Design and Development phases has a direct regulatory obligation.
+### 1.3 Key Success Criteria
+*   **HIPAA Compliance**: 100% of PHI fields are encrypted at rest and in transit.
+*   **Air-Gap Deployment**: The system operates successfully in a local, on-premises environment with zero external network dependencies.
+*   **Auditability**: Every data access and modification event is logged with user ID, timestamp, and action type.
+*   **Access Control**: RBAC strictly enforces least-privilege access for Admin, Clinician, and Front Desk roles.
 
-| HIPAA Control ID | Control Description | System Component | Implementation Constraint |
-|---|---|---|---|
-| 164.312(a)(1) | Access Control | Web Form, PostgreSQL | Unique user identification for Admin, Clinician, and Front Desk roles. |
-| 164.312(a)(2)(i) | Unique User Identification | RBAC Matrix | System must enforce distinct login credentials for every user. |
-| 164.312(b) | Audit Controls | PostgreSQL Audit Log | Immutable logging of all access, creation, modification, and deletion of PHI. |
-| 164.312(c)(1) | Integrity | Web Form, PostgreSQL | Mechanisms to authenticate and verify that PHI has not been altered or destroyed inappropriately. |
-| 164.312(c)(2)(i) | Person or Entity Authentication | Web Form | Verification that the person or entity seeking access is the one claimed. |
-| 164.312(e)(1) | Transmission Security | Web Form, Docker Compose | Encryption of PHI in transit (TLS 1.2+) for all data entering or leaving the on-premises network. |
-| 164.312(e)(2)(ii) | Encryption | PostgreSQL, PDF Generator | Implementation of technology and policy to encrypt PHI at rest. |
+### 1.4 Business Value
+*   **Risk Reduction**: Eliminates regulatory fines and reputational damage from data breaches.
+*   **Efficiency**: Reduces administrative burden and errors in patient data collection.
+*   **Control**: Ensures complete ownership and control over sensitive patient data.
+*   **Trust**: Enhances patient trust through demonstrable commitment to data security and privacy.
 
-### 2.1 Data Classification Matrix
+## 2. HIPAA Privacy Rule: PHI Usage and Disclosure
 
-| Data Category | Examples | Classification | Handling Requirement |
-|---|---|---|---|
-| Protected Health Information (PHI) | Demographics, Insurance Info, Medical History | High Sensitivity | Field-level encryption at rest; strict RBAC; full audit logging. |
-| Non-PII Operational Data | Appointment IDs, System Logs | Low Sensitivity | Standard database storage; limited access to Admin role. |
-| Audit Trail Data | Access Logs, Export Timestamps | High Sensitivity | Immutable storage; write-only access for system; read access for Admin/Compliance. |
+The system must enforce strict usage and disclosure limitations for Protected Health Information (PHI) as defined by the HIPAA Privacy Rule. PHI includes demographics, insurance information, and medical history collected via the intake form.
 
-### 2.2 Field-Level Encryption Strategy
+| Data Field Category | PHI Classification | Permitted Internal Use | Disclosure Constraints |
+| :--- | :--- | :--- | :--- |
+| Demographics | PHI | Internal use only for intake processing | No external disclosure without explicit patient authorization |
+| Insurance Information | PHI | Internal use only for billing/verification | No external disclosure without explicit patient authorization |
+| Medical History | PHI | Internal use only for clinical review | No external disclosure without explicit patient authorization |
 
-All PHI fields are subject to field-level encryption. This ensures that even if the underlying PostgreSQL storage is compromised, the data remains unreadable without the appropriate decryption keys.
+**Binding Constraint**: The system must implement Role-Based Access Control (RBAC) to ensure that PHI is only accessible to users with a legitimate 'need-to-know' for their specific role (Admin, Clinician, Front Desk). Access must be logged for every read and write operation.
 
-- **Encryption Scope:** Demographics, Insurance Information, Medical History.
-- **Key Management:** Decryption keys are restricted to the `Clinician` and `Admin` roles. The `Front Desk` role interacts only with encrypted tokens for non-PII fields.
-- **Transit Security:** All data transmitted between the web form and the PostgreSQL database is encrypted using TLS 1.2 or higher.
+### 2.1 Access Control (164.312(a))
+*   **Unique User Identification**: Every user accessing the system must have a unique identifier (Admin, Clinician, Front Desk).
+*   **Emergency Access Procedure**: A documented procedure must exist for obtaining necessary ePHI during an emergency, subject to post-event audit review.
+*   **Automatic Logoff**: The system must automatically logoff users after a period of inactivity to prevent unauthorized access on shared workstations.
+*   **Encryption and Decryption**: PHI must be encrypted at rest (PostgreSQL) and in transit (TLS) to prevent unauthorized access if physical or network security is compromised.
 
-## 3. Role-Based Access Control (RBAC) Policy
+### 2.3 Integrity (164.312(c))
+*   **Data Integrity**: PHI must be protected against improper alteration or destruction.
+*   **Mechanism**: Implement checksums or cryptographic hashes for critical data fields to detect unauthorized changes.
+*   **Policy**: Implement strict input validation and sanitization to prevent data corruption or injection attacks.
 
-The PatientIntake system enforces a strict RBAC model based on the principle of least privilege. The following matrix defines the authorized actions for each role. This matrix supersedes any previous draft matrices to resolve inconsistencies.
+### 2.4 Transmission Security (164.312(e))
+*   **Network Security**: Implement mechanisms to authenticate and encrypt ePHI when it is sent over an electronic network.
+*   **Protocol**: Use TLS 1.2 or higher for all data in transit.
+*   **Air-Gap Constraint**: In the air-gapped environment, internal service-to-service communication must also be encrypted to prevent lateral movement attacks.
 
-| Role | Data Entry | Read Access | Edit Access | Export Access | Audit Access |
-|---|---|---|---|---|---|
-| Admin | System Config | All Records | System Config | All Records | Full Audit |
-| Clinician | Clinical Notes | Assigned/Reviewed | Own Actions |  |  |
-| Front Desk | New Submissions | Pending/Own | Demographics Only | No | No |
-| Patient | Own Data | No | No | No | No |
+## 3. Operational Constraints
 
-### 3.2 Audit Log Requirements
+### 3.1 Open Source Only
+The system must be built and deployed using only open-source technologies. No commercial SaaS, proprietary libraries, or cloud-based services are permitted. This ensures full control over the codebase and data sovereignty.
 
-- **Scope:** Every read, write, update, and delete operation on PHI is logged.
-- **Content:** Each log entry must include the User ID, Timestamp, Action Type, Record ID, and IP Address.
-- **Storage:** Audit logs are stored in a dedicated, immutable PostgreSQL table. Access to this table is restricted to the `Admin` role.
-- **Retention:** Audit logs must be retained for a period of [TBD] years, in accordance with HIPAA record retention requirements. *Note: Specific retention period to be defined by Compliance Officer.*
+### 3.2 Air-Gapped On-Prem
+The system must be deployable via Docker Compose in a fully isolated, on-premises environment. No external network connectivity is allowed for data processing or storage. This constraint impacts dependency management, patching, and key rotation strategies.
 
-### 3.3 PDF Export Governance
+## 4. Risk Summary
 
-PDF exports of patient intake summaries are a high-risk activity and are subject to strict controls.
+| Risk | Trigger | Impact | Mitigation | Owner |
+| :--- | :--- | :--- | :--- | :--- |
+| Key Rotation Failure | Encryption key becomes compromised or lost | High (Data inaccessibility) | Implement robust key management and backup procedures | Security Architect |
+| Air-Gap Deployment Complexity | Inability to update dependencies or patches without external network access | Medium (Operational inefficiency) | Develop a documented, repeatable air-gap update process | DevOps Engineer |
+| RBAC Misconfiguration | Incorrect role assignment or permission inheritance | High (HIPAA violation) | Rigorous testing of access control edge cases and regular audit log reviews | Security Architect |
 
-- **Authorization:** Only `Admin` and `Clinician` roles are authorized to generate PDF exports.
-- **Watermarking:** Every exported PDF must include a dynamic watermark containing the user ID, timestamp, and record ID.
-- **Logging:** Every export event is logged in the audit trail with the specific record ID and the user who initiated the export.
+## 5. Knowledge Gaps
 
-## 4. On-Premises Data Residency Enforcement
-
-Given the on-premises deployment model, strict data residency controls are enforced to ensure that PHI never leaves the authorized local environment.
-
-### 4.1 Deployment Constraints
-
-- **No External Cloud Dependencies:** The system must operate entirely within the on-premises network. No data is transmitted to external cloud services.
-- **Docker Compose Isolation:** The system is deployed using Docker Compose, ensuring that all services (PostgreSQL, Web Form, PDF Generator) are isolated within the local container network.
-- **Air-Gap Capability:** The system must be deployable in an air-gapped environment, with no external network connectivity required for operation.
-
-## 5. Knowledge Gaps & Unresolved Decisions
-
-The following items require resolution by the designated owners before the Design phase can proceed.
-
-| Gap ID | Description | Impact | Owner | Resolution Required |
-|---|---|---|---|---|
-| KG-01 | Data Retention Period | Compliance Risk | Compliance Officer | Define specific retention period (e.g., 6 years, 7 years) based on state/federal regulations. |
-| KG-02 | Encryption Algorithm Specification | Security Risk | Security Architect | Specify the exact encryption algorithm (e.g., AES-256-GCM) and key management strategy. |
-| KG-03 | Incident Response Plan | Operational Risk | Compliance Officer | Define the specific steps for breach notification and containment within the on-premises environment. |
-
-## 6. Decision Rationale
-
-The decision to use on-premises deployment with Docker Compose is driven by the requirement for strict data residency and the absence of external cloud dependencies. This decision constrains the Design phase to focus on local infrastructure management and air-gap setup. The RBAC model is designed to minimize the attack surface by restricting access to PHI only to roles that require it for clinical or administrative purposes.
+*   **Data Retention Period**: The specific HIPAA-mandated or organizational data retention period for patient intake records is not defined. Decision owner: Compliance Officer. Evidence needed: Organizational policy or legal requirement.
+*   **Key Management Strategy**: The specific mechanism for managing encryption keys (e.g., HSM, KMS, local file) is not defined. Decision owner: Security Architect. Evidence needed: Security policy or infrastructure capabilities.
+*   **Backup & Recovery RPO/RTO**: The required Recovery Point Objective (RPO) and Recovery Time Objective (RTO) for the on-premises system are not defined. Decision owner: IT Operations. Evidence needed: Business continuity plan.

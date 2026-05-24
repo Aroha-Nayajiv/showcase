@@ -1,70 +1,82 @@
 # HIPAA Patient Intake System Project Charter
 
-## 1. Business Vision and Value Proposition
+## 1. Business Vision and Strategic Problem Statement
 
-The PatientIntake project establishes a secure, on-premises, open-source web application to digitize and secure the patient intake process. The core business value proposition is to eliminate the security risks and inefficiencies of paper-based or legacy digital intake methods by providing a HIPAA-compliant, air-gapped capable system. This system ensures 100% audit trail coverage, zero unauthorized access incidents, and successful deployment in isolated environments without external cloud dependencies.
+### 1.1 The Core Business Problem
+The organization currently lacks a secure, sovereign method for collecting and managing patient intake data. Reliance on fragmented, potentially cloud-exposed, or manual processes creates unacceptable regulatory risk under HIPAA and operational friction for clinical staff. The core business problem is the inability to guarantee data sovereignty and strict compliance while maintaining a streamlined patient experience.
 
-## 2. Core Business Capabilities
+### 1.2 Strategic Vision
+To deploy a self-contained, HIPAA-compliant PatientIntake system that ensures:
+1. **Data Sovereignty**: All patient data (demographics, insurance, medical history) remains strictly within the organization's on-premises infrastructure, eliminating external cloud dependencies.
+2. **Regulatory Compliance**: Full adherence to HIPAA Privacy and Security Rules through field-level encryption and comprehensive audit logging.
+3. **Operational Efficiency**: A structured, user-friendly web interface for Front Desk staff to capture data accurately, reducing administrative burden and errors.
 
-The system must deliver three primary business capabilities:
+### 1.4 High-Level Stakeholder Map
+The following roles are established based on the project DNA and system blueprint. Detailed governance and interaction matrices are maintained in the `inception_stakeholder_map` artifact.
 
-1. **Secure Patient Data Ingestion**: Collect patient demographics, insurance information, and medical history via a structured web form. All data must be encrypted at rest (field-level) and in transit (TLS 1.2+).
-2. **Role-Based Access Governance**: Enforce strict access controls for Admin, Clinician, and Front Desk roles. Access to sensitive data and export functions must be governed by RBAC policies.
-3. **Compliant PDF Reporting**: Generate PDF intake summaries for authorized staff only. Exports must include watermarking and access timestamps to ensure traceability and prevent unauthorized distribution.
+| Role | Primary Responsibility | Access Scope |
+| :--- | :--- | :--- |
+| **Patient** | Submits intake data via web form. | Read-only access to own submitted data (if applicable). |
+| **Front Desk** | Captures demographics and insurance info. | Create/Update demographic/insurance fields; cannot view clinical notes. |
+| **Clinician** | Reviews and updates medical history. | View/Update medical history; cannot modify administrative audit logs. |
+| **Admin** | Manages system configuration and compliance. | Manage user roles; view audit logs; cannot edit clinical data. |
 
-## 3. Stakeholder Needs and Access Requirements
+### 1.6 Data Handling & Encryption Mandates
+To comply with the Security Rule's requirements for protecting ePHI, the system must enforce specific data handling standards.
 
-| Role | Primary Need | Data Access Scope | Governance Constraint |
-|---|---|---|---|
-| Admin | System configuration and user management | Full system access, including audit logs and user roles | Must not access clinical data for operational purposes |
-| Clinician | Review and manage patient intake data | Read/Write access to medical history and demographics | Must have full audit trail visibility for their submissions |
-| Front Desk | Data entry and initial patient verification | Write access to demographics and insurance; Read access to submission status | Limited to intake form fields; no access to clinical history |
-| Patient | Submit intake information | N/A (External User) | Access limited to the intake form; no access to stored data |
+*   **Field-Level Encryption**: All PHI fields (demographics, insurance information, medical history) must be encrypted at the application level before being persisted to the local PostgreSQL database. This ensures that even in the event of a database compromise, the data remains unreadable without the corresponding decryption keys.
+*   **Encryption in Transit**: All data transmissions between the web client and the on-premises server must utilize TLS 1.2 or higher to prevent interception of PHI during the intake process.
+*   **Audit Logging**: Every access, creation, modification, and deletion of a patient record must be logged. The audit log must capture the user identity, timestamp, action performed, and the specific record affected. This log is immutable and accessible only to Admins for compliance review.
 
-## 4. HIPAA Compliance and Data Governance
+### 1.7 Operational & Air-Gap Constraints
+The system's deployment model imposes additional compliance considerations regarding data sovereignty and physical security.
 
-The system must adhere to the HIPAA Security Rule. The following table maps critical requirements to business constraints:
+*   **On-Premises Deployment**: The system must be deployed entirely within the organization's local infrastructure using Docker Compose. No data may be transmitted to external cloud services for processing, storage, or analytics.
+*   **Air-Gap Readiness**: The system must be designed and documented to support an air-gapped environment, ensuring that no external network dependencies (e.g., package managers, telemetry services, cloud-based authentication providers) are required for core functionality.
+*   **Data Retention**: Data retention and disposal policies must be defined in accordance with state and federal healthcare regulations. Decision Gap: Specific retention period (e.g., 6 years, 10 years) is not yet defined and must be established by the Compliance Officer.
 
-| HIPAA Control | Data Flow | Business Constraint | Verification Method |
-|---|---|---|---|
-| 164.312(a)(1) - Access Control | Structured Web Form | Implement RBAC for Admin, Clinician, and Front Desk. Enforce unique user identification. | RBAC matrix validation in Design; Unit tests for access control edge cases. |
-| 164.312(a)(2)(iv) - Encryption | Structured Web Form (In Transit) | Enforce TLS 1.2+ for all data in transit between the patient's browser and the web application. | SSL/TLS configuration audit; Automated penetration testing for protocol version. |
-| 164.312(a)(2)(iv) - Encryption | Local PostgreSQL Database (At Rest) | Implement field-level encryption for all Protected Health Information (PHI) fields (demographics, insurance, medical history) at rest. | Encryption algorithm validation; Key management policy review. |
-| 164.312(b) - Audit Controls | All Data Flows (Read/Write) | Log every read and write operation to the local PostgreSQL audit log. Ensure logs are immutable and tamper-evident. | Audit log schema validation; Integration tests for log completeness. |
-| 164.312(c)(1) - Integrity | Structured Web Form (Submission) | Ensure data integrity during submission via field-level validation. Prevent unauthorized alteration of PHI. | Form validation unit tests; Data integrity checks in integration tests. |
-| 164.312(c)(2) - Person or Entity Authentication | PDF Export (Authorized Staff) | Require strong authentication for staff accessing the PDF export feature. | Authentication flow testing; Access control edge case tests. |
-| 164.312(d)(1) - Transmission Security | PDF Export (Export) | Secure the PDF export process to ensure only authorized staff can download summaries. Apply watermarking and access timestamps. | Export authorization tests; Watermarking and timestamp verification. |
+## 2. Success Criteria (Measurable)
 
-## 5. Business Success Metrics
+The following criteria define project success. Specific thresholds are subject to validation against organizational benchmarks.
 
-| Metric | Target | Measurement Method |
-|---|---|---|
-| HIPAA Audit Trail Coverage | 100% | Automated verification of audit log completeness for all PHI access events. |
-| Unauthorized Access Incidents | 0 | Security monitoring and incident reporting. |
-| Air-Gap Deployment Success | 100% | Successful deployment and operation in isolated environments without external cloud dependencies. |
+| Criterion | Measurement Method | Target | Owner |
+| :--- | :--- | :--- | :--- |
+| **HIPAA Compliance** | Internal/External Audit | Pass all HIPAA Security Rule controls | Compliance Officer |
+| **Air-Gap Deployment** | Operational Verification | Successful deployment in isolated network | Operations Team |
+| **Intake Efficiency** | User Survey / Time Study | Reduce intake time by X% vs. legacy method | Product Owner |
+| **Data Security** | Incident Tracking | Zero unauthorized data exfiltration incidents | Security Architect |
 
-## 6. Key Risks and Mitigations
+## 3. Key Risks (Summary)
 
-| Risk ID | Risk Description | Impact | Mitigation Strategy | Owner |
-|---|---|---|---|---|
-| R01 | Supply Chain Vulnerability in Open-Source Dependencies | High | Implement automated, offline-capable dependency scanning (e.g., OWASP Dependency-Check) integrated into the CI/CD pipeline. Maintain a strict Software Bill of Materials (SBOM) for all container images. | DevOps Lead |
-| R02 | Loss of Vendor Support for Critical Components | Medium | Establish an internal community of practice to monitor upstream project activity. Define a fallback strategy for critical components (e.g., PostgreSQL, Nginx) including internal patching capabilities or alternative open-source replacements. | CTO |
-| R03 | Compliance Validation Burden | High | Document all open-source components and their versions. Ensure that the chosen stack has established HIPAA compliance guidelines or certifications (e.g., PostgreSQL's security features) to streamline the compliance audit process. | Compliance Officer |
-| R04 | Single Point of Failure in Local Infrastructure | Medium | Implement local high-availability configurations for PostgreSQL (e.g., streaming replication) within the Docker Compose stack. Define clear RPO (Recovery Point Objective) and RTO (Recovery Time Objective) targets for local recovery. | Infrastructure Manager |
+Detailed risk analysis is maintained in the `inception_risk_register` artifact.
 
-## 7. Knowledge Gaps and Assumptions
+*   **Complexity of Field-Level Encryption**: Requires rigorous implementation to avoid data loss or access issues.
+*   **Operational Overhead**: Maintaining on-prem infrastructure requires dedicated resources.
+*   **User Adoption**: Staff may resist new workflows if the UI is not intuitive.
+*   **Key Management**: Loss of encryption keys could result in permanent data inaccessibility.
 
-- **Knowledge Gap**: Specific key management mechanism for field-level encryption is not defined. Decision owner: Security Architect. Evidence needed: Key management best practices for on-premises HIPAA systems.
-- **Assumption**: The on-premises environment provides a secure network perimeter. This assumption is reversible if network security requirements change.
-- **Assumption**: MFA is supported by the chosen open-source identity provider. This assumption is reversible if the identity provider does not support MFA.
+## 4. Decision Rationale
 
-## 8. Downstream Constraints
+This charter establishes the non-negotiable business constraints for the PatientIntake system. The decision to mandate on-premises deployment and open-source technology is driven by the need for absolute data control and cost predictability. The focus on field-level encryption and audit logging is driven by HIPAA compliance requirements. These constraints will guide all subsequent design and development decisions.
 
-- **Design Phase**: MUST implement the RBAC matrix and field-level encryption as defined in this charter. MUST design the audit log schema to support immutable logging.
-- **Development Phase**: MUST NOT use any external cloud dependencies. MUST implement all controls as defined in this charter. MUST include automated tests for access control and encryption.
-- **Testing Phase**: MUST verify all HIPAA Security Rule controls through unit and integration tests. MUST include penetration testing for network security.
+## 5. Knowledge Gaps
 
-This artifact defers to [inception_stakeholder_map] for detailed stakeholder roles and responsibilities; see that artifact for the full treatment.
-This artifact defers to [inception_scope_definition] for detailed scope boundaries; see that artifact for the full treatment.
-This artifact defers to [inception_compliance_obligations] for detailed compliance obligations; see that artifact for the full treatment.
-This artifact defers to [inception_technology_strategy] for detailed technology strategy; see that artifact for the full treatment.
+The following decisions require resolution before the Design phase can proceed. These are not implementation details but strategic decisions that impact architecture and compliance.
+
+| Gap ID | Description | Decision Owner | Impact |
+| :--- | :--- | :--- | :--- |
+| **KG-001** | Specific Encryption Algorithms and Key Management Strategy | Security Architect | Determines cryptographic libraries and key storage architecture. |
+| **KG-002** | Data Retention Period (e.g., 6 years, 10 years) | Compliance Officer | Determines database partitioning strategy and archival processes. |
+| **KG-003** | Backup and Recovery Strategy (RPO/RTO) | Operations Team | Determines infrastructure redundancy and backup automation requirements. |
+
+## 6. Approval
+
+This charter is approved by the Project Sponsor and Chief Strategy Officer. It serves as the binding document for the PatientIntake project.
+
+**Project Sponsor**: [Name]
+**Chief Strategy Officer**: [Name]
+**Date**: [Current Date]
+
+**Compliance Officer**: [Name]
+**Security Architect**: [Name]
+**Date**: [Current Date]
