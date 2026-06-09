@@ -1,6 +1,6 @@
 # pronext
 
-> [0;34m🏥 DEVAI SIMPLE — Procurement Partners (ProNext) Platform[0m
+> Build ProNext — a unified, AI-native healthcare procurement and supply chain platform targeting post-acute and non-acute providers: skilled nursing facilities, assisted living and senior care communities, rehabilitation centres, critical access hospitals, community hospitals, urgent care clinics, surgery centres, and physician groups.
 
 ## Generated Artifacts
 
