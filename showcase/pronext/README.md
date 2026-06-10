@@ -5,6 +5,7 @@
 ## Generated Artifacts
 
 - [inception compliance security architecture](docs/inception_compliance_security_architecture.md)
+- [inception risk register](docs/inception_risk_register.md)
 - [inception whole product vision](docs/inception_whole_product_vision.md)
 - [operational constraints](docs/operational_constraints.md)
 
