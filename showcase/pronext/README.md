@@ -6,6 +6,7 @@
 
 - [compliance security architecture agent governance](docs/compliance_security_architecture_agent_governance.md)
 - [compliance security architecture](docs/compliance_security_architecture.md)
+- [inception compliance security architecture data perimeter](docs/inception_compliance_security_architecture_data_perimeter.md)
 - [inception whole product vision](docs/inception_whole_product_vision.md)
 - [operational constraints](docs/operational_constraints.md)
 - [success criteria](docs/success_criteria.md)
