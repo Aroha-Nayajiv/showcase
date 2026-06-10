@@ -4,6 +4,7 @@
 
 ## Generated Artifacts
 
+- [compliance security architecture agent governance](docs/compliance_security_architecture_agent_governance.md)
 - [compliance security architecture](docs/compliance_security_architecture.md)
 - [inception whole product vision](docs/inception_whole_product_vision.md)
 - [success criteria](docs/success_criteria.md)
