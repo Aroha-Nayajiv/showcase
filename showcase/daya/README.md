@@ -8,6 +8,7 @@
 - [governance compliance](docs/governance_compliance.md)
 - [product anonymous fulfillment journey spec](docs/product_anonymous_fulfillment_journey_spec.md)
 - [product client facing exchange donor micro donation](docs/product_client_facing_exchange_donor_micro_donation.md)
+- [product financial clearing](docs/product_financial_clearing.md)
 - [product ngo governance](docs/product_ngo_governance.md)
 - [product vision and scope](docs/product_vision_and_scope.md)
 - [risk register and operating constraints](docs/risk_register_and_operating_constraints.md)
