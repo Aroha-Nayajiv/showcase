@@ -6,6 +6,7 @@
 
 - [anonymous credit fulfillment](docs/anonymous_credit_fulfillment.md)
 - [governance compliance](docs/governance_compliance.md)
+- [product anonymous fulfillment journey spec](docs/product_anonymous_fulfillment_journey_spec.md)
 - [product client facing exchange donor micro donation](docs/product_client_facing_exchange_donor_micro_donation.md)
 - [product ngo governance](docs/product_ngo_governance.md)
 - [product vision and scope](docs/product_vision_and_scope.md)
