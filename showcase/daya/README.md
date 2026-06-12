@@ -4,6 +4,7 @@
 
 ## Generated Artifacts
 
+- [anonymous credit fulfillment](docs/anonymous_credit_fulfillment.md)
 - [governance compliance](docs/governance_compliance.md)
 - [product vision and scope](docs/product_vision_and_scope.md)
 - [risk register and operating constraints](docs/risk_register_and_operating_constraints.md)
