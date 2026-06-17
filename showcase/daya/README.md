@@ -8,6 +8,7 @@
 - [compliance risk](docs/compliance_risk.md)
 - [design api surface](docs/design_api_surface.md)
 - [domain model](docs/domain_model.md)
+- [graphql contract](docs/graphql_contract.md)
 - [integration adapters](docs/integration_adapters.md)
 - [merchant journey](docs/merchant_journey.md)
 - [observability governance](docs/observability_governance.md)
