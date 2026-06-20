@@ -5,6 +5,9 @@
 ## Generated Artifacts
 
 - [project glossary](docs/project_glossary.md)
+- [product beneficiary journey](requirements/product_beneficiary_journey.md)
+- [product donor journey](requirements/product_donor_journey.md)
+- [product restaurant journey](requirements/product_restaurant_journey.md)
 - [compliance governance framework](scope/compliance_governance_framework.md)
 - [decision foundations](scope/decision_foundations.md)
 - [inception operating model](scope/inception_operating_model.md)
