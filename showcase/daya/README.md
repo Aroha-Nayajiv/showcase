@@ -5,6 +5,7 @@
 ## Generated Artifacts
 
 - [project glossary](docs/project_glossary.md)
+- [operator dashboard spec](requirements/operator_dashboard_spec.md)
 - [product beneficiary journey](requirements/product_beneficiary_journey.md)
 - [product donor journey](requirements/product_donor_journey.md)
 - [product restaurant journey](requirements/product_restaurant_journey.md)

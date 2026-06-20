@@ -1,6 +1,6 @@
 # Project Identity Glossary — DAYA
 
-> Auto-generated from the project asset registry.  Last updated: **2026-06-20 21:52 UTC**  
+> Auto-generated from the project asset registry.  Last updated: **2026-06-20 22:09 UTC**  
 > Total IDs: **61** across **5** families.
 
 ---
