@@ -1,23 +1,21 @@
 # Project Identity Glossary — DAYA
 
-> Auto-generated from the project asset registry.  Last updated: **2026-06-27 14:40 UTC**  
+> Auto-generated from the project asset registry.  Last updated: **2026-06-27 14:51 UTC**  
 > Total IDs: **94** across **5** families.
 
 ---
 
 ## Families
 
-- [Actors (ACT)](#family-act) — 6 IDs
-- [User Journeys (JNY)](#family-jny) — 10 IDs
-- [Capabilities (CAP)](#family-cap) — 9 IDs
-- [Architectural Surfaces (SUR)](#family-sur) — 11 IDs
-- [Constraints (CON)](#family-con) — 58 IDs
+- [Actors (ACT)](#actors-act) — 6 IDs
+- [User Journeys (JNY)](#user-journeys-jny) — 10 IDs
+- [Capabilities (CAP)](#capabilities-cap) — 9 IDs
+- [Architectural Surfaces (SUR)](#architectural-surfaces-sur) — 11 IDs
+- [Constraints (CON)](#constraints-con) — 58 IDs
 
 ---
 
-<a id="family-act"></a>
-
-## Actors (`ACT-`)
+## Actors ACT
 
 | ID | Label | Type | Defined In | Also Used In |
 |:---|:------|:-----|:-----------|:-------------|
@@ -28,53 +26,51 @@
 | [ACT-ADA6716160](#act-ada6716160) | Beneficiary | Actor role | [design/data_model_schema.md](design/data_model_schema.md#L41) | [design/design_api_surface.md](design/design_api_surface.md), [design/design_integration_adapters_offline_tokens.md](design/design_integration_adapters_offline_tokens.md), [design/infrastructure_topology.md](design/infrastructure_topology.md), [design/integration_adapters.md](design/integration_adapters.md), [design/security_architecture.md](design/security_architecture.md), [inception/compliance_risk.md](inception/compliance_risk.md), [inception/inception_operating_model.md](inception/inception_operating_model.md), [inception/inception_product_strategy.md](inception/inception_product_strategy.md), [inception/technical_architecture.md](inception/technical_architecture.md), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md), [product/donor_funding_activation.md](product/donor_funding_activation.md), [product/merchant_pos_integration.md](product/merchant_pos_integration.md), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md) |
 | [ACT-AF904DCFF9](#act-af904dcff9) | Merchant | Actor role | [design/data_model_schema.md](design/data_model_schema.md#L41) | [design/design_api_surface.md](design/design_api_surface.md), [design/design_integration_adapters_offline_tokens.md](design/design_integration_adapters_offline_tokens.md), [design/infrastructure_topology.md](design/infrastructure_topology.md), [design/integration_adapters.md](design/integration_adapters.md), [design/security_architecture.md](design/security_architecture.md), [inception/compliance_risk.md](inception/compliance_risk.md), [inception/inception_operating_model.md](inception/inception_operating_model.md), [inception/inception_product_strategy.md](inception/inception_product_strategy.md), [inception/technical_architecture.md](inception/technical_architecture.md), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md), [product/donor_funding_activation.md](product/donor_funding_activation.md), [product/merchant_pos_integration.md](product/merchant_pos_integration.md), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md) |
 
-<a id="act-086a974d63"></a>
+### ACT-086A974D63
 
-### ACT-086A974D63 — Platform Administrator
+**Platform Administrator**  
 
 **Type:** Actor role  
 **Referenced in:** [design/background_processing.md](design/background_processing.md#L142), [design/background_processing.md](design/background_processing.md#L284), [design/background_processing.md](design/background_processing.md#L318), [design/background_processing.md](design/background_processing.md#L587), [design/background_processing.md](design/background_processing.md#L768), [design/data_model_schema.md](design/data_model_schema.md#L41), [design/data_model_schema.md](design/data_model_schema.md#L205), [design/data_model_schema.md](design/data_model_schema.md#L258), [design/data_model_schema.md](design/data_model_schema.md#L361), [design/data_model_schema.md](design/data_model_schema.md#L377), [design/data_model_schema.md](design/data_model_schema.md#L420), [design/design_api_surface.md](design/design_api_surface.md#L3), [design/design_api_surface.md](design/design_api_surface.md#L22), [design/design_api_surface.md](design/design_api_surface.md#L52), [design/design_api_surface.md](design/design_api_surface.md#L72), [design/design_api_surface.md](design/design_api_surface.md#L155), [design/design_api_surface.md](design/design_api_surface.md#L389), [design/design_api_surface.md](design/design_api_surface.md#L420), [design/design_integration_adapters_offline_tokens.md](design/design_integration_adapters_offline_tokens.md#L186), [design/design_integration_adapters_offline_tokens.md](design/design_integration_adapters_offline_tokens.md#L217), [design/design_observability.md](design/design_observability.md#L65), [design/design_observability.md](design/design_observability.md#L141), [design/design_observability.md](design/design_observability.md#L191), [design/design_observability.md](design/design_observability.md#L256), [design/design_observability.md](design/design_observability.md#L371), [design/design_observability.md](design/design_observability.md#L395), [design/design_observability.md](design/design_observability.md#L421), [design/infrastructure_topology.md](design/infrastructure_topology.md#L72), [design/integration_adapters.md](design/integration_adapters.md#L262), [design/security_architecture.md](design/security_architecture.md#L13), [design/security_architecture.md](design/security_architecture.md#L20), [design/security_architecture.md](design/security_architecture.md#L49), [design/security_architecture.md](design/security_architecture.md#L78), [design/security_architecture.md](design/security_architecture.md#L90), [design/security_architecture.md](design/security_architecture.md#L96), [design/security_architecture.md](design/security_architecture.md#L120), [design/security_architecture.md](design/security_architecture.md#L219), [design/security_architecture.md](design/security_architecture.md#L221), [design/security_architecture.md](design/security_architecture.md#L237), [design/security_architecture.md](design/security_architecture.md#L292), [design/security_architecture.md](design/security_architecture.md#L489), [design/security_architecture.md](design/security_architecture.md#L502), [inception/compliance_risk.md](inception/compliance_risk.md#L12), [inception/compliance_risk.md](inception/compliance_risk.md#L61), [inception/compliance_risk.md](inception/compliance_risk.md#L100), [inception/compliance_risk.md](inception/compliance_risk.md#L101), [inception/compliance_risk.md](inception/compliance_risk.md#L117), [inception/compliance_risk.md](inception/compliance_risk.md#L121), [inception/compliance_risk.md](inception/compliance_risk.md#L126), [inception/compliance_risk.md](inception/compliance_risk.md#L138), [inception/inception_operating_model.md](inception/inception_operating_model.md#L39), [inception/inception_operating_model.md](inception/inception_operating_model.md#L74), [inception/inception_operating_model.md](inception/inception_operating_model.md#L107), [inception/inception_operating_model.md](inception/inception_operating_model.md#L117), [inception/inception_operating_model.md](inception/inception_operating_model.md#L125), [inception/inception_operating_model.md](inception/inception_operating_model.md#L126), [inception/inception_operating_model.md](inception/inception_operating_model.md#L136), [inception/inception_operating_model.md](inception/inception_operating_model.md#L170), [inception/inception_operating_model.md](inception/inception_operating_model.md#L176), [inception/inception_operating_model.md](inception/inception_operating_model.md#L178), [inception/inception_operating_model.md](inception/inception_operating_model.md#L189), [inception/inception_operating_model.md](inception/inception_operating_model.md#L232), [inception/inception_operating_model.md](inception/inception_operating_model.md#L283), [inception/inception_operating_model.md](inception/inception_operating_model.md#L293), [inception/inception_operating_model.md](inception/inception_operating_model.md#L298), [inception/inception_operating_model.md](inception/inception_operating_model.md#L380), [inception/inception_operating_model.md](inception/inception_operating_model.md#L382), [inception/technical_architecture.md](inception/technical_architecture.md#L85), [inception/technical_architecture.md](inception/technical_architecture.md#L153), [inception/technical_architecture.md](inception/technical_architecture.md#L226), [inception/technical_architecture.md](inception/technical_architecture.md#L250), [inception/technical_architecture.md](inception/technical_architecture.md#L263), [inception/technical_architecture.md](inception/technical_architecture.md#L289), [inception/technical_architecture.md](inception/technical_architecture.md#L297), [inception/technical_architecture.md](inception/technical_architecture.md#L353), [inception/technical_architecture.md](inception/technical_architecture.md#L364), [inception/technical_architecture.md](inception/technical_architecture.md#L366), [inception/technical_architecture.md](inception/technical_architecture.md#L371), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L9), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L28), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L57), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L161), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L192), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L229), [product/donor_funding_activation.md](product/donor_funding_activation.md#L121), [product/donor_funding_activation.md](product/donor_funding_activation.md#L304), [product/donor_funding_activation.md](product/donor_funding_activation.md#L322), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L348), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L81), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L82), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L83), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L91), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L165), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L188), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L209), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L292), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L315), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L172), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L202), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L269), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L274), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L278)  
 
-<a id="act-09e028aeb0"></a>
+### ACT-09E028AEB0
 
-### ACT-09E028AEB0 — NGO Operator
+**NGO Operator**  
 
 **Type:** Actor role  
 **Referenced in:** [design/background_processing.md](design/background_processing.md#L318), [design/data_model_schema.md](design/data_model_schema.md#L41), [design/data_model_schema.md](design/data_model_schema.md#L205), [design/data_model_schema.md](design/data_model_schema.md#L361), [design/data_model_schema.md](design/data_model_schema.md#L370), [design/data_model_schema.md](design/data_model_schema.md#L376), [design/design_api_surface.md](design/design_api_surface.md#L3), [design/design_api_surface.md](design/design_api_surface.md#L22), [design/design_api_surface.md](design/design_api_surface.md#L52), [design/design_api_surface.md](design/design_api_surface.md#L72), [design/design_api_surface.md](design/design_api_surface.md#L389), [design/design_api_surface.md](design/design_api_surface.md#L439), [design/design_observability.md](design/design_observability.md#L65), [design/design_observability.md](design/design_observability.md#L192), [design/design_observability.md](design/design_observability.md#L256), [design/infrastructure_topology.md](design/infrastructure_topology.md#L53), [design/infrastructure_topology.md](design/infrastructure_topology.md#L72), [design/integration_adapters.md](design/integration_adapters.md#L262), [design/security_architecture.md](design/security_architecture.md#L13), [design/security_architecture.md](design/security_architecture.md#L21), [design/security_architecture.md](design/security_architecture.md#L90), [design/security_architecture.md](design/security_architecture.md#L96), [design/security_architecture.md](design/security_architecture.md#L127), [design/security_architecture.md](design/security_architecture.md#L219), [design/security_architecture.md](design/security_architecture.md#L221), [design/security_architecture.md](design/security_architecture.md#L237), [inception/compliance_risk.md](inception/compliance_risk.md#L60), [inception/compliance_risk.md](inception/compliance_risk.md#L78), [inception/compliance_risk.md](inception/compliance_risk.md#L100), [inception/compliance_risk.md](inception/compliance_risk.md#L100), [inception/compliance_risk.md](inception/compliance_risk.md#L117), [inception/compliance_risk.md](inception/compliance_risk.md#L138), [inception/inception_operating_model.md](inception/inception_operating_model.md#L31), [inception/inception_operating_model.md](inception/inception_operating_model.md#L73), [inception/inception_operating_model.md](inception/inception_operating_model.md#L104), [inception/inception_operating_model.md](inception/inception_operating_model.md#L125), [inception/inception_operating_model.md](inception/inception_operating_model.md#L126), [inception/inception_operating_model.md](inception/inception_operating_model.md#L144), [inception/inception_operating_model.md](inception/inception_operating_model.md#L176), [inception/inception_operating_model.md](inception/inception_operating_model.md#L288), [inception/inception_operating_model.md](inception/inception_operating_model.md#L368), [inception/inception_operating_model.md](inception/inception_operating_model.md#L370), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L9), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L18), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L41), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L120), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L147), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L197), [inception/technical_architecture.md](inception/technical_architecture.md#L85), [inception/technical_architecture.md](inception/technical_architecture.md#L152), [inception/technical_architecture.md](inception/technical_architecture.md#L354), [inception/technical_architecture.md](inception/technical_architecture.md#L367), [inception/technical_architecture.md](inception/technical_architecture.md#L371), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L132), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L143), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L154), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L192), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L258), [product/donor_funding_activation.md](product/donor_funding_activation.md#L51), [product/donor_funding_activation.md](product/donor_funding_activation.md#L220), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L48), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L348), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L5), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L9), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L22), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L35), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L60), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L64), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L103), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L107), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L133), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L180), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L188), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L218), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L231), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L247), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L292), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L6), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L17), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L29), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L46), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L57), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L172)  
 
-<a id="act-7ba340ff76"></a>
+### ACT-7BA340FF76
 
-### ACT-7BA340FF76 — Dispute Adjudicator
+**Dispute Adjudicator**  
 
 **Type:** Actor role  
 **Referenced in:** [design/background_processing.md](design/background_processing.md#L146), [design/data_model_schema.md](design/data_model_schema.md#L510), [design/data_model_schema.md](design/data_model_schema.md#L545), [design/design_integration_adapters_offline_tokens.md](design/design_integration_adapters_offline_tokens.md#L110), [design/design_integration_adapters_offline_tokens.md](design/design_integration_adapters_offline_tokens.md#L269), [design/integration_adapters.md](design/integration_adapters.md#L198), [design/security_architecture.md](design/security_architecture.md#L22), [design/security_architecture.md](design/security_architecture.md#L90), [design/security_architecture.md](design/security_architecture.md#L96), [design/security_architecture.md](design/security_architecture.md#L134), [design/security_architecture.md](design/security_architecture.md#L215), [design/security_architecture.md](design/security_architecture.md#L219), [design/security_architecture.md](design/security_architecture.md#L221), [design/security_architecture.md](design/security_architecture.md#L230), [design/security_architecture.md](design/security_architecture.md#L296), [design/security_architecture.md](design/security_architecture.md#L351), [design/security_architecture.md](design/security_architecture.md#L353), [inception/compliance_risk.md](inception/compliance_risk.md#L140), [inception/inception_operating_model.md](inception/inception_operating_model.md#L47), [inception/inception_operating_model.md](inception/inception_operating_model.md#L75), [inception/inception_operating_model.md](inception/inception_operating_model.md#L110), [inception/inception_operating_model.md](inception/inception_operating_model.md#L127), [inception/inception_operating_model.md](inception/inception_operating_model.md#L176), [inception/inception_operating_model.md](inception/inception_operating_model.md#L183), [inception/inception_operating_model.md](inception/inception_operating_model.md#L192), [inception/inception_operating_model.md](inception/inception_operating_model.md#L249), [inception/inception_operating_model.md](inception/inception_operating_model.md#L303), [inception/inception_operating_model.md](inception/inception_operating_model.md#L392), [inception/inception_operating_model.md](inception/inception_operating_model.md#L394), [inception/technical_architecture.md](inception/technical_architecture.md#L355), [inception/technical_architecture.md](inception/technical_architecture.md#L369), [inception/technical_architecture.md](inception/technical_architecture.md#L380), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L183), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L229), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L259), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L164), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L248), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L254), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L365), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L190), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L223), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L237), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L240), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L255), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L274), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L278), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L278), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L278), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L286)  
 
-<a id="act-80c62c7814"></a>
+### ACT-80C62C7814
 
-### ACT-80C62C7814 — Donor
+**Donor**  
 
 **Type:** Actor role  
 **Referenced in:** [design/infrastructure_topology.md](design/infrastructure_topology.md#L55), [design/security_architecture.md](design/security_architecture.md#L13), [design/security_architecture.md](design/security_architecture.md#L23), [design/security_architecture.md](design/security_architecture.md#L90), [design/security_architecture.md](design/security_architecture.md#L96), [design/security_architecture.md](design/security_architecture.md#L141), [inception/compliance_risk.md](inception/compliance_risk.md#L101), [inception/compliance_risk.md](inception/compliance_risk.md#L101), [inception/inception_operating_model.md](inception/inception_operating_model.md#L7), [inception/inception_operating_model.md](inception/inception_operating_model.md#L70), [inception/inception_operating_model.md](inception/inception_operating_model.md#L96), [inception/inception_operating_model.md](inception/inception_operating_model.md#L176), [inception/inception_operating_model.md](inception/inception_operating_model.md#L181), [inception/inception_operating_model.md](inception/inception_operating_model.md#L201), [inception/inception_operating_model.md](inception/inception_operating_model.md#L221), [inception/inception_operating_model.md](inception/inception_operating_model.md#L262), [inception/inception_operating_model.md](inception/inception_operating_model.md#L343), [inception/inception_operating_model.md](inception/inception_operating_model.md#L345), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L11), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L19), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L76), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L112), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L171), [inception/technical_architecture.md](inception/technical_architecture.md#L84), [inception/technical_architecture.md](inception/technical_architecture.md#L356), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L219), [product/donor_funding_activation.md](product/donor_funding_activation.md#L5), [product/donor_funding_activation.md](product/donor_funding_activation.md#L75), [product/donor_funding_activation.md](product/donor_funding_activation.md#L88), [product/donor_funding_activation.md](product/donor_funding_activation.md#L100), [product/donor_funding_activation.md](product/donor_funding_activation.md#L142), [product/donor_funding_activation.md](product/donor_funding_activation.md#L146), [product/donor_funding_activation.md](product/donor_funding_activation.md#L161), [product/donor_funding_activation.md](product/donor_funding_activation.md#L176), [product/donor_funding_activation.md](product/donor_funding_activation.md#L189), [product/donor_funding_activation.md](product/donor_funding_activation.md#L203), [product/donor_funding_activation.md](product/donor_funding_activation.md#L210), [product/donor_funding_activation.md](product/donor_funding_activation.md#L233), [product/donor_funding_activation.md](product/donor_funding_activation.md#L263), [product/donor_funding_activation.md](product/donor_funding_activation.md#L280), [product/donor_funding_activation.md](product/donor_funding_activation.md#L290), [product/donor_funding_activation.md](product/donor_funding_activation.md#L313), [product/donor_funding_activation.md](product/donor_funding_activation.md#L337), [product/donor_funding_activation.md](product/donor_funding_activation.md#L346), [product/donor_funding_activation.md](product/donor_funding_activation.md#L361), [product/donor_funding_activation.md](product/donor_funding_activation.md#L370), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L15)  
 
-<a id="act-ada6716160"></a>
+### ACT-ADA6716160
 
-### ACT-ADA6716160 — Beneficiary
+**Beneficiary**  
 
 **Type:** Actor role  
 **Referenced in:** [design/data_model_schema.md](design/data_model_schema.md#L41), [design/design_api_surface.md](design/design_api_surface.md#L52), [design/design_api_surface.md](design/design_api_surface.md#L230), [design/design_api_surface.md](design/design_api_surface.md#L318), [design/design_integration_adapters_offline_tokens.md](design/design_integration_adapters_offline_tokens.md#L114), [design/design_integration_adapters_offline_tokens.md](design/design_integration_adapters_offline_tokens.md#L206), [design/design_integration_adapters_offline_tokens.md](design/design_integration_adapters_offline_tokens.md#L280), [design/infrastructure_topology.md](design/infrastructure_topology.md#L54), [design/integration_adapters.md](design/integration_adapters.md#L5), [design/integration_adapters.md](design/integration_adapters.md#L163), [design/security_architecture.md](design/security_architecture.md#L13), [design/security_architecture.md](design/security_architecture.md#L24), [design/security_architecture.md](design/security_architecture.md#L90), [design/security_architecture.md](design/security_architecture.md#L96), [design/security_architecture.md](design/security_architecture.md#L148), [inception/compliance_risk.md](inception/compliance_risk.md#L30), [inception/compliance_risk.md](inception/compliance_risk.md#L78), [inception/inception_operating_model.md](inception/inception_operating_model.md#L15), [inception/inception_operating_model.md](inception/inception_operating_model.md#L71), [inception/inception_operating_model.md](inception/inception_operating_model.md#L98), [inception/inception_operating_model.md](inception/inception_operating_model.md#L176), [inception/inception_operating_model.md](inception/inception_operating_model.md#L188), [inception/inception_operating_model.md](inception/inception_operating_model.md#L201), [inception/inception_operating_model.md](inception/inception_operating_model.md#L209), [inception/inception_operating_model.md](inception/inception_operating_model.md#L262), [inception/inception_operating_model.md](inception/inception_operating_model.md#L330), [inception/inception_operating_model.md](inception/inception_operating_model.md#L332), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L6), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L12), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L41), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L48), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L67), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L112), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L147), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L171), [inception/technical_architecture.md](inception/technical_architecture.md#L84), [inception/technical_architecture.md](inception/technical_architecture.md#L357), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L6), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L14), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L19), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L21), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L22), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L26), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L31), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L33), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L36), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L41), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L43), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L48), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L49), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L52), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L56), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L57), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L61), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L68), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L103), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L172), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L207), [product/donor_funding_activation.md](product/donor_funding_activation.md#L180), [product/donor_funding_activation.md](product/donor_funding_activation.md#L225), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L249), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L5), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L60), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L71), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L103), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L108), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L180), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L219), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L232), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L292), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L46), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L58), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L69), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L92), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L96), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L154), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L158), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L223), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L228)  
 
-<a id="act-af904dcff9"></a>
+### ACT-AF904DCFF9
 
-### ACT-AF904DCFF9 — Merchant
+**Merchant**  
 
 **Type:** Actor role  
 **Referenced in:** [design/data_model_schema.md](design/data_model_schema.md#L41), [design/data_model_schema.md](design/data_model_schema.md#L399), [design/design_api_surface.md](design/design_api_surface.md#L233), [design/design_api_surface.md](design/design_api_surface.md#L439), [design/design_integration_adapters_offline_tokens.md](design/design_integration_adapters_offline_tokens.md#L165), [design/design_integration_adapters_offline_tokens.md](design/design_integration_adapters_offline_tokens.md#L206), [design/design_integration_adapters_offline_tokens.md](design/design_integration_adapters_offline_tokens.md#L250), [design/design_integration_adapters_offline_tokens.md](design/design_integration_adapters_offline_tokens.md#L263), [design/infrastructure_topology.md](design/infrastructure_topology.md#L55), [design/integration_adapters.md](design/integration_adapters.md#L163), [design/integration_adapters.md](design/integration_adapters.md#L262), [design/security_architecture.md](design/security_architecture.md#L13), [design/security_architecture.md](design/security_architecture.md#L25), [design/security_architecture.md](design/security_architecture.md#L90), [design/security_architecture.md](design/security_architecture.md#L96), [design/security_architecture.md](design/security_architecture.md#L156), [design/security_architecture.md](design/security_architecture.md#L230), [design/security_architecture.md](design/security_architecture.md#L253), [inception/compliance_risk.md](inception/compliance_risk.md#L62), [inception/compliance_risk.md](inception/compliance_risk.md#L77), [inception/compliance_risk.md](inception/compliance_risk.md#L102), [inception/inception_operating_model.md](inception/inception_operating_model.md#L23), [inception/inception_operating_model.md](inception/inception_operating_model.md#L72), [inception/inception_operating_model.md](inception/inception_operating_model.md#L101), [inception/inception_operating_model.md](inception/inception_operating_model.md#L176), [inception/inception_operating_model.md](inception/inception_operating_model.md#L182), [inception/inception_operating_model.md](inception/inception_operating_model.md#L189), [inception/inception_operating_model.md](inception/inception_operating_model.md#L230), [inception/inception_operating_model.md](inception/inception_operating_model.md#L267), [inception/inception_operating_model.md](inception/inception_operating_model.md#L355), [inception/inception_operating_model.md](inception/inception_operating_model.md#L357), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L6), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L13), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L20), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L57), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L112), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L120), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L146), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L166), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L171), [inception/technical_architecture.md](inception/technical_architecture.md#L85), [inception/technical_architecture.md](inception/technical_architecture.md#L152), [inception/technical_architecture.md](inception/technical_architecture.md#L358), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L68), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L80), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L148), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L174), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L215), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L239), [product/donor_funding_activation.md](product/donor_funding_activation.md#L225), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L5), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L146), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L248), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L308), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L15), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L296), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L92), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L154), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L180)  
 
 ---
 
-<a id="family-jny"></a>
-
-## User Journeys (`JNY-`)
+## User Journeys JNY
 
 | ID | Label | Type | Defined In | Also Used In |
 |:---|:------|:-----|:-----------|:-------------|
@@ -89,81 +85,79 @@
 | [JNY-E5F45D37C6](#jny-e5f45d37c6) | Merchant-Beneficiary Refund Flow | User journey | [design/data_model_schema.md](design/data_model_schema.md#L18) | [design/design_api_surface.md](design/design_api_surface.md), [design/security_architecture.md](design/security_architecture.md), [inception/inception_operating_model.md](inception/inception_operating_model.md), [inception/inception_product_strategy.md](inception/inception_product_strategy.md), [inception/technical_architecture.md](inception/technical_architecture.md), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md) |
 | [JNY-E82B8A88D8](#jny-e82b8a88d8) | Beneficiary Eligibility & Voucher Redemption | User journey | [design/data_model_schema.md](design/data_model_schema.md#L12) | [design/design_api_surface.md](design/design_api_surface.md), [design/design_observability.md](design/design_observability.md), [design/infrastructure_topology.md](design/infrastructure_topology.md), [design/security_architecture.md](design/security_architecture.md), [inception/inception_operating_model.md](inception/inception_operating_model.md), [inception/inception_product_strategy.md](inception/inception_product_strategy.md), [inception/technical_architecture.md](inception/technical_architecture.md), [product/merchant_pos_integration.md](product/merchant_pos_integration.md) |
 
-<a id="jny-2b038c9362"></a>
+### JNY-2B038C9362
 
-### JNY-2B038C9362 — Beneficiary-Platform Dispute Flow
+**Beneficiary-Platform Dispute Flow**  
 
 **Type:** User journey  
 **Referenced in:** [design/data_model_schema.md](design/data_model_schema.md#L96), [design/data_model_schema.md](design/data_model_schema.md#L507), [design/infrastructure_topology.md](design/infrastructure_topology.md#L72), [design/security_architecture.md](design/security_architecture.md#L215), [design/security_architecture.md](design/security_architecture.md#L294), [design/security_architecture.md](design/security_architecture.md#L296), [design/security_architecture.md](design/security_architecture.md#L527), [inception/inception_operating_model.md](inception/inception_operating_model.md#L50), [inception/inception_operating_model.md](inception/inception_operating_model.md#L394), [inception/technical_architecture.md](inception/technical_architecture.md#L369), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L3), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L249), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L139), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L164), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L175), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L190), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L220), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L223)  
 
-<a id="jny-356f465db3"></a>
+### JNY-356F465DB3
 
-### JNY-356F465DB3 — Merchant Onboarding & POS Integration
+**Merchant Onboarding & POS Integration**  
 
 **Type:** User journey  
 **Referenced in:** [design/infrastructure_topology.md](design/infrastructure_topology.md#L164), [inception/inception_operating_model.md](inception/inception_operating_model.md#L26), [inception/inception_operating_model.md](inception/inception_operating_model.md#L182), [inception/inception_operating_model.md](inception/inception_operating_model.md#L207), [inception/inception_operating_model.md](inception/inception_operating_model.md#L357), [inception/inception_operating_model.md](inception/inception_operating_model.md#L377), [inception/inception_operating_model.md](inception/inception_operating_model.md#L427), [inception/inception_operating_model.md](inception/inception_operating_model.md#L447), [inception/inception_operating_model.md](inception/inception_operating_model.md#L462), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L174), [inception/technical_architecture.md](inception/technical_architecture.md#L295), [inception/technical_architecture.md](inception/technical_architecture.md#L364), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L12), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L53)  
 
-<a id="jny-35eba169c6"></a>
+### JNY-35EBA169C6
 
-### JNY-35EBA169C6 — Financial Reconciliation & Payout
+**Financial Reconciliation & Payout**  
 
 **Type:** User journey  
 **Referenced in:** [design/background_processing.md](design/background_processing.md#L536), [design/data_model_schema.md](design/data_model_schema.md#L438), [inception/technical_architecture.md](inception/technical_architecture.md#L365), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L176)  
 
-<a id="jny-4c4ba15817"></a>
+### JNY-4C4BA15817
 
-### JNY-4C4BA15817 — NGO Governance & Beneficiary Offboarding
+**NGO Governance & Beneficiary Offboarding**  
 
 **Type:** User journey  
 **Referenced in:** [design/infrastructure_topology.md](design/infrastructure_topology.md#L72), [design/infrastructure_topology.md](design/infrastructure_topology.md#L164), [inception/compliance_risk.md](inception/compliance_risk.md#L100), [inception/inception_operating_model.md](inception/inception_operating_model.md#L18), [inception/inception_operating_model.md](inception/inception_operating_model.md#L34), [inception/inception_operating_model.md](inception/inception_operating_model.md#L148), [inception/inception_operating_model.md](inception/inception_operating_model.md#L370), [inception/inception_operating_model.md](inception/inception_operating_model.md#L428), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L18), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L120), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L129), [inception/technical_architecture.md](inception/technical_architecture.md#L367), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L138), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L81)  
 
-<a id="jny-54963dd39a"></a>
+### JNY-54963DD39A
 
-### JNY-54963DD39A — Compliance Failure & Anonymized Recovery
+**Compliance Failure & Anonymized Recovery**  
 
 **Type:** User journey  
 **Referenced in:** [inception/inception_operating_model.md](inception/inception_operating_model.md#L382), [inception/inception_operating_model.md](inception/inception_operating_model.md#L435), [inception/technical_architecture.md](inception/technical_architecture.md#L366)  
 
-<a id="jny-62d850e94b"></a>
+### JNY-62D850E94B
 
-### JNY-62D850E94B — Donor Onboarding & Funding Activation
+**Donor Onboarding & Funding Activation**  
 
 **Type:** User journey  
 **Referenced in:** [design/design_observability.md](design/design_observability.md#L202), [design/design_observability.md](design/design_observability.md#L361), [design/design_observability.md](design/design_observability.md#L384), [design/infrastructure_topology.md](design/infrastructure_topology.md#L168), [inception/inception_operating_model.md](inception/inception_operating_model.md#L10), [inception/inception_operating_model.md](inception/inception_operating_model.md#L202), [inception/inception_operating_model.md](inception/inception_operating_model.md#L345), [inception/inception_operating_model.md](inception/inception_operating_model.md#L445), [inception/technical_architecture.md](inception/technical_architecture.md#L362), [product/donor_funding_activation.md](product/donor_funding_activation.md#L5), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L137)  
 
-<a id="jny-90b07623fb"></a>
+### JNY-90B07623FB
 
-### JNY-90B07623FB — Merchant Payout Error Handling Flow
+**Merchant Payout Error Handling Flow**  
 
 **Type:** User journey  
 **Referenced in:** [design/background_processing.md](design/background_processing.md#L561), [design/data_model_schema.md](design/data_model_schema.md#L97), [inception/inception_operating_model.md](inception/inception_operating_model.md#L28), [inception/inception_operating_model.md](inception/inception_operating_model.md#L197), [inception/inception_operating_model.md](inception/inception_operating_model.md#L233), [inception/inception_operating_model.md](inception/inception_operating_model.md#L366), [inception/technical_architecture.md](inception/technical_architecture.md#L370), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L308)  
 
-<a id="jny-ca74d631dc"></a>
+### JNY-CA74D631DC
 
-### JNY-CA74D631DC — Platform-NGO Fraud Investigation Flow
+**Platform-NGO Fraud Investigation Flow**  
 
 **Type:** User journey  
 **Referenced in:** [inception/inception_operating_model.md](inception/inception_operating_model.md#L50), [inception/inception_operating_model.md](inception/inception_operating_model.md#L198), [inception/inception_operating_model.md](inception/inception_operating_model.md#L378), [inception/technical_architecture.md](inception/technical_architecture.md#L371), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L127), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L129), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L257)  
 
-<a id="jny-e5f45d37c6"></a>
+### JNY-E5F45D37C6
 
-### JNY-E5F45D37C6 — Merchant-Beneficiary Refund Flow
+**Merchant-Beneficiary Refund Flow**  
 
 **Type:** User journey  
 **Referenced in:** [design/data_model_schema.md](design/data_model_schema.md#L18), [design/design_api_surface.md](design/design_api_surface.md#L349), [design/design_api_surface.md](design/design_api_surface.md#L406), [design/design_api_surface.md](design/design_api_surface.md#L423), [design/design_api_surface.md](design/design_api_surface.md#L425), [design/design_api_surface.md](design/design_api_surface.md#L429), [design/design_api_surface.md](design/design_api_surface.md#L430), [design/design_api_surface.md](design/design_api_surface.md#L446), [design/security_architecture.md](design/security_architecture.md#L215), [design/security_architecture.md](design/security_architecture.md#L230), [design/security_architecture.md](design/security_architecture.md#L351), [inception/inception_operating_model.md](inception/inception_operating_model.md#L28), [inception/inception_operating_model.md](inception/inception_operating_model.md#L240), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L20), [inception/technical_architecture.md](inception/technical_architecture.md#L368), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L65), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L68), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L253), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L150), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L174)  
 
-<a id="jny-e82b8a88d8"></a>
+### JNY-E82B8A88D8
 
-### JNY-E82B8A88D8 — Beneficiary Eligibility & Voucher Redemption
+**Beneficiary Eligibility & Voucher Redemption**  
 
 **Type:** User journey  
 **Referenced in:** [design/data_model_schema.md](design/data_model_schema.md#L12), [design/design_api_surface.md](design/design_api_surface.md#L349), [design/design_api_surface.md](design/design_api_surface.md#L359), [design/design_api_surface.md](design/design_api_surface.md#L414), [design/design_api_surface.md](design/design_api_surface.md#L416), [design/design_api_surface.md](design/design_api_surface.md#L420), [design/design_api_surface.md](design/design_api_surface.md#L446), [design/design_observability.md](design/design_observability.md#L355), [design/design_observability.md](design/design_observability.md#L384), [design/infrastructure_topology.md](design/infrastructure_topology.md#L160), [design/security_architecture.md](design/security_architecture.md#L209), [inception/inception_operating_model.md](inception/inception_operating_model.md#L19), [inception/inception_operating_model.md](inception/inception_operating_model.md#L203), [inception/inception_operating_model.md](inception/inception_operating_model.md#L332), [inception/inception_operating_model.md](inception/inception_operating_model.md#L446), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L145), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L160), [inception/technical_architecture.md](inception/technical_architecture.md#L363), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L136)  
 
 ---
 
-<a id="family-cap"></a>
-
-## Capabilities (`CAP-`)
+## Capabilities CAP
 
 | ID | Label | Type | Defined In | Also Used In |
 |:---|:------|:-----|:-----------|:-------------|
@@ -177,74 +171,72 @@
 | [CAP-TRANSACTION-FINANCIAL-ENGINE](#cap-transaction-financial-engine) | Transaction & Financial Engine (product_donor_funding_activation) | Capability | [design/data_model_schema.md](design/data_model_schema.md#L378) | [design/design_api_surface.md](design/design_api_surface.md), [design/design_observability.md](design/design_observability.md), [inception/compliance_risk.md](inception/compliance_risk.md), [inception/inception_operating_model.md](inception/inception_operating_model.md), [inception/inception_product_strategy.md](inception/inception_product_strategy.md), [inception/technical_architecture.md](inception/technical_architecture.md), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md) |
 | [CAP-TRANSACTION-REFUND-REVERSAL-ENGINE](#cap-transaction-refund-reversal-engine) | Transaction Refund & Reversal Engine | Capability | [inception/inception_operating_model.md](inception/inception_operating_model.md#L240) | [inception/technical_architecture.md](inception/technical_architecture.md) |
 
-<a id="cap-compliance-security-audit"></a>
+### CAP-COMPLIANCE-SECURITY-AUDIT
 
-### CAP-COMPLIANCE-SECURITY-AUDIT — Compliance, Security & Audit (product_ngo_governance_offboarding)
+**Compliance, Security & Audit (product_ngo_governance_offboarding)**  
 
 **Type:** Capability  
 **Referenced in:** [inception/inception_operating_model.md](inception/inception_operating_model.md#L43), [inception/inception_operating_model.md](inception/inception_operating_model.md#L74), [inception/inception_operating_model.md](inception/inception_operating_model.md#L179), [inception/technical_architecture.md](inception/technical_architecture.md#L378), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L286)  
 
-<a id="cap-dispute-resolution-chargeback-management"></a>
+### CAP-DISPUTE-RESOLUTION-CHARGEBACK-MANAGEMENT
 
-### CAP-DISPUTE-RESOLUTION-CHARGEBACK-MANAGEMENT — Dispute Resolution & Chargeback Management (product_dispute_resolution_fraud)
+**Dispute Resolution & Chargeback Management (product_dispute_resolution_fraud)**  
 
 **Type:** Capability  
 **Referenced in:** [design/data_model_schema.md](design/data_model_schema.md#L438), [inception/compliance_risk.md](inception/compliance_risk.md#L77), [inception/inception_operating_model.md](inception/inception_operating_model.md#L51), [inception/inception_operating_model.md](inception/inception_operating_model.md#L75), [inception/inception_operating_model.md](inception/inception_operating_model.md#L249), [inception/inception_operating_model.md](inception/inception_operating_model.md#L400), [inception/technical_architecture.md](inception/technical_architecture.md#L380), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L100), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L168), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L225)  
 
-<a id="cap-fraud-detection-fraud-prevention-screening"></a>
+### CAP-FRAUD-DETECTION-FRAUD-PREVENTION-SCREENING
 
-### CAP-FRAUD-DETECTION-FRAUD-PREVENTION-SCREENING — Fraud Detection & Fraud Prevention Screening (product_dispute_resolution_fraud)
+**Fraud Detection & Fraud Prevention Screening (product_dispute_resolution_fraud)**  
 
 **Type:** Capability  
 **Referenced in:** [inception/compliance_risk.md](inception/compliance_risk.md#L100), [inception/inception_operating_model.md](inception/inception_operating_model.md#L52), [inception/inception_operating_model.md](inception/inception_operating_model.md#L75), [inception/inception_operating_model.md](inception/inception_operating_model.md#L248), [inception/inception_operating_model.md](inception/inception_operating_model.md#L431), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L102), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L136), [inception/technical_architecture.md](inception/technical_architecture.md#L371), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L189), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L207)  
 
-<a id="cap-identity-access-management"></a>
+### CAP-IDENTITY-ACCESS-MANAGEMENT
 
-### CAP-IDENTITY-ACCESS-MANAGEMENT — Identity & Access Management
+**Identity & Access Management**  
 
 **Type:** Capability  
 **Referenced in:** [design/data_model_schema.md](design/data_model_schema.md#L121), [design/data_model_schema.md](design/data_model_schema.md#L378), [design/design_api_surface.md](design/design_api_surface.md#L199), [inception/inception_operating_model.md](inception/inception_operating_model.md#L42), [inception/inception_operating_model.md](inception/inception_operating_model.md#L70), [inception/inception_operating_model.md](inception/inception_operating_model.md#L73), [inception/inception_operating_model.md](inception/inception_operating_model.md#L74), [inception/inception_operating_model.md](inception/inception_operating_model.md#L406), [inception/technical_architecture.md](inception/technical_architecture.md#L375), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L286)  
 
-<a id="cap-marketplace-matchmaking"></a>
+### CAP-MARKETPLACE-MATCHMAKING
 
-### CAP-MARKETPLACE-MATCHMAKING — Marketplace & Matchmaking (product_merchant_pos_integration)
+**Marketplace & Matchmaking (product_merchant_pos_integration)**  
 
 **Type:** Capability  
 **Referenced in:** [inception/inception_operating_model.md](inception/inception_operating_model.md#L70), [inception/inception_operating_model.md](inception/inception_operating_model.md#L71), [inception/inception_operating_model.md](inception/inception_operating_model.md#L429), [inception/technical_architecture.md](inception/technical_architecture.md#L377)  
 
-<a id="cap-merchant-ngo-operations"></a>
+### CAP-MERCHANT-NGO-OPERATIONS
 
-### CAP-MERCHANT-NGO-OPERATIONS — Merchant & NGO Operations (product_beneficiary_redemption_engine)
+**Merchant & NGO Operations (product_beneficiary_redemption_engine)**  
 
 **Type:** Capability  
 **Referenced in:** [inception/inception_operating_model.md](inception/inception_operating_model.md#L35), [inception/inception_operating_model.md](inception/inception_operating_model.md#L71), [inception/inception_operating_model.md](inception/inception_operating_model.md#L72), [inception/inception_operating_model.md](inception/inception_operating_model.md#L73), [inception/inception_operating_model.md](inception/inception_operating_model.md#L233), [inception/inception_operating_model.md](inception/inception_operating_model.md#L423), [inception/technical_architecture.md](inception/technical_architecture.md#L379)  
 
-<a id="cap-merchant-payout-failure-error-handling"></a>
+### CAP-MERCHANT-PAYOUT-FAILURE-ERROR-HANDLING
 
-### CAP-MERCHANT-PAYOUT-FAILURE-ERROR-HANDLING — Merchant Payout Failure & Error Handling (inception_operating_model)
+**Merchant Payout Failure & Error Handling (inception_operating_model)**  
 
 **Type:** Capability  
 **Referenced in:** [inception/inception_operating_model.md](inception/inception_operating_model.md#L269), [inception/technical_architecture.md](inception/technical_architecture.md#L370)  
 
-<a id="cap-transaction-financial-engine"></a>
+### CAP-TRANSACTION-FINANCIAL-ENGINE
 
-### CAP-TRANSACTION-FINANCIAL-ENGINE — Transaction & Financial Engine (product_donor_funding_activation)
+**Transaction & Financial Engine (product_donor_funding_activation)**  
 
 **Type:** Capability  
 **Referenced in:** [design/data_model_schema.md](design/data_model_schema.md#L378), [design/data_model_schema.md](design/data_model_schema.md#L438), [design/data_model_schema.md](design/data_model_schema.md#L486), [design/design_api_surface.md](design/design_api_surface.md#L333), [design/design_api_surface.md](design/design_api_surface.md#L338), [design/design_api_surface.md](design/design_api_surface.md#L342), [design/design_observability.md](design/design_observability.md#L181), [inception/compliance_risk.md](inception/compliance_risk.md#L58), [inception/inception_operating_model.md](inception/inception_operating_model.md#L72), [inception/inception_operating_model.md](inception/inception_operating_model.md#L179), [inception/inception_operating_model.md](inception/inception_operating_model.md#L186), [inception/inception_operating_model.md](inception/inception_operating_model.md#L414), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L44), [inception/technical_architecture.md](inception/technical_architecture.md#L180), [inception/technical_architecture.md](inception/technical_architecture.md#L376), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L60), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L87), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L93), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L97)  
 
-<a id="cap-transaction-refund-reversal-engine"></a>
+### CAP-TRANSACTION-REFUND-REVERSAL-ENGINE
 
-### CAP-TRANSACTION-REFUND-REVERSAL-ENGINE — Transaction Refund & Reversal Engine
+**Transaction Refund & Reversal Engine**  
 
 **Type:** Capability  
 **Referenced in:** [inception/inception_operating_model.md](inception/inception_operating_model.md#L240), [inception/technical_architecture.md](inception/technical_architecture.md#L368)  
 
 ---
 
-<a id="family-sur"></a>
-
-## Architectural Surfaces (`SUR-`)
+## Architectural Surfaces SUR
 
 | ID | Label | Type | Defined In | Also Used In |
 |:---|:------|:-----|:-----------|:-------------|
@@ -260,88 +252,86 @@
 | [SUR-D94C2E24C3](#sur-d94c2e24c3) | SUR-5B18C8719F (product_beneficiary_redemption_engine) | Architectural surface | *(not yet in any published artifact)* | — |
 | [SUR-FA61592CD4](#sur-fa61592cd4) | Data Persistence Layer | Architectural surface | [design/data_model_schema.md](design/data_model_schema.md#L449) | [design/design_api_surface.md](design/design_api_surface.md), [design/integration_adapters.md](design/integration_adapters.md), [design/security_architecture.md](design/security_architecture.md), [inception/compliance_risk.md](inception/compliance_risk.md), [inception/inception_operating_model.md](inception/inception_operating_model.md), [inception/technical_architecture.md](inception/technical_architecture.md) |
 
-<a id="sur-0d95dcd966"></a>
+### SUR-0D95DCD966
 
-### SUR-0D95DCD966 — SUR-FA61592CD4 (inception_compliance_risk)
-
-**Type:** Architectural surface  
-**Referenced in:** *(not yet in any published artifact)*  
-
-<a id="sur-15a920abde"></a>
-
-### SUR-15A920ABDE — SUR-5B18C8719F (inception_technical_architecture)
+**SUR-FA61592CD4 (inception_compliance_risk)**  
 
 **Type:** Architectural surface  
 **Referenced in:** *(not yet in any published artifact)*  
 
-<a id="sur-1d9a2feb5f"></a>
+### SUR-15A920ABDE
 
-### SUR-1D9A2FEB5F — SUR-85E4A5B6E7 (inception_technical_architecture)
+**SUR-5B18C8719F (inception_technical_architecture)**  
 
 **Type:** Architectural surface  
 **Referenced in:** *(not yet in any published artifact)*  
 
-<a id="sur-43e71c4e2b"></a>
+### SUR-1D9A2FEB5F
 
-### SUR-43E71C4E2B — Client Interface Layer
+**SUR-85E4A5B6E7 (inception_technical_architecture)**  
+
+**Type:** Architectural surface  
+**Referenced in:** *(not yet in any published artifact)*  
+
+### SUR-43E71C4E2B
+
+**Client Interface Layer**  
 
 **Type:** Architectural surface  
 **Referenced in:** [design/data_model_schema.md](design/data_model_schema.md#L141), [design/data_model_schema.md](design/data_model_schema.md#L409), [design/data_model_schema.md](design/data_model_schema.md#L510), [inception/compliance_risk.md](inception/compliance_risk.md#L30), [inception/inception_operating_model.md](inception/inception_operating_model.md#L208), [inception/technical_architecture.md](inception/technical_architecture.md#L9), [inception/technical_architecture.md](inception/technical_architecture.md#L81), [inception/technical_architecture.md](inception/technical_architecture.md#L113), [inception/technical_architecture.md](inception/technical_architecture.md#L132), [inception/technical_architecture.md](inception/technical_architecture.md#L135), [inception/technical_architecture.md](inception/technical_architecture.md#L315), [inception/technical_architecture.md](inception/technical_architecture.md#L375), [inception/technical_architecture.md](inception/technical_architecture.md#L379), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L61)  
 
-<a id="sur-496f903818"></a>
+### SUR-496F903818
 
-### SUR-496F903818 — SUR-43E71C4E2B (inception_product_strategy)
+**SUR-43E71C4E2B (inception_product_strategy)**  
 
 **Type:** Architectural surface  
 **Referenced in:** *(not yet in any published artifact)*  
 
-<a id="sur-5b18c8719f"></a>
+### SUR-5B18C8719F
 
-### SUR-5B18C8719F — Payment Processing Surface
+**Payment Processing Surface**  
 
 **Type:** Architectural surface  
 **Referenced in:** [design/data_model_schema.md](design/data_model_schema.md#L447), [design/design_api_surface.md](design/design_api_surface.md#L3), [design/design_api_surface.md](design/design_api_surface.md#L13), [design/design_api_surface.md](design/design_api_surface.md#L99), [design/design_integration_adapters_offline_tokens.md](design/design_integration_adapters_offline_tokens.md#L274), [design/integration_adapters.md](design/integration_adapters.md#L109), [design/integration_adapters.md](design/integration_adapters.md#L185), [inception/inception_operating_model.md](inception/inception_operating_model.md#L138), [inception/inception_operating_model.md](inception/inception_operating_model.md#L223), [inception/technical_architecture.md](inception/technical_architecture.md#L19), [inception/technical_architecture.md](inception/technical_architecture.md#L92), [inception/technical_architecture.md](inception/technical_architecture.md#L108), [inception/technical_architecture.md](inception/technical_architecture.md#L114), [inception/technical_architecture.md](inception/technical_architecture.md#L128), [inception/technical_architecture.md](inception/technical_architecture.md#L133), [inception/technical_architecture.md](inception/technical_architecture.md#L136), [inception/technical_architecture.md](inception/technical_architecture.md#L147), [inception/technical_architecture.md](inception/technical_architecture.md#L320), [inception/technical_architecture.md](inception/technical_architecture.md#L362), [inception/technical_architecture.md](inception/technical_architecture.md#L364), [inception/technical_architecture.md](inception/technical_architecture.md#L378), [product/donor_funding_activation.md](product/donor_funding_activation.md#L69)  
 
-<a id="sur-610861d01a"></a>
+### SUR-610861D01A
 
-### SUR-610861D01A — SUR-FA61592CD4 (product_ngo_governance_offboarding)
+**SUR-FA61592CD4 (product_ngo_governance_offboarding)**  
 
 **Type:** Architectural surface  
 **Referenced in:** *(not yet in any published artifact)*  
 
-<a id="sur-85e4a5b6e7"></a>
+### SUR-85E4A5B6E7
 
-### SUR-85E4A5B6E7 — API Orchestration Layer
+**API Orchestration Layer**  
 
 **Type:** Architectural surface  
 **Referenced in:** [design/data_model_schema.md](design/data_model_schema.md#L408), [design/data_model_schema.md](design/data_model_schema.md#L445), [design/design_api_surface.md](design/design_api_surface.md#L3), [design/design_api_surface.md](design/design_api_surface.md#L17), [design/design_api_surface.md](design/design_api_surface.md#L99), [design/design_api_surface.md](design/design_api_surface.md#L263), [design/design_api_surface.md](design/design_api_surface.md#L353), [design/design_integration_adapters_offline_tokens.md](design/design_integration_adapters_offline_tokens.md#L266), [design/design_observability.md](design/design_observability.md#L227), [design/infrastructure_topology.md](design/infrastructure_topology.md#L59), [design/infrastructure_topology.md](design/infrastructure_topology.md#L144), [design/infrastructure_topology.md](design/infrastructure_topology.md#L150), [design/integration_adapters.md](design/integration_adapters.md#L17), [design/integration_adapters.md](design/integration_adapters.md#L109), [design/integration_adapters.md](design/integration_adapters.md#L181), [design/integration_adapters.md](design/integration_adapters.md#L271), [design/integration_adapters.md](design/integration_adapters.md#L277), [design/security_architecture.md](design/security_architecture.md#L8), [inception/technical_architecture.md](inception/technical_architecture.md#L29), [inception/technical_architecture.md](inception/technical_architecture.md#L89), [inception/technical_architecture.md](inception/technical_architecture.md#L100), [inception/technical_architecture.md](inception/technical_architecture.md#L101), [inception/technical_architecture.md](inception/technical_architecture.md#L104), [inception/technical_architecture.md](inception/technical_architecture.md#L126), [inception/technical_architecture.md](inception/technical_architecture.md#L127), [inception/technical_architecture.md](inception/technical_architecture.md#L132), [inception/technical_architecture.md](inception/technical_architecture.md#L133), [inception/technical_architecture.md](inception/technical_architecture.md#L134), [inception/technical_architecture.md](inception/technical_architecture.md#L135), [inception/technical_architecture.md](inception/technical_architecture.md#L136), [inception/technical_architecture.md](inception/technical_architecture.md#L152), [inception/technical_architecture.md](inception/technical_architecture.md#L325), [inception/technical_architecture.md](inception/technical_architecture.md#L362), [inception/technical_architecture.md](inception/technical_architecture.md#L363), [inception/technical_architecture.md](inception/technical_architecture.md#L365), [inception/technical_architecture.md](inception/technical_architecture.md#L368), [inception/technical_architecture.md](inception/technical_architecture.md#L370), [inception/technical_architecture.md](inception/technical_architecture.md#L375), [inception/technical_architecture.md](inception/technical_architecture.md#L376), [inception/technical_architecture.md](inception/technical_architecture.md#L377), [inception/technical_architecture.md](inception/technical_architecture.md#L379)  
 
-<a id="sur-9119d8b358"></a>
+### SUR-9119D8B358
 
-### SUR-9119D8B358 — SUR-85E4A5B6E7 (product_merchant_pos_integration)
-
-**Type:** Architectural surface  
-**Referenced in:** *(not yet in any published artifact)*  
-
-<a id="sur-d94c2e24c3"></a>
-
-### SUR-D94C2E24C3 — SUR-5B18C8719F (product_beneficiary_redemption_engine)
+**SUR-85E4A5B6E7 (product_merchant_pos_integration)**  
 
 **Type:** Architectural surface  
 **Referenced in:** *(not yet in any published artifact)*  
 
-<a id="sur-fa61592cd4"></a>
+### SUR-D94C2E24C3
 
-### SUR-FA61592CD4 — Data Persistence Layer
+**SUR-5B18C8719F (product_beneficiary_redemption_engine)**  
+
+**Type:** Architectural surface  
+**Referenced in:** *(not yet in any published artifact)*  
+
+### SUR-FA61592CD4
+
+**Data Persistence Layer**  
 
 **Type:** Architectural surface  
 **Referenced in:** [design/data_model_schema.md](design/data_model_schema.md#L449), [design/design_api_surface.md](design/design_api_surface.md#L269), [design/integration_adapters.md](design/integration_adapters.md#L186), [design/integration_adapters.md](design/integration_adapters.md#L197), [design/integration_adapters.md](design/integration_adapters.md#L214), [design/integration_adapters.md](design/integration_adapters.md#L216), [design/security_architecture.md](design/security_architecture.md#L8), [inception/compliance_risk.md](inception/compliance_risk.md#L106), [inception/inception_operating_model.md](inception/inception_operating_model.md#L138), [inception/technical_architecture.md](inception/technical_architecture.md#L39), [inception/technical_architecture.md](inception/technical_architecture.md#L90), [inception/technical_architecture.md](inception/technical_architecture.md#L102), [inception/technical_architecture.md](inception/technical_architecture.md#L108), [inception/technical_architecture.md](inception/technical_architecture.md#L115), [inception/technical_architecture.md](inception/technical_architecture.md#L117), [inception/technical_architecture.md](inception/technical_architecture.md#L134), [inception/technical_architecture.md](inception/technical_architecture.md#L136), [inception/technical_architecture.md](inception/technical_architecture.md#L330), [inception/technical_architecture.md](inception/technical_architecture.md#L365), [inception/technical_architecture.md](inception/technical_architecture.md#L366), [inception/technical_architecture.md](inception/technical_architecture.md#L367), [inception/technical_architecture.md](inception/technical_architecture.md#L369), [inception/technical_architecture.md](inception/technical_architecture.md#L376), [inception/technical_architecture.md](inception/technical_architecture.md#L378), [inception/technical_architecture.md](inception/technical_architecture.md#L380)  
 
 ---
 
-<a id="family-con"></a>
-
-## Constraints (`CON-`)
+## Constraints CON
 
 | ID | Label | Type | Defined In | Also Used In |
 |:---|:------|:-----|:-----------|:-------------|
@@ -404,408 +394,408 @@
 | [CON-FCFF86A326](#con-fcff86a326) | Implied concern: Classify all beneficiary-related data as 'Highly Sensitive' and restrict database access to cryptographic hashing layers only. | Implied concern | [design/integration_adapters.md](design/integration_adapters.md#L220) | [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md) |
 | [CON-FD21121DD5](#con-fd21121dd5) | Achieve 99.99% operational uptime across AWS multi-AZ configurations for all critical service endpoints. | Implied concern | [design/integration_adapters.md](design/integration_adapters.md#L373) | [inception/inception_operating_model.md](inception/inception_operating_model.md), [inception/inception_product_strategy.md](inception/inception_product_strategy.md), [inception/technical_architecture.md](inception/technical_architecture.md) |
 
-<a id="con-06232374d9"></a>
+### CON-06232374D9
 
-### CON-06232374D9 — Ensure Stripe Webhook Processing Latency averages below 150ms from card tap to merchant ledger entry.
+**Ensure Stripe Webhook Processing Latency averages below 150ms from card tap to merchant ledger entry.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/data_model_schema.md](design/data_model_schema.md#L548), [design/design_api_surface.md](design/design_api_surface.md#L13), [design/design_api_surface.md](design/design_api_surface.md#L100), [design/design_api_surface.md](design/design_api_surface.md#L233), [design/design_api_surface.md](design/design_api_surface.md#L260), [design/design_api_surface.md](design/design_api_surface.md#L446), [design/design_observability.md](design/design_observability.md#L216), [design/design_observability.md](design/design_observability.md#L393), [design/infrastructure_topology.md](design/infrastructure_topology.md#L27), [design/infrastructure_topology.md](design/infrastructure_topology.md#L113), [design/infrastructure_topology.md](design/infrastructure_topology.md#L212), [design/integration_adapters.md](design/integration_adapters.md#L159), [design/integration_adapters.md](design/integration_adapters.md#L287), [design/integration_adapters.md](design/integration_adapters.md#L371), [design/security_architecture.md](design/security_architecture.md#L256), [design/security_architecture.md](design/security_architecture.md#L338), [design/security_architecture.md](design/security_architecture.md#L381), [inception/inception_operating_model.md](inception/inception_operating_model.md#L292), [inception/inception_operating_model.md](inception/inception_operating_model.md#L456), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L81), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L139), [inception/technical_architecture.md](inception/technical_architecture.md#L25), [inception/technical_architecture.md](inception/technical_architecture.md#L53), [inception/technical_architecture.md](inception/technical_architecture.md#L96), [inception/technical_architecture.md](inception/technical_architecture.md#L309), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L73), [product/donor_funding_activation.md](product/donor_funding_activation.md#L127), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L114)  
 
-<a id="con-0a0288eed4"></a>
+### CON-0A0288EED4
 
-### CON-0A0288EED4 — Implied concern: Implement strict data isolation where beneficiary demographic status and legal names are cryptographically segregated from public ...
+**Implied concern: Implement strict data isolation where beneficiary demographic status and legal names are cryptographically segregated from public ...**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/background_processing.md](design/background_processing.md#L31), [design/background_processing.md](design/background_processing.md#L247), [design/data_model_schema.md](design/data_model_schema.md#L5), [design/data_model_schema.md](design/data_model_schema.md#L36), [design/data_model_schema.md](design/data_model_schema.md#L119), [design/design_api_surface.md](design/design_api_surface.md#L11), [design/design_api_surface.md](design/design_api_surface.md#L198), [design/design_api_surface.md](design/design_api_surface.md#L213), [design/design_integration_adapters_offline_tokens.md](design/design_integration_adapters_offline_tokens.md#L22), [design/design_integration_adapters_offline_tokens.md](design/design_integration_adapters_offline_tokens.md#L32), [design/design_observability.md](design/design_observability.md#L26), [design/design_observability.md](design/design_observability.md#L322), [design/design_observability.md](design/design_observability.md#L325), [design/integration_adapters.md](design/integration_adapters.md#L12), [design/integration_adapters.md](design/integration_adapters.md#L170), [design/integration_adapters.md](design/integration_adapters.md#L203), [design/integration_adapters.md](design/integration_adapters.md#L216), [design/integration_adapters.md](design/integration_adapters.md#L220), [design/security_architecture.md](design/security_architecture.md#L33), [design/security_architecture.md](design/security_architecture.md#L78), [design/security_architecture.md](design/security_architecture.md#L154), [design/security_architecture.md](design/security_architecture.md#L234), [design/security_architecture.md](design/security_architecture.md#L302), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L68), [product/donor_funding_activation.md](product/donor_funding_activation.md#L251), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L49), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L214), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L239), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L38), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L46), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L105), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L194), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L274)  
 
-<a id="con-10f4381094"></a>
+### CON-10F4381094
 
-### CON-10F4381094 — Implied concern: Disaster recovery procedures for financial ledger consistency in the event of infrastructure failure
+**Implied concern: Disaster recovery procedures for financial ledger consistency in the event of infrastructure failure**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/data_model_schema.md](design/data_model_schema.md#L407), [design/infrastructure_topology.md](design/infrastructure_topology.md#L11), [design/infrastructure_topology.md](design/infrastructure_topology.md#L107), [design/integration_adapters.md](design/integration_adapters.md#L159), [design/security_architecture.md](design/security_architecture.md#L386)  
 
-<a id="con-121117f5a2"></a>
+### CON-121117F5A2
 
-### CON-121117F5A2 — Scalability of the anonymous credit distribution engine during peak event-driven load
+**Scalability of the anonymous credit distribution engine during peak event-driven load**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/data_model_schema.md](design/data_model_schema.md#L19), [design/infrastructure_topology.md](design/infrastructure_topology.md#L114), [design/security_architecture.md](design/security_architecture.md#L391), [inception/inception_operating_model.md](inception/inception_operating_model.md#L453), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L127), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L136), [inception/technical_architecture.md](inception/technical_architecture.md#L240)  
 
-<a id="con-1762ea5021"></a>
+### CON-1762EA5021
 
-### CON-1762EA5021 — Implied concern: Implement append-only cryptographic log auditing in Aurora PostgreSQL for all financial ledger mutations.
+**Implied concern: Implement append-only cryptographic log auditing in Aurora PostgreSQL for all financial ledger mutations.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/background_processing.md](design/background_processing.md#L112), [design/background_processing.md](design/background_processing.md#L140), [design/background_processing.md](design/background_processing.md#L249), [design/background_processing.md](design/background_processing.md#L458), [design/background_processing.md](design/background_processing.md#L477), [design/data_model_schema.md](design/data_model_schema.md#L57), [design/data_model_schema.md](design/data_model_schema.md#L61), [design/data_model_schema.md](design/data_model_schema.md#L487), [design/design_api_surface.md](design/design_api_surface.md#L176), [design/design_api_surface.md](design/design_api_surface.md#L205), [design/design_api_surface.md](design/design_api_surface.md#L213), [design/design_api_surface.md](design/design_api_surface.md#L269), [design/design_integration_adapters_offline_tokens.md](design/design_integration_adapters_offline_tokens.md#L21), [design/design_integration_adapters_offline_tokens.md](design/design_integration_adapters_offline_tokens.md#L259), [design/design_observability.md](design/design_observability.md#L48), [design/design_observability.md](design/design_observability.md#L265), [design/design_observability.md](design/design_observability.md#L366), [design/infrastructure_topology.md](design/infrastructure_topology.md#L32), [design/infrastructure_topology.md](design/infrastructure_topology.md#L110), [design/infrastructure_topology.md](design/infrastructure_topology.md#L247), [design/integration_adapters.md](design/integration_adapters.md#L239), [design/security_architecture.md](design/security_architecture.md#L124), [design/security_architecture.md](design/security_architecture.md#L176), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L93), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L98), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L162), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L197), [product/donor_funding_activation.md](product/donor_funding_activation.md#L214), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L365), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L31), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L314), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L36), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L66), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L114), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L189), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L274)  
 
-<a id="con-2059b17fb2"></a>
+### CON-2059B17FB2
 
-### CON-2059B17FB2 — Implied concern: Monitor Credit Pool Utilization Rate with automated alerts triggering when thresholds exceed 85%.
+**Implied concern: Monitor Credit Pool Utilization Rate with automated alerts triggering when thresholds exceed 85%.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/background_processing.md](design/background_processing.md#L153), [design/background_processing.md](design/background_processing.md#L317), [design/background_processing.md](design/background_processing.md#L767), [design/design_observability.md](design/design_observability.md#L136), [design/design_observability.md](design/design_observability.md#L186), [design/design_observability.md](design/design_observability.md#L383), [design/integration_adapters.md](design/integration_adapters.md#L239), [design/integration_adapters.md](design/integration_adapters.md#L246), [design/security_architecture.md](design/security_architecture.md#L392), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L150), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L30)  
 
-<a id="con-226a13ffb8"></a>
+### CON-226A13FFB8
 
-### CON-226A13FFB8 — Implied concern: Comply with financial regulations governing quasi-cash instruments, specifically regarding unclaimed property and escheatment laws...
+**Implied concern: Comply with financial regulations governing quasi-cash instruments, specifically regarding unclaimed property and escheatment laws...**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/background_processing.md](design/background_processing.md#L771), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L135), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L86)  
 
-<a id="con-23a501c051"></a>
+### CON-23A501C051
 
-### CON-23A501C051 — Correlate donor impact receipts with beneficiary redemption events without linking PII, using UUIDv4 mapping for analytics.
+**Correlate donor impact receipts with beneficiary redemption events without linking PII, using UUIDv4 mapping for analytics.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/data_model_schema.md](design/data_model_schema.md#L57), [design/data_model_schema.md](design/data_model_schema.md#L119), [design/data_model_schema.md](design/data_model_schema.md#L413), [design/data_model_schema.md](design/data_model_schema.md#L489), [design/data_model_schema.md](design/data_model_schema.md#L560), [design/infrastructure_topology.md](design/infrastructure_topology.md#L75), [design/infrastructure_topology.md](design/infrastructure_topology.md#L170), [design/security_architecture.md](design/security_architecture.md#L144), [inception/compliance_risk.md](inception/compliance_risk.md#L24), [inception/compliance_risk.md](inception/compliance_risk.md#L69), [inception/compliance_risk.md](inception/compliance_risk.md#L108), [inception/inception_operating_model.md](inception/inception_operating_model.md#L12), [inception/inception_operating_model.md](inception/inception_operating_model.md#L70), [inception/inception_operating_model.md](inception/inception_operating_model.md#L147), [inception/inception_operating_model.md](inception/inception_operating_model.md#L226), [inception/inception_operating_model.md](inception/inception_operating_model.md#L352), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L54), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L108), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L138), [inception/technical_architecture.md](inception/technical_architecture.md#L170), [inception/technical_architecture.md](inception/technical_architecture.md#L337), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L100), [product/donor_funding_activation.md](product/donor_funding_activation.md#L239)  
 
-<a id="con-2788862587"></a>
+### CON-2788862587
 
-### CON-2788862587 — Classify all beneficiary-related data as 'Highly Sensitive' and restrict database access to cryptographic hashing layers only.
+**Classify all beneficiary-related data as 'Highly Sensitive' and restrict database access to cryptographic hashing layers only.**  
 
 **Type:** Implied concern  
 **Referenced in:** [inception/compliance_risk.md](inception/compliance_risk.md#L10), [inception/inception_operating_model.md](inception/inception_operating_model.md#L21), [inception/inception_operating_model.md](inception/inception_operating_model.md#L71), [inception/inception_operating_model.md](inception/inception_operating_model.md#L146), [inception/inception_operating_model.md](inception/inception_operating_model.md#L164), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L119), [inception/technical_architecture.md](inception/technical_architecture.md#L45), [inception/technical_architecture.md](inception/technical_architecture.md#L337)  
 
-<a id="con-2d70edcdee"></a>
+### CON-2D70EDCDEE
 
-### CON-2D70EDCDEE — Provide multi-modal interaction paths (voice, tap, scan) for donation round-up configuration and redemption history.
+**Provide multi-modal interaction paths (voice, tap, scan) for donation round-up configuration and redemption history.**  
 
 **Type:** Implied concern  
 **Referenced in:** [inception/inception_operating_model.md](inception/inception_operating_model.md#L11), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L139), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L15), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L19), [product/donor_funding_activation.md](product/donor_funding_activation.md#L50), [product/donor_funding_activation.md](product/donor_funding_activation.md#L268), [product/donor_funding_activation.md](product/donor_funding_activation.md#L381)  
 
-<a id="con-30ea97016b"></a>
+### CON-30EA97016B
 
-### CON-30EA97016B — Data residency and jurisdictional compliance for user data across multiple metropolitan regions
+**Data residency and jurisdictional compliance for user data across multiple metropolitan regions**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/data_model_schema.md](design/data_model_schema.md#L201), [design/data_model_schema.md](design/data_model_schema.md#L211), [design/infrastructure_topology.md](design/infrastructure_topology.md#L5), [design/infrastructure_topology.md](design/infrastructure_topology.md#L122), [design/security_architecture.md](design/security_architecture.md#L8), [design/security_architecture.md](design/security_architecture.md#L245), [inception/compliance_risk.md](inception/compliance_risk.md#L70), [inception/inception_operating_model.md](inception/inception_operating_model.md#L234), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L127), [inception/technical_architecture.md](inception/technical_architecture.md#L337), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L123), [product/donor_funding_activation.md](product/donor_funding_activation.md#L17), [product/donor_funding_activation.md](product/donor_funding_activation.md#L95), [product/donor_funding_activation.md](product/donor_funding_activation.md#L119), [product/donor_funding_activation.md](product/donor_funding_activation.md#L242), [product/donor_funding_activation.md](product/donor_funding_activation.md#L273), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L44), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L109), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L144), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L42)  
 
-<a id="con-3335d67672"></a>
+### CON-3335D67672
 
-### CON-3335D67672 — Implied concern: Protect against replay attacks on offline fallback QR/barcode tokens using time-bound cryptographic signatures.
+**Implied concern: Protect against replay attacks on offline fallback QR/barcode tokens using time-bound cryptographic signatures.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/infrastructure_topology.md](design/infrastructure_topology.md#L264), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L85), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L112), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L165)  
 
-<a id="con-34312c6dc9"></a>
+### CON-34312C6DC9
 
-### CON-34312C6DC9 — Implied concern: Secure client-side storage on Expo devices using SecureStore for offline tokens, preventing token theft or cloning.
+**Implied concern: Secure client-side storage on Expo devices using SecureStore for offline tokens, preventing token theft or cloning.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/design_integration_adapters_offline_tokens.md](design/design_integration_adapters_offline_tokens.md#L7), [design/security_architecture.md](design/security_architecture.md#L78), [design/security_architecture.md](design/security_architecture.md#L373), [product/donor_funding_activation.md](product/donor_funding_activation.md#L35), [product/donor_funding_activation.md](product/donor_funding_activation.md#L120), [product/donor_funding_activation.md](product/donor_funding_activation.md#L330), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L76), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L166)  
 
-<a id="con-387cdd9aeb"></a>
+### CON-387CDD9AEB
 
-### CON-387CDD9AEB — Implied concern: Ensure offline fallback interfaces are intuitive and accessible without requiring complex technical troubleshooting.
+**Implied concern: Ensure offline fallback interfaces are intuitive and accessible without requiring complex technical troubleshooting.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/design_integration_adapters_offline_tokens.md](design/design_integration_adapters_offline_tokens.md#L280), [product/donor_funding_activation.md](product/donor_funding_activation.md#L271), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L81), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L109), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L115), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L154)  
 
-<a id="con-4093c26bcc"></a>
+### CON-4093C26BCC
 
-### CON-4093C26BCC — Implied concern: Data residency and jurisdictional compliance for user data across multiple metropolitan regions
+**Implied concern: Data residency and jurisdictional compliance for user data across multiple metropolitan regions**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/infrastructure_topology.md](design/infrastructure_topology.md#L5), [product/donor_funding_activation.md](product/donor_funding_activation.md#L242), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L42)  
 
-<a id="con-413928cb1c"></a>
+### CON-413928CB1C
 
-### CON-413928CB1C — Implied concern: Correlate donor impact receipts with beneficiary redemption events without linking PII, using UUIDv4 mapping for analytics.
+**Implied concern: Correlate donor impact receipts with beneficiary redemption events without linking PII, using UUIDv4 mapping for analytics.**  
 
 **Type:** Implied concern  
 **Referenced in:** [product/donor_funding_activation.md](product/donor_funding_activation.md#L239)  
 
-<a id="con-4152f2c7c3"></a>
+### CON-4152F2C7C3
 
-### CON-4152F2C7C3 — Implied concern: Latency optimization for real-time POS clearance to prevent restaurant queue stagnation
+**Implied concern: Latency optimization for real-time POS clearance to prevent restaurant queue stagnation**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/data_model_schema.md](design/data_model_schema.md#L231), [design/design_integration_adapters_offline_tokens.md](design/design_integration_adapters_offline_tokens.md#L176), [design/infrastructure_topology.md](design/infrastructure_topology.md#L126), [design/integration_adapters.md](design/integration_adapters.md#L369), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L109)  
 
-<a id="con-4820fad5a9"></a>
+### CON-4820FAD5A9
 
-### CON-4820FAD5A9 — Define strict data retention policies for donor transaction history vs. anonymous redemption analytics.
+**Define strict data retention policies for donor transaction history vs. anonymous redemption analytics.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/background_processing.md](design/background_processing.md#L583), [design/security_architecture.md](design/security_architecture.md#L396), [inception/compliance_risk.md](inception/compliance_risk.md#L43), [inception/compliance_risk.md](inception/compliance_risk.md#L92), [inception/inception_operating_model.md](inception/inception_operating_model.md#L29), [inception/inception_operating_model.md](inception/inception_operating_model.md#L72), [inception/inception_operating_model.md](inception/inception_operating_model.md#L264), [inception/inception_operating_model.md](inception/inception_operating_model.md#L353), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L128), [inception/technical_architecture.md](inception/technical_architecture.md#L47), [product/donor_funding_activation.md](product/donor_funding_activation.md#L256), [product/donor_funding_activation.md](product/donor_funding_activation.md#L380), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L44), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L124)  
 
-<a id="con-527bfa6796"></a>
+### CON-527BFA6796
 
-### CON-527BFA6796 — Implied concern: Maintain Cache Hit Ratio (CHR) above 92% for restaurant search queries using the Redis Enterprise Cluster.
+**Implied concern: Maintain Cache Hit Ratio (CHR) above 92% for restaurant search queries using the Redis Enterprise Cluster.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/data_model_schema.md](design/data_model_schema.md#L48), [design/data_model_schema.md](design/data_model_schema.md#L139), [design/data_model_schema.md](design/data_model_schema.md#L190), [design/data_model_schema.md](design/data_model_schema.md#L447), [design/infrastructure_topology.md](design/infrastructure_topology.md#L35), [design/infrastructure_topology.md](design/infrastructure_topology.md#L137), [design/infrastructure_topology.md](design/infrastructure_topology.md#L174), [design/security_architecture.md](design/security_architecture.md#L382)  
 
-<a id="con-5bfa25e8f9"></a>
+### CON-5BFA25E8F9
 
-### CON-5BFA25E8F9 — Implied concern: Manage Stripe Connected Account liability and KYC compliance across multiple jurisdictions (SF, NYC, Chicago).
+**Implied concern: Manage Stripe Connected Account liability and KYC compliance across multiple jurisdictions (SF, NYC, Chicago).**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/design_api_surface.md](design/design_api_surface.md#L349), [design/design_api_surface.md](design/design_api_surface.md#L437), [product/donor_funding_activation.md](product/donor_funding_activation.md#L34), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L13)  
 
-<a id="con-5d64ebc654"></a>
+### CON-5D64EBC654
 
-### CON-5D64EBC654 — Latency optimization for real-time POS clearance to prevent restaurant queue stagnation
+**Latency optimization for real-time POS clearance to prevent restaurant queue stagnation**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/integration_adapters.md](design/integration_adapters.md#L369), [inception/inception_operating_model.md](inception/inception_operating_model.md#L27), [inception/inception_operating_model.md](inception/inception_operating_model.md#L72), [inception/inception_operating_model.md](inception/inception_operating_model.md#L365), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L139), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L166), [inception/technical_architecture.md](inception/technical_architecture.md#L242), [inception/technical_architecture.md](inception/technical_architecture.md#L253), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L109)  
 
-<a id="con-6061fcca83"></a>
+### CON-6061FCCA83
 
-### CON-6061FCCA83 — Implement append-only cryptographic log auditing in Aurora PostgreSQL for all financial ledger mutations.
+**Implement append-only cryptographic log auditing in Aurora PostgreSQL for all financial ledger mutations.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/background_processing.md](design/background_processing.md#L112), [design/background_processing.md](design/background_processing.md#L249), [design/background_processing.md](design/background_processing.md#L458), [design/background_processing.md](design/background_processing.md#L477), [design/design_observability.md](design/design_observability.md#L265), [design/design_observability.md](design/design_observability.md#L366), [design/integration_adapters.md](design/integration_adapters.md#L239), [inception/compliance_risk.md](inception/compliance_risk.md#L108), [inception/compliance_risk.md](inception/compliance_risk.md#L132), [inception/compliance_risk.md](inception/compliance_risk.md#L144), [inception/inception_operating_model.md](inception/inception_operating_model.md#L119), [inception/inception_operating_model.md](inception/inception_operating_model.md#L154), [inception/inception_operating_model.md](inception/inception_operating_model.md#L157), [inception/inception_operating_model.md](inception/inception_operating_model.md#L199), [inception/inception_operating_model.md](inception/inception_operating_model.md#L241), [inception/inception_operating_model.md](inception/inception_operating_model.md#L259), [inception/inception_operating_model.md](inception/inception_operating_model.md#L420), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L137), [inception/technical_architecture.md](inception/technical_architecture.md#L44), [inception/technical_architecture.md](inception/technical_architecture.md#L120), [inception/technical_architecture.md](inception/technical_architecture.md#L181), [inception/technical_architecture.md](inception/technical_architecture.md#L262), [inception/technical_architecture.md](inception/technical_architecture.md#L333), [inception/technical_architecture.md](inception/technical_architecture.md#L363), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L98), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L365), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L87), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L128), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L292), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L329), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L338), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L352), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L360), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L375), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L381)  
 
-<a id="con-61ec670500"></a>
+### CON-61EC670500
 
-### CON-61EC670500 — Handling of financial edge cases such as double-spending prevention and voided transactions
+**Handling of financial edge cases such as double-spending prevention and voided transactions**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/data_model_schema.md](design/data_model_schema.md#L80), [design/data_model_schema.md](design/data_model_schema.md#L163), [design/data_model_schema.md](design/data_model_schema.md#L450), [design/infrastructure_topology.md](design/infrastructure_topology.md#L194), [design/integration_adapters.md](design/integration_adapters.md#L377), [inception/inception_operating_model.md](inception/inception_operating_model.md#L119), [inception/inception_operating_model.md](inception/inception_operating_model.md#L183), [inception/inception_operating_model.md](inception/inception_operating_model.md#L238), [inception/inception_operating_model.md](inception/inception_operating_model.md#L421), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L102), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L139), [inception/technical_architecture.md](inception/technical_architecture.md#L35), [inception/technical_architecture.md](inception/technical_architecture.md#L64), [inception/technical_architecture.md](inception/technical_architecture.md#L279), [inception/technical_architecture.md](inception/technical_architecture.md#L344), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L71), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L81)  
 
-<a id="con-62097ebbf3"></a>
+### CON-62097EBBF3
 
-### CON-62097EBBF3 — Manage Stripe Connected Account liability and KYC compliance across multiple jurisdictions (SF, NYC, Chicago).
+**Manage Stripe Connected Account liability and KYC compliance across multiple jurisdictions (SF, NYC, Chicago).**  
 
 **Type:** Implied concern  
 **Referenced in:** [inception/compliance_risk.md](inception/compliance_risk.md#L82), [inception/inception_operating_model.md](inception/inception_operating_model.md#L88), [inception/inception_operating_model.md](inception/inception_operating_model.md#L182), [inception/inception_operating_model.md](inception/inception_operating_model.md#L207), [inception/inception_operating_model.md](inception/inception_operating_model.md#L230), [inception/inception_operating_model.md](inception/inception_operating_model.md#L377), [inception/inception_operating_model.md](inception/inception_operating_model.md#L462), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L90), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L128), [inception/technical_architecture.md](inception/technical_architecture.md#L26), [inception/technical_architecture.md](inception/technical_architecture.md#L97), [inception/technical_architecture.md](inception/technical_architecture.md#L150)  
 
-<a id="con-66390130aa"></a>
+### CON-66390130AA
 
-### CON-66390130AA — Enforce PCI-DSS Level 1 compliance by ensuring zero raw card data touches MealCredit servers, relying entirely on Stripe Elements/SDK.
+**Enforce PCI-DSS Level 1 compliance by ensuring zero raw card data touches MealCredit servers, relying entirely on Stripe Elements/SDK.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/data_model_schema.md](design/data_model_schema.md#L201), [design/design_api_surface.md](design/design_api_surface.md#L3), [design/design_api_surface.md](design/design_api_surface.md#L9), [design/design_api_surface.md](design/design_api_surface.md#L349), [design/design_api_surface.md](design/design_api_surface.md#L394), [design/design_api_surface.md](design/design_api_surface.md#L446), [design/design_observability.md](design/design_observability.md#L326), [design/design_observability.md](design/design_observability.md#L399), [design/infrastructure_topology.md](design/infrastructure_topology.md#L15), [design/infrastructure_topology.md](design/infrastructure_topology.md#L223), [design/integration_adapters.md](design/integration_adapters.md#L5), [design/integration_adapters.md](design/integration_adapters.md#L202), [design/integration_adapters.md](design/integration_adapters.md#L216), [design/integration_adapters.md](design/integration_adapters.md#L282), [inception/compliance_risk.md](inception/compliance_risk.md#L13), [inception/inception_operating_model.md](inception/inception_operating_model.md#L88), [inception/inception_operating_model.md](inception/inception_operating_model.md#L140), [inception/inception_operating_model.md](inception/inception_operating_model.md#L163), [inception/inception_operating_model.md](inception/inception_operating_model.md#L182), [inception/inception_operating_model.md](inception/inception_operating_model.md#L223), [inception/inception_operating_model.md](inception/inception_operating_model.md#L302), [inception/inception_operating_model.md](inception/inception_operating_model.md#L364), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L119), [inception/technical_architecture.md](inception/technical_architecture.md#L24), [inception/technical_architecture.md](inception/technical_architecture.md#L54), [inception/technical_architecture.md](inception/technical_architecture.md#L95), [inception/technical_architecture.md](inception/technical_architecture.md#L144), [inception/technical_architecture.md](inception/technical_architecture.md#L323), [inception/technical_architecture.md](inception/technical_architecture.md#L337), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L115), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L233), [product/donor_funding_activation.md](product/donor_funding_activation.md#L32), [product/donor_funding_activation.md](product/donor_funding_activation.md#L69), [product/donor_funding_activation.md](product/donor_funding_activation.md#L127), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L32), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L342), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L52)  
 
-<a id="con-68497304b1"></a>
+### CON-68497304B1
 
-### CON-68497304B1 — Ensure the Expo mobile application and Wallet passes are fully compatible with screen readers and high-contrast modes for visually impaired beneficiaries.
+**Ensure the Expo mobile application and Wallet passes are fully compatible with screen readers and high-contrast modes for visually impaired beneficiaries.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/infrastructure_topology.md](design/infrastructure_topology.md#L267), [inception/inception_operating_model.md](inception/inception_operating_model.md#L340), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L139), [inception/technical_architecture.md](inception/technical_architecture.md#L14), [product/donor_funding_activation.md](product/donor_funding_activation.md#L82), [product/donor_funding_activation.md](product/donor_funding_activation.md#L266), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L333), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L123)  
 
-<a id="con-6c177d0102"></a>
+### CON-6C177D0102
 
-### CON-6C177D0102 — Design the merchant edge dashboard to support keyboard-only navigation and low-vision readability standards.
+**Design the merchant edge dashboard to support keyboard-only navigation and low-vision readability standards.**  
 
 **Type:** Implied concern  
 **Referenced in:** [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L57), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L139), [inception/technical_architecture.md](inception/technical_architecture.md#L14), [product/donor_funding_activation.md](product/donor_funding_activation.md#L267), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L274), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L282), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L334), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L122)  
 
-<a id="con-6d5e21557b"></a>
+### CON-6D5E21557B
 
-### CON-6D5E21557B — Implied concern: Maintain p99 latency below 250ms for voucher creation and scanning callbacks under 10,000 concurrent connections.
+**Implied concern: Maintain p99 latency below 250ms for voucher creation and scanning callbacks under 10,000 concurrent connections.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/data_model_schema.md](design/data_model_schema.md#L135), [design/data_model_schema.md](design/data_model_schema.md#L438), [design/design_api_surface.md](design/design_api_surface.md#L260), [design/design_integration_adapters_offline_tokens.md](design/design_integration_adapters_offline_tokens.md#L279), [design/infrastructure_topology.md](design/infrastructure_topology.md#L187), [design/infrastructure_topology.md](design/infrastructure_topology.md#L193), [design/infrastructure_topology.md](design/infrastructure_topology.md#L221), [design/integration_adapters.md](design/integration_adapters.md#L13), [design/integration_adapters.md](design/integration_adapters.md#L186), [design/integration_adapters.md](design/integration_adapters.md#L269), [design/integration_adapters.md](design/integration_adapters.md#L371), [design/security_architecture.md](design/security_architecture.md#L380), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L111)  
 
-<a id="con-6eadae655d"></a>
+### CON-6EADAE655D
 
-### CON-6EADAE655D — Implied concern: Scalability of the anonymous credit distribution engine during peak event-driven load
+**Implied concern: Scalability of the anonymous credit distribution engine during peak event-driven load**  
 
 **Type:** Implied concern  
 **Referenced in:** *(not yet in any published artifact)*  
 
-<a id="con-6f604d5455"></a>
+### CON-6F604D5455
 
-### CON-6F604D5455 — Implied concern: Define strict data retention policies for donor transaction history vs. anonymous redemption analytics.
+**Implied concern: Define strict data retention policies for donor transaction history vs. anonymous redemption analytics.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/background_processing.md](design/background_processing.md#L583), [product/donor_funding_activation.md](product/donor_funding_activation.md#L256), [product/donor_funding_activation.md](product/donor_funding_activation.md#L380)  
 
-<a id="con-7031be57b3"></a>
+### CON-7031BE57B3
 
-### CON-7031BE57B3 — Monitor Credit Pool Utilization Rate with automated alerts triggering when thresholds exceed 85%.
+**Monitor Credit Pool Utilization Rate with automated alerts triggering when thresholds exceed 85%.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/background_processing.md](design/background_processing.md#L153), [design/background_processing.md](design/background_processing.md#L317), [design/background_processing.md](design/background_processing.md#L767), [design/design_observability.md](design/design_observability.md#L186), [design/design_observability.md](design/design_observability.md#L383), [design/integration_adapters.md](design/integration_adapters.md#L239), [inception/compliance_risk.md](inception/compliance_risk.md#L102), [inception/inception_operating_model.md](inception/inception_operating_model.md#L44), [inception/inception_operating_model.md](inception/inception_operating_model.md#L117), [inception/inception_operating_model.md](inception/inception_operating_model.md#L181), [inception/inception_operating_model.md](inception/inception_operating_model.md#L188), [inception/inception_operating_model.md](inception/inception_operating_model.md#L224), [inception/inception_operating_model.md](inception/inception_operating_model.md#L274), [inception/inception_operating_model.md](inception/inception_operating_model.md#L282), [inception/inception_operating_model.md](inception/inception_operating_model.md#L418), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L121), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L139), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L159), [inception/technical_architecture.md](inception/technical_architecture.md#L249)  
 
-<a id="con-72d9cecaf8"></a>
+### CON-72D9CECAF8
 
-### CON-72D9CECAF8 — Implied concern: Handling of financial edge cases such as double-spending prevention and voided transactions
+**Implied concern: Handling of financial edge cases such as double-spending prevention and voided transactions**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/integration_adapters.md](design/integration_adapters.md#L377)  
 
-<a id="con-7f03cf540e"></a>
+### CON-7F03CF540E
 
-### CON-7F03CF540E — Maintain p99 latency below 250ms for voucher creation and scanning callbacks under 10,000 concurrent connections.
+**Maintain p99 latency below 250ms for voucher creation and scanning callbacks under 10,000 concurrent connections.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/integration_adapters.md](design/integration_adapters.md#L13), [design/integration_adapters.md](design/integration_adapters.md#L269), [design/integration_adapters.md](design/integration_adapters.md#L371), [inception/inception_operating_model.md](inception/inception_operating_model.md#L292), [inception/inception_operating_model.md](inception/inception_operating_model.md#L455), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L127), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L139), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L167), [inception/technical_architecture.md](inception/technical_architecture.md#L37), [inception/technical_architecture.md](inception/technical_architecture.md#L53), [inception/technical_architecture.md](inception/technical_architecture.md#L57), [inception/technical_architecture.md](inception/technical_architecture.md#L248), [inception/technical_architecture.md](inception/technical_architecture.md#L255), [inception/technical_architecture.md](inception/technical_architecture.md#L309)  
 
-<a id="con-81fb01f06b"></a>
+### CON-81FB01F06B
 
-### CON-81FB01F06B — Ensure SOC2 Type II structural planning is baked into the infrastructure-as-code and access control policies.
+**Ensure SOC2 Type II structural planning is baked into the infrastructure-as-code and access control policies.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/background_processing.md](design/background_processing.md#L147), [design/background_processing.md](design/background_processing.md#L249), [design/data_model_schema.md](design/data_model_schema.md#L61), [design/data_model_schema.md](design/data_model_schema.md#L377), [design/design_observability.md](design/design_observability.md#L149), [design/infrastructure_topology.md](design/infrastructure_topology.md#L223), [inception/compliance_risk.md](inception/compliance_risk.md#L132), [inception/inception_operating_model.md](inception/inception_operating_model.md#L140), [inception/inception_operating_model.md](inception/inception_operating_model.md#L189), [inception/inception_operating_model.md](inception/inception_operating_model.md#L199), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L119), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L139), [inception/technical_architecture.md](inception/technical_architecture.md#L54), [inception/technical_architecture.md](inception/technical_architecture.md#L288), [inception/technical_architecture.md](inception/technical_architecture.md#L337), [product/donor_funding_activation.md](product/donor_funding_activation.md#L18), [product/donor_funding_activation.md](product/donor_funding_activation.md#L121)  
 
-<a id="con-92f07e31b0"></a>
+### CON-92F07E31B0
 
-### CON-92F07E31B0 — Implement strict data isolation where beneficiary demographic status and legal names are cryptographically segregated from public transaction logs.
+**Implement strict data isolation where beneficiary demographic status and legal names are cryptographically segregated from public transaction logs.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/design_observability.md](design/design_observability.md#L26), [design/design_observability.md](design/design_observability.md#L97), [design/design_observability.md](design/design_observability.md#L322), [design/design_observability.md](design/design_observability.md#L325), [design/infrastructure_topology.md](design/infrastructure_topology.md#L63), [design/integration_adapters.md](design/integration_adapters.md#L12), [inception/compliance_risk.md](inception/compliance_risk.md#L54), [inception/compliance_risk.md](inception/compliance_risk.md#L58), [inception/inception_operating_model.md](inception/inception_operating_model.md#L21), [inception/inception_operating_model.md](inception/inception_operating_model.md#L71), [inception/inception_operating_model.md](inception/inception_operating_model.md#L264), [inception/inception_operating_model.md](inception/inception_operating_model.md#L339), [inception/inception_operating_model.md](inception/inception_operating_model.md#L410), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L51), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L119), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L139), [inception/technical_architecture.md](inception/technical_architecture.md#L34), [inception/technical_architecture.md](inception/technical_architecture.md#L55), [inception/technical_architecture.md](inception/technical_architecture.md#L121), [inception/technical_architecture.md](inception/technical_architecture.md#L159), [inception/technical_architecture.md](inception/technical_architecture.md#L333), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L68), [product/donor_funding_activation.md](product/donor_funding_activation.md#L251), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L214), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L239), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L38), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L46), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L105), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L194), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L274)  
 
-<a id="con-94f025d2c8"></a>
+### CON-94F025D2C8
 
-### CON-94F025D2C8 — Disaster recovery procedures for financial ledger consistency in the event of infrastructure failure
+**Disaster recovery procedures for financial ledger consistency in the event of infrastructure failure**  
 
 **Type:** Implied concern  
 **Referenced in:** [inception/inception_operating_model.md](inception/inception_operating_model.md#L390), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L139), [inception/technical_architecture.md](inception/technical_architecture.md#L46), [inception/technical_architecture.md](inception/technical_architecture.md#L123)  
 
-<a id="con-9b82d67faf"></a>
+### CON-9B82D67FAF
 
-### CON-9B82D67FAF — Ensure cross-border data residency compliance if the platform expands beyond the initial US metro footprints.
+**Ensure cross-border data residency compliance if the platform expands beyond the initial US metro footprints.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/design_api_surface.md](design/design_api_surface.md#L349), [design/design_api_surface.md](design/design_api_surface.md#L385), [design/design_api_surface.md](design/design_api_surface.md#L432), [design/security_architecture.md](design/security_architecture.md#L245), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L128), [inception/technical_architecture.md](inception/technical_architecture.md#L63), [inception/technical_architecture.md](inception/technical_architecture.md#L337), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L109), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L144)  
 
-<a id="con-a0b785a40d"></a>
+### CON-A0B785A40D
 
-### CON-A0B785A40D — Implied concern: Ensure Stripe Webhook Processing Latency averages below 150ms from card tap to merchant ledger entry.
+**Implied concern: Ensure Stripe Webhook Processing Latency averages below 150ms from card tap to merchant ledger entry.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/design_observability.md](design/design_observability.md#L216), [design/design_observability.md](design/design_observability.md#L393)  
 
-<a id="con-aa83b13877"></a>
+### CON-AA83B13877
 
-### CON-AA83B13877 — Protect against replay attacks on offline fallback QR/barcode tokens using time-bound cryptographic signatures.
+**Protect against replay attacks on offline fallback QR/barcode tokens using time-bound cryptographic signatures.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/design_integration_adapters_offline_tokens.md](design/design_integration_adapters_offline_tokens.md#L67), [design/integration_adapters.md](design/integration_adapters.md#L159), [design/integration_adapters.md](design/integration_adapters.md#L184), [design/integration_adapters.md](design/integration_adapters.md#L204), [design/security_architecture.md](design/security_architecture.md#L44), [design/security_architecture.md](design/security_architecture.md#L78), [inception/inception_operating_model.md](inception/inception_operating_model.md#L250), [inception/inception_operating_model.md](inception/inception_operating_model.md#L259), [inception/inception_operating_model.md](inception/inception_operating_model.md#L412), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L139), [inception/technical_architecture.md](inception/technical_architecture.md#L15), [inception/technical_architecture.md](inception/technical_architecture.md#L65), [inception/technical_architecture.md](inception/technical_architecture.md#L86), [inception/technical_architecture.md](inception/technical_architecture.md#L266), [inception/technical_architecture.md](inception/technical_architecture.md#L343), [product/donor_funding_activation.md](product/donor_funding_activation.md#L350)  
 
-<a id="con-b1dfebec8c"></a>
+### CON-B1DFEBEC8C
 
-### CON-B1DFEBEC8C — Comply with financial regulations governing quasi-cash instruments, specifically regarding unclaimed property and escheatment laws for expiring credits.
+**Comply with financial regulations governing quasi-cash instruments, specifically regarding unclaimed property and escheatment laws for expiring credits.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/background_processing.md](design/background_processing.md#L771), [design/design_api_surface.md](design/design_api_surface.md#L396), [design/design_observability.md](design/design_observability.md#L158), [inception/compliance_risk.md](inception/compliance_risk.md#L24), [inception/inception_operating_model.md](inception/inception_operating_model.md#L53), [inception/inception_operating_model.md](inception/inception_operating_model.md#L75), [inception/inception_operating_model.md](inception/inception_operating_model.md#L170), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L128), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L139), [inception/technical_architecture.md](inception/technical_architecture.md#L177), [product/donor_funding_activation.md](product/donor_funding_activation.md#L94), [product/donor_funding_activation.md](product/donor_funding_activation.md#L172), [product/donor_funding_activation.md](product/donor_funding_activation.md#L256), [product/donor_funding_activation.md](product/donor_funding_activation.md#L297), [product/donor_funding_activation.md](product/donor_funding_activation.md#L380), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L24), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L79), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L135), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L148), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L292), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L86)  
 
-<a id="con-b3d71a437d"></a>
+### CON-B3D71A437D
 
-### CON-B3D71A437D — Implied concern: Adhere to FTC guidelines on anonymity, ensuring no de-anonymization attacks can link beneficiaries to donors through metadata anal...
+**Implied concern: Adhere to FTC guidelines on anonymity, ensuring no de-anonymization attacks can link beneficiaries to donors through metadata anal...**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/data_model_schema.md](design/data_model_schema.md#L123), [design/data_model_schema.md](design/data_model_schema.md#L201), [design/data_model_schema.md](design/data_model_schema.md#L207), [design/data_model_schema.md](design/data_model_schema.md#L276), [design/data_model_schema.md](design/data_model_schema.md#L357), [design/design_api_surface.md](design/design_api_surface.md#L230), [design/design_integration_adapters_offline_tokens.md](design/design_integration_adapters_offline_tokens.md#L44), [design/design_observability.md](design/design_observability.md#L399), [design/infrastructure_topology.md](design/infrastructure_topology.md#L123), [design/security_architecture.md](design/security_architecture.md#L11), [design/security_architecture.md](design/security_architecture.md#L33), [design/security_architecture.md](design/security_architecture.md#L78), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L181), [product/donor_funding_activation.md](product/donor_funding_activation.md#L252), [product/donor_funding_activation.md](product/donor_funding_activation.md#L375), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L73), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L292), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L42), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L194)  
 
-<a id="con-bb253df0a2"></a>
+### CON-BB253DF0A2
 
-### CON-BB253DF0A2 — Implied concern: Log all administrative ledger operations and infrastructure changes to AWS CloudTrail for SOC2 Type II evidence.
+**Implied concern: Log all administrative ledger operations and infrastructure changes to AWS CloudTrail for SOC2 Type II evidence.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/data_model_schema.md](design/data_model_schema.md#L268), [design/design_api_surface.md](design/design_api_surface.md#L208), [design/design_api_surface.md](design/design_api_surface.md#L404), [design/design_api_surface.md](design/design_api_surface.md#L441), [design/design_observability.md](design/design_observability.md#L48), [design/infrastructure_topology.md](design/infrastructure_topology.md#L110), [design/integration_adapters.md](design/integration_adapters.md#L264), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L116), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L42), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L365), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L42)  
 
-<a id="con-bf1cd5707e"></a>
+### CON-BF1CD5707E
 
-### CON-BF1CD5707E — Implied concern: Achieve 99.99% operational uptime across AWS multi-AZ configurations for all critical service endpoints.
+**Implied concern: Achieve 99.99% operational uptime across AWS multi-AZ configurations for all critical service endpoints.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/infrastructure_topology.md](design/infrastructure_topology.md#L222), [design/integration_adapters.md](design/integration_adapters.md#L373), [design/security_architecture.md](design/security_architecture.md#L385), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L61)  
 
-<a id="con-c22d030d21"></a>
+### CON-C22D030D21
 
-### CON-C22D030D21 — Adhere to FTC guidelines on anonymity, ensuring no de-anonymization attacks can link beneficiaries to donors through metadata analysis.
+**Adhere to FTC guidelines on anonymity, ensuring no de-anonymization attacks can link beneficiaries to donors through metadata analysis.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/design_observability.md](design/design_observability.md#L97), [inception/compliance_risk.md](inception/compliance_risk.md#L25), [inception/compliance_risk.md](inception/compliance_risk.md#L37), [inception/compliance_risk.md](inception/compliance_risk.md#L54), [inception/compliance_risk.md](inception/compliance_risk.md#L66), [inception/compliance_risk.md](inception/compliance_risk.md#L94), [inception/inception_operating_model.md](inception/inception_operating_model.md#L13), [inception/inception_operating_model.md](inception/inception_operating_model.md#L70), [inception/inception_operating_model.md](inception/inception_operating_model.md#L147), [inception/inception_operating_model.md](inception/inception_operating_model.md#L162), [inception/inception_operating_model.md](inception/inception_operating_model.md#L221), [inception/inception_operating_model.md](inception/inception_operating_model.md#L263), [inception/inception_operating_model.md](inception/inception_operating_model.md#L302), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L51), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L107), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L137), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L139), [inception/technical_architecture.md](inception/technical_architecture.md#L34), [inception/technical_architecture.md](inception/technical_architecture.md#L55), [inception/technical_architecture.md](inception/technical_architecture.md#L166), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L32), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L117), [product/donor_funding_activation.md](product/donor_funding_activation.md#L252), [product/donor_funding_activation.md](product/donor_funding_activation.md#L375), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L73), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L42), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L194)  
 
-<a id="con-c42f7b521b"></a>
+### CON-C42F7B521B
 
-### CON-C42F7B521B — Secure client-side storage on Expo devices using SecureStore for offline tokens, preventing token theft or cloning.
+**Secure client-side storage on Expo devices using SecureStore for offline tokens, preventing token theft or cloning.**  
 
 **Type:** Implied concern  
 **Referenced in:** [inception/compliance_risk.md](inception/compliance_risk.md#L36), [inception/inception_operating_model.md](inception/inception_operating_model.md#L411), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L139), [inception/technical_architecture.md](inception/technical_architecture.md#L16), [inception/technical_architecture.md](inception/technical_architecture.md#L275)  
 
-<a id="con-c4f0e02638"></a>
+### CON-C4F0E02638
 
-### CON-C4F0E02638 — Implied concern: Enforce PCI-DSS Level 1 compliance by ensuring zero raw card data touches MealCredit servers, relying entirely on Stripe Elements/...
+**Implied concern: Enforce PCI-DSS Level 1 compliance by ensuring zero raw card data touches MealCredit servers, relying entirely on Stripe Elements/...**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/design_observability.md](design/design_observability.md#L326), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L342)  
 
-<a id="con-cd9bdf7662"></a>
+### CON-CD9BDF7662
 
-### CON-CD9BDF7662 — Implied concern: Ensure the Expo mobile application and Wallet passes are fully compatible with screen readers and high-contrast modes for visually...
+**Implied concern: Ensure the Expo mobile application and Wallet passes are fully compatible with screen readers and high-contrast modes for visually...**  
 
 **Type:** Implied concern  
 **Referenced in:** [product/donor_funding_activation.md](product/donor_funding_activation.md#L82), [product/donor_funding_activation.md](product/donor_funding_activation.md#L266), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L282), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L333), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L123)  
 
-<a id="con-d0defc531a"></a>
+### CON-D0DEFC531A
 
-### CON-D0DEFC531A — Implied concern: Design the merchant edge dashboard to support keyboard-only navigation and low-vision readability standards.
+**Implied concern: Design the merchant edge dashboard to support keyboard-only navigation and low-vision readability standards.**  
 
 **Type:** Implied concern  
 **Referenced in:** [product/donor_funding_activation.md](product/donor_funding_activation.md#L267), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L334), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L122)  
 
-<a id="con-d0f5814f21"></a>
+### CON-D0F5814F21
 
-### CON-D0F5814F21 — Implied concern: Track Donation-to-Redemption Velocity (DRV) to monitor liquidity health against the 14-day target.
+**Implied concern: Track Donation-to-Redemption Velocity (DRV) to monitor liquidity health against the 14-day target.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/background_processing.md](design/background_processing.md#L133), [design/background_processing.md](design/background_processing.md#L309), [design/background_processing.md](design/background_processing.md#L565), [design/background_processing.md](design/background_processing.md#L578), [design/data_model_schema.md](design/data_model_schema.md#L52), [design/data_model_schema.md](design/data_model_schema.md#L57), [design/data_model_schema.md](design/data_model_schema.md#L101), [design/data_model_schema.md](design/data_model_schema.md#L413), [design/data_model_schema.md](design/data_model_schema.md#L489), [design/design_observability.md](design/design_observability.md#L388)  
 
-<a id="con-ddb51ebf45"></a>
+### CON-DDB51EBF45
 
-### CON-DDB51EBF45 — Implied concern: Ensure cross-border data residency compliance if the platform expands beyond the initial US metro footprints.
+**Implied concern: Ensure cross-border data residency compliance if the platform expands beyond the initial US metro footprints.**  
 
 **Type:** Implied concern  
 **Referenced in:** *(not yet in any published artifact)*  
 
-<a id="con-e84412a0fa"></a>
+### CON-E84412A0FA
 
-### CON-E84412A0FA — Implied concern: Ensure SOC2 Type II structural planning is baked into the infrastructure-as-code and access control policies.
+**Implied concern: Ensure SOC2 Type II structural planning is baked into the infrastructure-as-code and access control policies.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/background_processing.md](design/background_processing.md#L147), [design/background_processing.md](design/background_processing.md#L249), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L180), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L204), [product/ngo_governance_offboarding.md](product/ngo_governance_offboarding.md#L338)  
 
-<a id="con-ea7c3efecb"></a>
+### CON-EA7C3EFECB
 
-### CON-EA7C3EFECB — Maintain Cache Hit Ratio (CHR) above 92% for restaurant search queries using the Redis Enterprise Cluster.
+**Maintain Cache Hit Ratio (CHR) above 92% for restaurant search queries using the Redis Enterprise Cluster.**  
 
 **Type:** Implied concern  
 **Referenced in:** [inception/inception_operating_model.md](inception/inception_operating_model.md#L454), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L130), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L139), [inception/technical_architecture.md](inception/technical_architecture.md#L37), [inception/technical_architecture.md](inception/technical_architecture.md#L122), [inception/technical_architecture.md](inception/technical_architecture.md#L261), [inception/technical_architecture.md](inception/technical_architecture.md#L309), [inception/technical_architecture.md](inception/technical_architecture.md#L363), [inception/technical_architecture.md](inception/technical_architecture.md#L377)  
 
-<a id="con-f89c70071e"></a>
+### CON-F89C70071E
 
-### CON-F89C70071E — Track Donation-to-Redemption Velocity (DRV) to monitor liquidity health against the 14-day target.
+**Track Donation-to-Redemption Velocity (DRV) to monitor liquidity health against the 14-day target.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/background_processing.md](design/background_processing.md#L133), [design/background_processing.md](design/background_processing.md#L309), [design/background_processing.md](design/background_processing.md#L565), [design/design_observability.md](design/design_observability.md#L388), [inception/compliance_risk.md](inception/compliance_risk.md#L102), [inception/inception_operating_model.md](inception/inception_operating_model.md#L44), [inception/inception_operating_model.md](inception/inception_operating_model.md#L118), [inception/inception_operating_model.md](inception/inception_operating_model.md#L190), [inception/inception_operating_model.md](inception/inception_operating_model.md#L225), [inception/inception_operating_model.md](inception/inception_operating_model.md#L287), [inception/inception_operating_model.md](inception/inception_operating_model.md#L419), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L36), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L121), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L139), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L160), [inception/technical_architecture.md](inception/technical_architecture.md#L345)  
 
-<a id="con-fa7a13e601"></a>
+### CON-FA7A13E601
 
-### CON-FA7A13E601 — Ensure offline fallback interfaces are intuitive and accessible without requiring complex technical troubleshooting.
+**Ensure offline fallback interfaces are intuitive and accessible without requiring complex technical troubleshooting.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/infrastructure_topology.md](design/infrastructure_topology.md#L267), [inception/inception_operating_model.md](inception/inception_operating_model.md#L20), [inception/inception_operating_model.md](inception/inception_operating_model.md#L341), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L139), [inception/technical_architecture.md](inception/technical_architecture.md#L15), [product/donor_funding_activation.md](product/donor_funding_activation.md#L271)  
 
-<a id="con-fbbbf07295"></a>
+### CON-FBBBF07295
 
-### CON-FBBBF07295 — Log all administrative ledger operations and infrastructure changes to AWS CloudTrail for SOC2 Type II evidence.
+**Log all administrative ledger operations and infrastructure changes to AWS CloudTrail for SOC2 Type II evidence.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/integration_adapters.md](design/integration_adapters.md#L264), [inception/compliance_risk.md](inception/compliance_risk.md#L107), [inception/compliance_risk.md](inception/compliance_risk.md#L150), [inception/inception_operating_model.md](inception/inception_operating_model.md#L45), [inception/inception_operating_model.md](inception/inception_operating_model.md#L156), [inception/inception_operating_model.md](inception/inception_operating_model.md#L157), [inception/inception_operating_model.md](inception/inception_operating_model.md#L389), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L139), [inception/technical_architecture.md](inception/technical_architecture.md#L36), [inception/technical_architecture.md](inception/technical_architecture.md#L163), [inception/technical_architecture.md](inception/technical_architecture.md#L288), [inception/technical_architecture.md](inception/technical_architecture.md#L337), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L9), [product/dispute_resolution_fraud.md](product/dispute_resolution_fraud.md#L151), [product/merchant_pos_integration.md](product/merchant_pos_integration.md#L365)  
 
-<a id="con-fc09c32f32"></a>
+### CON-FC09C32F32
 
-### CON-FC09C32F32 — Implied concern: Provide multi-modal interaction paths (voice, tap, scan) for donation round-up configuration and redemption history.
+**Implied concern: Provide multi-modal interaction paths (voice, tap, scan) for donation round-up configuration and redemption history.**  
 
 **Type:** Implied concern  
 **Referenced in:** [product/donor_funding_activation.md](product/donor_funding_activation.md#L268), [product/donor_funding_activation.md](product/donor_funding_activation.md#L381)  
 
-<a id="con-fcff86a326"></a>
+### CON-FCFF86A326
 
-### CON-FCFF86A326 — Implied concern: Classify all beneficiary-related data as 'Highly Sensitive' and restrict database access to cryptographic hashing layers only.
+**Implied concern: Classify all beneficiary-related data as 'Highly Sensitive' and restrict database access to cryptographic hashing layers only.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/integration_adapters.md](design/integration_adapters.md#L220), [product/product_beneficiary_redemption_engine.md](product/product_beneficiary_redemption_engine.md#L52)  
 
-<a id="con-fd21121dd5"></a>
+### CON-FD21121DD5
 
-### CON-FD21121DD5 — Achieve 99.99% operational uptime across AWS multi-AZ configurations for all critical service endpoints.
+**Achieve 99.99% operational uptime across AWS multi-AZ configurations for all critical service endpoints.**  
 
 **Type:** Implied concern  
 **Referenced in:** [design/integration_adapters.md](design/integration_adapters.md#L373), [inception/inception_operating_model.md](inception/inception_operating_model.md#L45), [inception/inception_operating_model.md](inception/inception_operating_model.md#L74), [inception/inception_operating_model.md](inception/inception_operating_model.md#L448), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L130), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L139), [inception/inception_product_strategy.md](inception/inception_product_strategy.md#L166), [inception/technical_architecture.md](inception/technical_architecture.md#L47), [inception/technical_architecture.md](inception/technical_architecture.md#L56)  
