@@ -6,7 +6,9 @@
 
 - [background processing](design/background_processing.md)
 - [data model schema](design/data_model_schema.md)
+- [design api surface graphql schema](design/design_api_surface_graphql_schema.md)
 - [design api surface](design/design_api_surface.md)
+- [design frontend presentation](design/design_frontend_presentation.md)
 - [design integration adapters offline tokens](design/design_integration_adapters_offline_tokens.md)
 - [design observability](design/design_observability.md)
 - [infrastructure topology](design/infrastructure_topology.md)
