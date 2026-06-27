@@ -1,5 +1,7 @@
 # Product Strategy & Value Proposition
 
+## 1. Product Strategy & Value Proposition
+
 ### 1.1 Core Mission: Decoupling Food Assistance from Social Stigma
 The MealCredit platform is designed to eliminate the social stigma traditionally associated with food assistance by converting real-time financial micro-donations into fractional, anonymous culinary credits. These credits function identically to cash or standard gift cards at commercial restaurant establishments, ensuring that Beneficiaries (ACT-ADA6716160) can exercise choice and dignity without revealing their status to Merchant Partners (ACT-AF904DCFF9) or the public. This 'dignity by design' approach is the foundational value proposition that drives user adoption and platform trust.
 
@@ -17,7 +19,16 @@ To ensure the platform operates within its intended social-impact mandate, stric
 *   **Donor (ACT-80C62C7814) Rights & Expectations:** Donors retain the right to direct impact flows (global, regional, or specific merchant types) as defined in the platform's donation engine. Their primary governance interaction is through transparent impact reporting, which must strictly adhere to FTC anonymity guidelines to prevent any linkage between donor identity and beneficiary identity.
 *   **Merchant Partner (ACT-AF904DCFF9) Obligations:** Merchant Partners are bound by strict data handling and service level obligations. They must accept MealCredits as equivalent to cash, maintain PCI-DSS compliance at the point of sale, and participate in the platform's dispute resolution framework (JNY-E5F45D37C6) without attempting to de-anonymize the transaction source.
 
-### 2.6 Quasi-Cash Instrument Classification and Escheatment
+### 1.4 Strategic Roadmap & Scale
+The initial phase targets 50,000 Monthly Active Users (MAU) across three metropolitan footprints: San Francisco, New York City, and Chicago. The strategy involves transitioning from a single-city MVP to a resilient, multi-tenant architecture capable of supporting this scale. This modernization includes replacing legacy polling mechanisms with an event-driven serverless architecture and integrating robust enterprise POS gateways to ensure seamless transactions.
+
+### 1.6 Knowledge Gaps
+*   **KNOWLEDGE_GAP:** Specific escheatment laws for quasi-cash instruments in SF, NYC, and Chicago require legal review to determine exact retention periods and reporting obligations.
+*   **KNOWLEDGE_GAP:** The exact fee structure for Merchant Partners is not yet defined and needs to be established to ensure merchant adoption while maintaining platform sustainability.
+
+---
+
+### 2.1. Quasi-Cash Instrument Classification and Escheatment
 
 MealCredits are classified as a prepaid access instrument or stored-value card under federal and state financial regulations. As such, they are subject to unclaimed property laws, which require the holder of the funds to report and remit dormant balances to the state.
 
@@ -32,7 +43,7 @@ For the small percentage of credits that expire without redemption, the platform
 
 **Knowledge Gap:** The specific escheatment thresholds and reporting frequencies for California, New York, and Illinois must be confirmed by Legal Counsel before the financial engine (CAP-TRANSACTION-FINANCIAL-ENGINE) is finalized.
 
-### 2.7 FTC Anonymity Guidelines and De-anonymization Prevention
+### 2.2. FTC Anonymity Guidelines and De-anonymization Prevention
 
 The core value proposition of MealCredit is decoupling food assistance from social stigma. This requires absolute anonymity for the Beneficiary (ACT-ADA6716160). The Federal Trade Commission (FTC) guidelines on privacy and data security mandate that any data collection must not enable the de-anonymization of individuals, especially in sensitive contexts like food assistance.
 
@@ -45,7 +56,7 @@ All analytics and impact reporting will rely on UUIDv4 mapping (CON-23A501C051).
 **Merchant POS Interface Constraints**
 The Merchant edge dashboard (CON-6C177D0102) and POS integration must be designed to display generic "Payment Approved" messages. Any UI element that reveals the source of funds (e.g., "MealCredit Payment") must be avoided to prevent social stigma. The Merchant (ACT-AF904DCFF9) will be trained to treat MealCredits exactly like cash or standard gift cards, with no special handling or disclosure required.
 
-### 2.8 Regulatory Risk Summary
+### 2.3. Regulatory Risk Summary
 
 | Regulatory Domain | Specific Risk | Strategic Mitigation | Primary Owner |
 | :--- | :--- | :--- | :--- |
@@ -57,7 +68,7 @@ This regulatory posture ensures that MealCredit not only complies with current l
 
 ---
 
-### 3.9 Strategic Value Proposition for Merchants
+### 3.1. Strategic Value Proposition for Merchants
 
 To achieve the target scale of 50,000 MAU, the platform must incentivize Merchant Partners to adopt the MealCredit payment rail. The value proposition is built on three pillars:
 
@@ -82,7 +93,7 @@ To comply with financial regulations governing quasi-cash instruments, all Merch
     *   **Chicago:** Compliance with Illinois state financial regulations and Chicago local business licensing.
 *   **Unclaimed Property and Escheatment:** Merchants must agree to the platform's data retention and unclaimed property policies. Any residual credit balances in a Beneficiary's account that are not redeemed within the specified period (e.g., 14-day DRV target) will be subject to escheatment laws in the relevant jurisdiction. Merchants are not liable for unclaimed property; this is managed centrally by the platform.
 
-### 3.10 Liability Frameworks
+### 3.3. Liability Frameworks
 
 The liability framework is designed to protect the platform, Donors, and Merchants from financial loss and regulatory penalties.
 
@@ -141,24 +152,46 @@ The final phase focuses on optimizing the platform for long-term sustainability,
 
 To validate the strategic alignment of the MealCredit platform and ensure the viability of the tripartite marketplace, success is measured through a balanced scorecard of liquidity health, operational resilience, and user engagement. These metrics are designed to provide real-time visibility into the platform's ability to decouple food assistance from social stigma while maintaining financial integrity across the SF, NYC, and Chicago metropolitan footprints.
 
-### 5.1 Liquidity and Financial Health
+### 5.1. Liquidity and Financial Health
 
 The core engine of the MealCredit platform is the conversion of donor funds into merchant-ready credits. The health of this engine is tracked through two primary liquidity metrics:
 
 *   **Credit Pool Utilization Rate (CON-7031BE57B3):** This metric monitors the percentage of available donor funds that are actively deployed in the ecosystem. A utilization rate below 85% indicates a liquidity shortfall, potentially leading to beneficiary redemption failures and donor dissatisfaction. Conversely, a rate persistently above 95% may signal a risk of fund exhaustion during peak demand. Automated alerts must trigger when thresholds deviate from the 85-95% optimal band to allow for dynamic donor engagement campaigns or fund top-ups.
 *   **Donation-to-Redemption Velocity (DRV) (CON-F89C70071E):** DRV measures the average time elapsed between a donor's contribution and the subsequent redemption of those funds by a beneficiary. The strategic target is a 14-day velocity, ensuring that donor intent is realized quickly and that credits remain fresh and relevant to the beneficiary. A slowing DRV indicates friction in the redemption journey (JNY-E82B8A88D8) or a lack of merchant participation, requiring immediate operational intervention.
 
-### 5.2 Operational Resilience and Performance
+### 5.2. Operational Resilience and Performance
 
 Given the platform's role in providing essential food assistance, operational uptime and transaction speed are non-negotiable components of the value proposition. The platform must support 50,000 MAU with zero tolerance for service degradation during peak meal times.
 
 *   **Operational Uptime (CON-FD21121DD5):** The platform must achieve 99.99% operational uptime across all AWS multi-AZ configurations. This high availability standard is critical to prevent queue stagnation at merchant POS terminals (CON-5D64EBC654) and to maintain trust with Merchant Partners (ACT-AF904DCFF9) who rely on instant payouts.
 *   **Transaction Latency:** While not a primary KPI for this strategic section, the underlying performance must support p99 latency below 250ms for voucher creation and scanning callbacks (CON-7F03CF540E) to ensure a seamless, cash-like experience for beneficiaries.
 
-### 5.3 User Engagement and Ecosystem Growth
+### 5.3. User Engagement and Ecosystem Growth
 
 Strategic success is also defined by the active participation and satisfaction of the three core actor groups: Donors (ACT-80C62C7814), Beneficiaries (ACT-ADA6716160), and Merchant Partners (ACT-AF904DCFF9).
 
 *   **Monthly Active Users (MAU):** The primary growth target is 50,000 MAU across the three initial metro footprints. This metric is tracked per actor group to ensure balanced ecosystem growth. For example, an imbalance between Donor and Beneficiary MAU may indicate a mismatch in funding supply and demand.
 *   **Merchant Onboarding and POS Integration (JNY-356F465DB3):** Success is measured by the number of active Merchant Partners integrated with the platform's POS gateway. A high number of onboarded but inactive merchants indicates a friction point in the integration process or a lack of beneficiary traffic in their locations.
 *   **Beneficiary Redemption Frequency:** This metric tracks how often beneficiaries use their credits. A low frequency may indicate a lack of merchant acceptance or a barrier to entry in the redemption journey, directly impacting the platform's mission to reduce stigma by making the experience indistinguishable from standard cash transactions.
+
+### 5.5. Strategic Alignment Validation
+
+These KPIs are directly tied to the system evolution objectives:
+1.  **Scale:** MAU and Merchant Onboarding metrics validate the transition to a multi-tenant architecture.
+2.  **Modernization:** DRV and Latency metrics validate the effectiveness of the event-driven serverless architecture and micro-frontends.
+3.  **Compliance and Trust:** Credit Pool Utilization and Operational Uptime metrics validate the platform's ability to maintain trust and financial integrity, which are foundational to the PCI-DSS Level 1 and SOC2 Type II compliance goals.
+
+By monitoring these signals, the MealCredit platform can ensure that its strategic mission of decoupling food assistance from social stigma is not only technically feasible but also operationally sustainable and financially viable.
+
+---
+
+## VP decision
+
+**Decision:** Approved
+
+---
+
+## VP feedback
+
+- Section 2.1 Quasi-Cash Instrument Classification: Replace the '14-day credit expiration' policy with the requirement-mandated '72-hour expiration' for unused emergency credits to prevent ledger stagnation.
+- Project identity grounding evidence: Project identity mismatch: ACT-09E028AEB0 is canonically 'NGO Operator', but this artifact binds it to 'NGOs'.

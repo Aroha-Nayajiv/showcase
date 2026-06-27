@@ -10,7 +10,7 @@ To meet the target scale of 50,000 MAU and ensure high availability, the platfor
 
 Each region operates as an independent logical tenant with isolated VPCs, databases, and compute resources. Cross-region replication is reserved for disaster recovery (CON-10F4381094) and is not used for active transaction processing to prevent split-brain financial ledger issues.
 
-### 1.1 Network Topology & Segmentation
+### 1.1. Network Topology & Segmentation
 
 Each regional VPC is segmented into public, private, and isolated subnets to enforce strict security boundaries and PCI-DSS Level 1 compliance (CON-66390130AA).
 
@@ -19,7 +19,7 @@ Each regional VPC is segmented into public, private, and isolated subnets to enf
 *   **Private Subnets (Data Tier):** Host Aurora PostgreSQL, DynamoDB Global Tables (if used for non-financial data), and ElastiCache Redis clusters. These subnets are strictly isolated from the public internet.
 *   **Isolated Subnets (Database Tier):** Host the primary Aurora PostgreSQL instances for the financial ledger. These subnets have no internet gateway or NAT gateway access, ensuring zero raw card data or PII can exfiltrate.
 
-### 1.2 Core Infrastructure Services
+### 1.2. Core Infrastructure Services
 
 #### 1.2.1. Compute & Orchestration
 
@@ -34,7 +34,7 @@ Each regional VPC is segmented into public, private, and isolated subnets to enf
     *   `KNOWLEDGE_GAP: Financial ledger reconciliation strategy - The decision to use Aurora PostgreSQL for the financial ledger is based on ACID requirements. However, the specific reconciliation process (e.g., periodic hash-checksums vs. distributed write-ahead ledger) is not yet defined. This must be detailed in the Financial Ledger Data Model artifact.`
 *   **Redis Enterprise Cluster:** Provides caching for restaurant search queries and session data, targeting a Cache Hit Ratio (CHR) above 92% (CON-527BFA6796). Deployed in a multi-AZ configuration for high availability.
 
-### 1.3 Knowledge Gaps & Assumptions
+### 1.3. Knowledge Gaps & Assumptions
 
 *   `ASSUMPTION: Single-Region Active Deployment - It is assumed that each metro footprint will operate in a single AWS Region for active traffic. Cross-region replication is deferred to Phase 2 for disaster recovery. Evidence needed: Business requirement for active-active cross-region failover.`
 *   `ASSUMPTION: Stripe Connected Accounts - It is assumed that Stripe Connected Accounts will be used for merchant payouts, requiring KYC compliance across jurisdictions (SF, NYC, Chicago). Evidence needed: Confirmation of Stripe product selection for payouts.`
@@ -45,7 +45,7 @@ Each regional VPC is segmented into public, private, and isolated subnets to enf
 
 This section defines the logical and physical data isolation boundaries for the MealCredit platform, ensuring strict segregation between NGO Operator operational data and Highly Sensitive Beneficiary information. The strategy is designed to support 50,000 MAU across SF, NYC, and Chicago while maintaining PCI-DSS Level 1 and SOC2 Type II compliance.
 
-### 2.1 Logical Isolation Architecture
+### 2.1. Logical Isolation Architecture
 
 The platform utilizes a Multi-Tenant Logical Isolation model within a shared AWS infrastructure footprint per metropolitan region. This approach balances cost-efficiency with strict data segregation requirements.
 
@@ -58,7 +58,7 @@ The platform utilizes a Multi-Tenant Logical Isolation model within a shared AWS
     *   **Database Level:** Aurora PostgreSQL (Serverless v2) will enforce isolation using Row-Level Security (RLS) policies. Each query must include a tenant_id context variable. RLS policies will automatically filter rows based on the authenticated user's NGO Operator association.
     *   **Application Level:** The API Orchestration Layer (SUR-85E4A5B6E7) will inject the tenant_id into the database connection context for every request originating from an NGO Operator or Beneficiary client.
 
-### 2.2 Cryptographic Segregation of Highly Sensitive Data
+### 2.2. Cryptographic Segregation of Highly Sensitive Data
 
 To adhere to CON-<timestamp> (Classify all beneficiary-related data as 'Highly Sensitive') and CON-92F07E31B0 (Implement strict data isolation where beneficiary demographic status and legal names are cryptographically segregated), the following strategy is implemented:
 
@@ -74,7 +74,33 @@ To adhere to CON-<timestamp> (Classify all beneficiary-related data as 'Highly S
 *   **Anonymization for Analytics:**
     *   CON-23A501C051 (Correlate donor impact receipts with beneficiary redemption events without linking PII) is addressed by using UUIDv4 mapping for analytics. The mapping table between UUIDs and hashed PII is stored in the HSD Vault and is never exposed to the analytics engine or NGO Operator dashboards.
 
-### 3.1 Financial Ledger: Aurora PostgreSQL (Serverless v2)
+### 2.3. Network & Infrastructure Isolation
+
+*   **VPC Segmentation:**
+    *   Each metropolitan footprint (SF, NYC, Chicago) will have its own AWS VPC to ensure network-level isolation.
+    *   Within each VPC, Private Subnets will host the Aurora PostgreSQL instances and Redis Enterprise Clusters. These subnets will have no direct internet access.
+    *   Public Subnets will host the API Gateway and Load Balancers, which will proxy requests to the private subnets via VPC Endpoints.
+
+*   **Encryption at Rest and in Transit:**
+    *   **At Rest:** All data stores (Aurora, DynamoDB, Redis) will be encrypted using AWS KMS keys. The HSD Vault will use a separate KMS key with stricter access policies.
+    *   **In Transit:** All internal communication between services (API Gateway, Lambda, Aurora) will use TLS 1.3. Internal service-to-service communication will be authenticated using mutual TLS (mTLS) where applicable.
+
+### 2.4. Validation Criteria
+
+*   **Data Isolation:** NGO Operators must not be able to query beneficiary PII from other NGOs. Test: Attempt to query beneficiary data with a different tenant_id context variable.
+*   **Cryptographic Segregation:** HSD fields must be stored as hashes in the operational schema. Test: Verify that plaintext PII is not present in the operational schema.
+*   **Compliance:** All administrative actions must be logged to CloudTrail. Test: Perform an administrative action and verify the log entry in CloudTrail.
+*   **PCI-DSS:** No raw card data must be stored in MealCredit's infrastructure. Test: Scan the database schema and application code for any card data storage logic.
+
+This design ensures that the MealCredit platform meets its strict data isolation and compliance requirements while supporting the scale and performance needs of 50,000 MAU across three metropolitan footprints.
+
+---
+
+## 3. Core Infrastructure Components & Data Persistence Topology
+
+This section defines the physical and logical topology for the MealCredit platform's core data services, ensuring high availability, strict compliance, and low-latency performance across the SF, NYC, and Chicago metropolitan footprints.
+
+### 3.1. Financial Ledger: Aurora PostgreSQL (Serverless v2)
 
 The financial ledger is the system's source of truth for all monetary movements. It must guarantee ACID compliance and support append-only cryptographic logging for SOC2 Type II auditability.
 
@@ -87,7 +113,7 @@ The financial ledger is the system's source of truth for all monetary movements.
     *   **Latency:** The ledger must support real-time debit/credit operations with p99 latency < 100ms to ensure Stripe Webhook Processing Latency averages below 150ms (CON-06232374D9).
     *   **Scalability:** Serverless v2 scaling units are configured to handle peak event-driven load (CON-121117F5A2) during donation spikes.
 
-### 3.2 High-Scale Event Storage: DynamoDB
+### 3.2. High-Scale Event Storage: DynamoDB
 
 DynamoDB is utilized for high-throughput, low-latency storage of non-financial event data, including user session states, merchant inventory updates, and anonymous redemption analytics.
 
@@ -99,7 +125,7 @@ DynamoDB is utilized for high-throughput, low-latency storage of non-financial e
     *   **Throughput:** Provisioned capacity is set to auto-scale with a minimum of 1,000 WCUs/RCUs per table, scaling up to handle 50,000 MAU.
     *   **Latency:** p99 latency for read/write operations must be < 50ms to support real-time POS clearance (CON-4152F2C7C3).
 
-### 3.3 Caching Layer: Redis Enterprise Cluster
+### 3.3. Caching Layer: Redis Enterprise Cluster
 
 Redis Enterprise Cluster is deployed to cache high-frequency read data, such as restaurant search results, merchant profiles, and active voucher states, to reduce load on the primary database.
 
@@ -117,7 +143,7 @@ Redis Enterprise Cluster is deployed to cache high-frequency read data, such as 
 
 This section defines the API Orchestration Layer (SUR-85E4A5B6E7), serving as the central nervous system for the MealCredit platform. It details the interaction between the GraphQL API, gRPC financial services, and Stripe Webhooks to ensure real-time POS clearance latency targets are met while maintaining strict PCI-DSS Level 1 and SOC2 Type II compliance.
 
-### 4.1 Architectural Overview and Service Boundaries
+### 4.1. Architectural Overview and Service Boundaries
 
 The API Orchestration Layer is a hybrid architecture designed to handle high-throughput CRUD operations via GraphQL and low-latency, high-integrity financial transactions via gRPC. This separation ensures that heavy analytical queries do not compete for resources with critical payment processing paths.
 
@@ -125,7 +151,7 @@ The API Orchestration Layer is a hybrid architecture designed to handle high-thr
 *   **gRPC Financial Services:** A dedicated, internal service mesh for financial transactions. This layer is optimized for low-latency, bidirectional streaming, and strict type safety. It handles voucher creation, POS clearance, and ledger mutations.
 *   **Stripe Webhook Processor:** An event-driven serverless function that ingests Stripe events (e.g., payment_intent.succeeded, charge.failed) and translates them into internal platform events for ledger updates and merchant payouts.
 
-### 4.2 GraphQL API Orchestration
+### 4.2. GraphQL API Orchestration
 
 The GraphQL API is the public-facing contract for all non-financial interactions. It is designed to be stateless and horizontally scalable.
 
@@ -148,7 +174,7 @@ The GraphQL API is the public-facing contract for all non-financial interactions
 *   **Cache Hit Ratio (CHR):** The GraphQL layer must maintain a CHR above 92% for restaurant search and beneficiary status queries using the Redis Enterprise Cluster (CON-527BFA6796).
 *   **SSE for Real-Time Updates:** Next.js dashboards utilize Server-Sent Events (SSE) to receive real-time updates on voucher status, dispute notifications, and payout confirmations, replacing the legacy polling mechanism.
 
-### 4.3 gRPC Financial Services Integration
+### 4.3. gRPC Financial Services Integration
 
 The gRPC layer is the critical path for financial integrity. It is designed to handle the strict latency requirements of POS clearance.
 
@@ -173,7 +199,7 @@ The gRPC layer is the critical path for financial integrity. It is designed to h
 *   **gRPC to Aurora PostgreSQL:** The gRPC services interact with Aurora PostgreSQL for financial ledger mutations. All mutations are wrapped in ACID transactions to ensure consistency.
 *   **gRPC to Redis:** The gRPC services use Redis for caching voucher states and session data to reduce database load.
 
-### 4.4 Stripe Webhook Processing and Integration
+### 4.4. Stripe Webhook Processing and Integration
 
 Stripe Webhooks are the primary mechanism for receiving real-time updates on payment events. The processing layer must be highly available and idempotent.
 
@@ -190,7 +216,18 @@ Stripe Webhooks are the primary mechanism for receiving real-time updates on pay
 *   **Dead-Letter Queue (DLQ):** Failed webhook events are sent to a DLQ for manual inspection and retry. This ensures no payment event is lost.
 *   **Idempotency:** All webhook handlers must be idempotent to handle duplicate events from Stripe.
 
-### 4.6 SOC2 Type II Structural Planning
+### 4.5. Validation Criteria
+
+*   **Latency:** p99 latency for voucher creation and scanning callbacks < 250ms under 10,000 concurrent connections (CON-6D5E21557B).
+*   **Availability:** 99.99% operational uptime across AWS multi-AZ configurations (CON-BF1CD5707E).
+*   **Compliance:** SOC2 Type II structural planning baked into IaC (CON-81FB01F06B). PCI-DSS Level 1 compliance via zero raw card data touch (CON-66390130AA).
+*   **Data Isolation:** Strict multi-tenant isolation enforced via RLS policies and VPC endpoints.
+
+This design ensures that the API Orchestration Layer is robust, scalable, and compliant, providing a solid foundation for the MealCredit platform's growth to 50,000 MAU across three metropolitan footprints.
+
+---
+
+### 5.1 SOC2 Type II Structural Planning
 
 To achieve SOC2 Type II certification, the infrastructure must be designed with "trust but verify" principles baked into the deployment pipeline. The following structural controls are mandatory:
 
@@ -201,7 +238,7 @@ To achieve SOC2 Type II certification, the infrastructure must be designed with 
     *   Multi-AZ deployment for all critical services (Aurora, ElastiCache).
 *   **Access Control Reviews:** Define a quarterly access review process for all privileged accounts (Platform Administrator, NGO Operator). Access must be granted via least-privilege IAM roles, with temporary credentials (STS) for service-to-service communication.
 
-### 4.7 AWS CloudTrail Logging and Administrative Auditing
+### 5.2 AWS CloudTrail Logging and Administrative Auditing
 
 To ensure complete traceability of all administrative and infrastructure changes, AWS CloudTrail must be configured as the central audit log for the platform.
 
@@ -216,7 +253,7 @@ To ensure complete traceability of all administrative and infrastructure changes
     *   Security group modifications that open ports to 0.0.0.0/0.
     *   CloudTrail configuration changes (e.g., stopping logging).
 
-### 4.8 Offline Fallback Security for Expo Mobile Applications
+### 5.3 Offline Fallback Security for Expo Mobile Applications
 
 To ensure resilience during network outages while maintaining security, the Expo mobile application must implement a secure offline fallback mechanism for voucher redemption. This design prevents token theft, cloning, and replay attacks.
 
@@ -229,7 +266,7 @@ To ensure resilience during network outages while maintaining security, the Expo
 *   **Replay Attack Prevention:** The merchant POS system must validate the token's signature and timestamp upon scan. If the timestamp is outside the validity window, the token is rejected. Additionally, the platform must maintain a short-term cache of recently used token hashes to prevent immediate replay within the validity window.
 *   **Offline Fallback Interface:** The Expo app must provide a simplified, intuitive interface for offline redemption, clearly displaying the token's expiry time and remaining credit. This interface must be accessible via voice commands and high-contrast modes to meet WCAG standards (CON-68497304B1, CON-FA7A13E601).
 
-### 4.9 Implementation Notes
+### 5.4 Implementation Notes
 
 *   **IaC Templates:** Create Terraform modules for VPC, Aurora, ElastiCache, and CloudTrail.
 *   **Security Groups:** Define strict ingress/egress rules for all subnets.
@@ -237,20 +274,22 @@ To ensure resilience during network outages while maintaining security, the Expo
 *   **Expo SecureStore:** Implement SecureStore integration for offline token storage.
 *   **CloudWatch Alarms:** Configure alarms for critical security events.
 
-### 4.10 Follow-Up Questions
+### 5.5 Follow-Up Questions
 
 *   **Question:** Who owns the offline token revocation strategy?
     *   **Why Critical:** The current design assumes a short-lived token strategy, but a formal revocation process is needed for fraud scenarios.
     *   **Answerable:** False
     *   **Blocking:** True
+    *   **Source Role:** Refiner
 *   **Question:** What is the exact legal retention period for financial logs in NYC and Chicago?
     *   **Why Critical:** The assumed 7-year retention may need adjustment based on local regulations.
     *   **Answerable:** False
     *   **Blocking:** False
+    *   **Source Role:** Refiner
 
 ---
 
-## 5. Validation & Acceptance Criteria
+## 6. Validation & Acceptance Criteria
 
 *   **Regional Deployment:** Verify that each metro region (SF, NYC, CHI) has an isolated VPC and Multi-AZ Aurora PostgreSQL deployment.
 *   **Data Isolation:** Confirm that NGO Operators cannot query beneficiary PII from other NGOs via RLS policies.
@@ -260,3 +299,17 @@ To ensure resilience during network outages while maintaining security, the Expo
 *   **Offline Security:** Confirm that offline tokens are stored in SecureStore and validated via time-bound HMAC-SHA256 signatures.
 
 This design ensures that the MealCredit platform meets its strict data isolation, compliance, and performance requirements while supporting the scale and performance needs of 50,000 MAU across three metropolitan footprints.
+
+# Infrastructure Topology & Deployment Design
+
+---
+
+## VP decision
+
+**Decision:** Approved
+
+---
+
+## VP feedback
+
+(No feedback)

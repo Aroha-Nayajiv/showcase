@@ -4,7 +4,7 @@
 
 This artifact defines the internal API contract for the Stripe Issuing Proxy, enabling the secure provisioning of virtual culinary credits for Beneficiaries (ACT-ADA6716160). The design strictly enforces PCI-DSS Level 1 compliance (CON-66390130AA) by ensuring zero raw card data touches MealCredit servers, relying entirely on Stripe Elements/Checkout for any sensitive data entry.
 
-### 1.1 Architectural Boundary & Compliance Posture
+### 1.1. Architectural Boundary & Compliance Posture
 
 The Stripe Issuing Proxy acts as a secure adapter between the internal event-driven serverless architecture and the external Stripe Issuing API. Its primary responsibility is to translate internal credit pool allocations into Stripe Issuing Card objects without ever handling, logging, or storing raw Primary Account Numbers (PANs), CVVs, or Expiry dates.
 
@@ -12,7 +12,7 @@ The Stripe Issuing Proxy acts as a secure adapter between the internal event-dri
  Data Isolation: Beneficiary demographic status and legal names are cryptographically segregated from public-facing transaction data (CON-0A0288EED4, CON-92F07E31B0). The proxy only handles the financial instrument mapping.
  Latency Target: Card provisioning requests must be processed asynchronously to maintain the p99 latency target of 250ms for POS clearance (CON-6D5E21557B, CON-7F03CF540E). Provisioning is a setup action, not a real-time transaction, but the API must return immediately with a correlation ID for status polling.
 
-### 1.2 Internal API Contract: Card Provisioning
+### 1.2. Internal API Contract: Card Provisioning
 
 The following REST API endpoint is defined for the internal API Orchestration Layer (SUR-85E4A5B6E7) to trigger virtual card creation for a verified Beneficiary.
 
@@ -20,16 +20,23 @@ Endpoint: `POST /v1/issuing/cards`
 
 Request Schema:
 
-- **beneficiary_id**: string (UUIDv4, required)
-- **credit_pool_id**: string (UUIDv4, required)
-- **initial_allocation_amount**: integer (cents, required, > 0)
-- **metadata**: {'ngo_operator_id': 'string (UUIDv4, required)', 'campaign_id': 'string (optional)'}
+{
+ "beneficiary_id": "string (UUIDv4, required)",
+ "credit_pool_id": "string (UUIDv4, required)",
+ "initial_allocation_amount": "integer (cents, required, > 0)",
+ "metadata": {
+ "ngo_operator_id": "string (UUIDv4, required)",
+ "campaign_id": "string (optional)"
+ }
+}
 
 Response Schema (202 Accepted):
 
-- **correlation_id**: string (UUIDv4, unique request identifier)
-- **status**: PROVISIONING_IN_PROGRESS
-- **polling_endpoint**: /v1/issuing/cards/{correlation_id}/status
+{
+ "correlation_id": "string (UUIDv4, unique request identifier)",
+ "status": "PROVISIONING_IN_PROGRESS",
+ "polling_endpoint": "/v1/issuing/cards/{correlation_id}/status"
+}
 
 Error Responses:
 
@@ -37,7 +44,7 @@ Error Responses:
  `403 Forbidden`: The beneficiary_id is not verified or is currently suspended.
  `409 Conflict`: A provisioning request for this beneficiary_id is already in progress.
 
-### 1.3 External Stripe API Mapping
+### 1.3. External Stripe API Mapping
 
 The proxy maps the internal request to the Stripe Issuing API. The following mapping ensures that no sensitive data is exposed in logs or internal databases.
 
@@ -74,7 +81,7 @@ POST https://api.stripe.com/v1/issuing/card_issuances
  }
 }
 
-### 1.4 Webhook Handling & Status Synchronization
+### 1.4. Webhook Handling & Status Synchronization
 
 To maintain consistency between the internal state and Stripe's state, the proxy must handle Stripe webhooks for card issuance events.
 
@@ -88,7 +95,7 @@ Processing Logic:
 
 Latency Consideration: Webhook processing must be idempotent to handle duplicate events from Stripe. The correlation_id or card_id should be used as the idempotency key.
 
-### 1.5 Validation & Acceptance Criteria
+### 1.6. Validation & Acceptance Criteria
 
  PCI-DSS Compliance: No raw card data is logged or stored in any MealCredit database or log file.
  API Contract: The `POST /v1/issuing/cards` endpoint returns a `202 Accepted` with a correlation_id within 100ms.
@@ -101,15 +108,30 @@ Latency Consideration: Webhook processing must be idempotent to handle duplicate
 
 This section defines the technical contract for the Stripe Webhook Adapter, which processes real-time POS transaction events. The adapter acts as the bridge between the external Payment Processing Surface (SUR-5B18C8719F) and the internal API Orchestration Layer (SUR-85E4A5B6E7), ensuring strict PCI-DSS Level 1 compliance by ensuring zero raw card data touches MealCredit servers, relying entirely on Stripe Elements and Stripe Issuing tokens.
 
-### 2.1 Event Schema & Payload Mapping
+### 2.2. Event Schema & Payload Mapping
 
 The adapter MUST strictly accept and validate the checkout.session.completed event type. The internal ledger mutation logic is triggered only upon this specific event.
 
 Input Schema (Stripe checkout.session.completed):
 
-- **id**: evt_1234567890
-- **type**: checkout.session.completed
-- **data**: {'object': {'id': 'cs_1234567890', 'payment_intent': 'pi_1234567890', 'customer': 'cus_1234567890', 'metadata': {'beneficiary_id': 'uuid_v4_hashed', 'merchant_id': 'acct_1234567890', 'transaction_ref': 'uuid_v4_internal'}, 'amount_total': 1500, 'currency': 'usd'}}
+{
+ "id": "evt_1234567890",
+ "type": "checkout.session.completed",
+ "data": {
+ "object": {
+ "id": "cs_1234567890",
+ "payment_intent": "pi_1234567890",
+ "customer": "cus_1234567890",
+ "metadata": {
+ "beneficiary_id": "uuid_v4_hashed",
+ "merchant_id": "acct_1234567890",
+ "transaction_ref": "uuid_v4_internal"
+ },
+ "amount_total": 1500,
+ "currency": "usd"
+ }
+ }
+}
 
 Internal Ledger Mutation Logic:
 Upon successful validation, the adapter MUST execute the following synchronous steps:
@@ -126,11 +148,17 @@ stripe_event_id: String (for audit trail)
 timestamp: ISO 8601 UTC
 4. Response: Return `200 OK` immediately after the ledger insert to minimize latency.
 
+### 2.3. Error Handling & Retry Policy
+
+Validation Errors: If the payload schema is invalid or signature verification fails, return `400 Bad Request` or `401 Unauthorized` with a structured error body.
+Processing Errors: If the ledger insert fails (e.g., database timeout), return `500 Internal Server Error`. Stripe will automatically retry the webhook delivery up to 3 times with exponential backoff.
+Idempotency Check: Before processing, the adapter MUST check if the stripe_event_id already exists in the ledger. If it does, return `200 OK` immediately without re-processing.
+
 ## 3. Offline Token Verification Contract
 
 This contract defines the cryptographic verification logic and state reconciliation process for offline QR/barcode fallback mechanisms. It ensures that MealCredit transactions can proceed with sub-150ms latency (CON-06232374D9) even during network partitions, while strictly preventing replay attacks (CON-AA83B13877) and maintaining financial ledger consistency (CON-10F4381094).
 
-### 3.1 Cryptographic Token Structure
+### 3.1. Cryptographic Token Structure
 
 The offline token is a self-contained, time-bound JWT (JSON Web Token) signed using the project's master signing key. It is generated by the Beneficiary's Expo mobile application (ACT-ADA6716160) and scanned by the Merchant's (ACT-AF904DCFF9) POS device.
 
@@ -148,7 +176,7 @@ Token Schema:
 
 Assumption: T_WINDOW is set to 60 seconds. MASTER_SIGNING_KEY is rotated quarterly. These values are `ASSUMPTION: T_WINDOW=60s, Key Rotation=Quarterly - Security Architecture & Access Control must ratify these thresholds based on PCI-DSS and operational risk.`
 
-### 3.2 Verification Logic
+### 3.2. Verification Logic
 
 The Offline Token Verification Adapter (part of the API Orchestration Layer, SUR-85E4A5B6E7) performs the following synchronous checks upon receiving a scanned token:
 
@@ -157,7 +185,7 @@ The Offline Token Verification Adapter (part of the API Orchestration Layer, SUR
 3. Nonce Uniqueness (Local Cache): Check the local Redis cache (SUR-5B18C8719F) for the nonce. If present, reject as a replay attempt. If absent, add nonce to cache with a TTL of T_WINDOW + 10s.
 4. Credit Pool Validation: Query the Financial Ledger (SUR-FA61592CD4) to ensure the beneficiary_credit_pool has sufficient balance for amt. This query must be optimized for p99 latency < 250ms (CON-6D5E21557B).
 
-### 3.3 Fallback State Reconciliation
+### 3.3. Fallback State Reconciliation
 
 In the event of a network partition where the central ledger is unreachable, the Merchant POS device (running Next.js on Edge runtime) acts as a local state holder.
 
@@ -169,13 +197,13 @@ In the event of a network partition where the central ledger is unreachable, the
  Valid transactions are committed to the Aurora PostgreSQL ledger (SUR-FA61592CD4).
  Invalid transactions (e.g., double-spent nonces) are flagged for manual review by the Dispute Adjudicator (ACT-7BA340FF76).
 
-### 3.4 Security & Compliance Constraints
+### 3.4. Security & Compliance Constraints
 
  PCI-DSS Level 1 (CON-66390130AA): Zero raw card data is stored or transmitted. The token contains only anonymized beneficiary IDs and transaction amounts.
  Data Isolation (CON-0A0288EED4): Beneficiary demographic data is never included in the token payload.
  Replay Attack Prevention (CON-AA83B13877): The combination of time-bound expiration and unique nonces ensures that a captured token cannot be reused.
 
-### 3.5 Dependencies & Deferrals
+### 3.5. Dependencies & Deferrals
 
  Data Model: The beneficiary_credit_pool schema is defined in the Financial Ledger Data Model artifact.
  Security: The MASTER_SIGNING_KEY rotation policy is defined in the Security Architecture & Access Control artifact.
@@ -187,7 +215,7 @@ In the event of a network partition where the central ledger is unreachable, the
 
 This section defines the Aurora PostgreSQL schema for SUR-FA61592CD4, focusing on the financial ledger and beneficiary credit pools. It enforces strict data isolation (CON-0A0288EED4) by cryptographically segregating beneficiary demographic status and legal names from public data, ensuring PCI-DSS Level 1 compliance (CON-66390130AA) by storing zero raw card data.
 
-### 4.1 Beneficiary Identity & PII Segregation
+### 4.1. Beneficiary Identity & PII Segregation
 
 To satisfy CON-0A0288EED4 and CON-FCFF86A326 (Classify all beneficiary-related data as 'Highly Sensitive'), the schema splits beneficiary identity into two distinct tables. The beneficiary_pii table is restricted to cryptographic hashing layers only, while the beneficiary_credit_profile table holds operational data.
 
@@ -206,7 +234,7 @@ current_balance (NUMERIC(15, 4), NOT NULL): Current available credits.
 is_active (BOOLEAN): Status of the credit profile.
 last_transaction_id (UUID): Reference to the last processed transaction.
 
-### 4.2 Financial Ledger & Credit Pools
+### 4.2. Financial Ledger & Credit Pools
 
 The financial ledger must be append-only to ensure auditability (CON-1762EA5021, CON-6061FCCA83). Credit pools track the aggregate funds from donors (CON-2059B17FB2, CON-7031BE57B3).
 
@@ -229,17 +257,22 @@ timestamp (TIMESTAMPTZ, NOT NULL): When the mutation occurred.
 hash_chain (VARCHAR(64), NOT NULL): SHA-256 hash of the previous ledger entry's hash, ensuring immutability.
 previous_hash (VARCHAR(64), NOT NULL): Hash of the previous entry.
 
-### 4.3 Data Isolation & Access Control
+### 4.3. Data Isolation & Access Control
 
 Row-Level Security (RLS): Enabled on all tables. beneficiary_pii is accessible only by the `Platform Administrator` (ACT-086A974D63) role. beneficiary_credit_profile is accessible by `NGO Operator` (ACT-09E028AEB0) and Merchant (ACT-AF904DCFF9) roles, but only for their assigned beneficiaries/merchants.
 Column-Level Security: legal_name_hash and demographic_status_hash are restricted to the `Platform Administrator` role.
 Audit Logging: All mutations to financial_ledger are logged to AWS CloudTrail (CON-BB253DF0A2, CON-FBBBF07295).
 
+### 4.4. Latency & Performance Considerations
+
+- Indexing: financial_ledger is partitioned by timestamp (monthly) to optimize query performance for recent transactions. Indexes on beneficiary_id and pool_id are created to support fast balance lookups.
+- Connection Pooling: Aurora PostgreSQL Proxy is used to manage connections, ensuring p99 latency below 250ms for voucher creation and scanning callbacks (CON-6D5E21557B, CON-7F03CF540E).
+
 ## 5. API Orchestration Layer Contract (SUR-85E4A5B6E7)
 
 This section defines the internal service boundaries and event-driven messaging patterns that connect the Stripe Proxy, POS Gateway, and Offline Verification services. It ensures strict data isolation, PCI-DSS Level 1 compliance, and sub-150ms latency for the MealCredit platform.
 
-### 5.1 Architectural Surface & Service Boundaries
+### 5.1. Architectural Surface & Service Boundaries
 
 The API Orchestration Layer (SUR-85E4A5B6E7) acts as the central nervous system for financial transactions. It decouples the external financial rails (Stripe Issuing/Connect) from the internal business logic (Beneficiary Eligibility, Merchant Operations) via a strict event-driven contract.
 
@@ -260,7 +293,7 @@ Service Boundaries:
  Boundary: OVS is a stateless service that validates tokens against a shared secret key (managed securely). It does not store transaction history.
  Dependency: Relies on the `Offline Cryptographic Token Verification Contract` (sibling artifact) for token structure.
 
-### 5.2 Event-Driven Messaging Patterns
+### 5.2. Event-Driven Messaging Patterns
 
 The platform uses an event-driven architecture to ensure scalability and resilience. All financial transactions are modeled as events, allowing for asynchronous processing and eventual consistency.
 
@@ -274,12 +307,21 @@ Key Events:
  Trigger: Stripe webhook checkout.session.completed received and validated.
  Payload:
 
-- **version**: 1.0
-- **type**: TransactionCompleted
-- **source**: pos_gateway_service
-- **id**: evt_1234567890
-- **time**: 2023-10-27T10:00:00Z
-- **data**: {'stripe_payment_intent_id': 'pi_1234567890', 'beneficiary_id': 'uuid_v4_hashed', 'merchant_id': 'acct_1234567890', 'amount': 1500, 'currency': 'usd', 'transaction_hash': 'abc123def456'}
+ {
+ "version": "1.0",
+ "type": "TransactionCompleted",
+ "source": "pos_gateway_service",
+ "id": "evt_1234567890",
+ "time": "2023-10-27T10:00:00Z",
+ "data": {
+ "stripe_payment_intent_id": "pi_1234567890",
+ "beneficiary_id": "uuid_v4_hashed",
+ "merchant_id": "acct_1234567890",
+ "amount": 1500,
+ "currency": "usd",
+ "transaction_hash": "abc123def456"
+ }
+ }
 
  Consumers: Financial Ledger Service, Notification Service.
 
@@ -287,12 +329,20 @@ Key Events:
  Trigger: Offline QR/barcode token successfully validated.
  Payload:
 
-- **version**: 1.0
-- **type**: OfflineTransactionVerified
-- **source**: offline_verification_service
-- **id**: evt_0987654321
-- **time**: 2023-10-27T10:05:00Z
-- **data**: {'token_id': 'tok_1234567890', 'beneficiary_id': 'uuid_v4_hashed', 'merchant_id': 'acct_1234567890', 'amount': 1500, 'signature': 'sig_1234567890'}
+ {
+ "version": "1.0",
+ "type": "OfflineTransactionVerified",
+ "source": "offline_verification_service",
+ "id": "evt_0987654321",
+ "time": "2023-10-27T10:05:00Z",
+ "data": {
+ "token_id": "tok_1234567890",
+ "beneficiary_id": "uuid_v4_hashed",
+ "merchant_id": "acct_1234567890",
+ "amount": 1500,
+ "signature": "sig_1234567890"
+ }
+ }
 
  Consumers: Financial Ledger Service, Reconciliation Service.
 
@@ -300,16 +350,21 @@ Key Events:
  Trigger: Internal API call to provision a new virtual card for a Beneficiary.
  Payload:
 
-- **version**: 1.0
-- **type**: CardProvisioningRequested
-- **source**: internal_api_orchestration
-- **id**: evt_1122334455
-- **time**: 2023-10-27T10:10:00Z
-- **data**: {'beneficiary_id': 'ben_1234567890', 'credit_pool_id': 'pool_1234567890'}
+ {
+ "version": "1.0",
+ "type": "CardProvisioningRequested",
+ "source": "internal_api_orchestration",
+ "id": "evt_1122334455",
+ "time": "2023-10-27T10:10:00Z",
+ "data": {
+ "beneficiary_id": "ben_1234567890",
+ "credit_pool_id": "pool_1234567890"
+ }
+ }
 
  Consumers: Stripe Proxy Service.
 
-### 5.3 Latency & Throughput SLAs
+### 5.3. Latency & Throughput SLAs
 
 To prevent restaurant queue stagnation (CON-4152F2C7C3, CON-5D64EBC654), the following SLAs are enforced:
 
@@ -317,14 +372,26 @@ To prevent restaurant queue stagnation (CON-4152F2C7C3, CON-5D64EBC654), the fol
  Throughput: The system must support a minimum of 500 transactions per second (TPS) across the 3 initial metropolitan footprints (SF, NYC, Chicago).
  Availability: 99.99% operational uptime (CON-BF1CD5707E, CON-FD21121DD5).
 
-### 5.4 Error Handling & Resilience
+### 5.5. Error Handling & Resilience
 
  Idempotency: All event consumers must be idempotent to handle duplicate events from the event bus. The TransactionCompleted event must include a unique transaction_hash to prevent double-spending (CON-61EC670500, CON-72D9CECAF8).
  Dead Letter Queues (DLQ): All event consumers must have a DLQ configured. Events that fail processing after 3 retries must be moved to the DLQ for manual inspection.
  Circuit Breakers: The Stripe Proxy Service must implement circuit breakers to prevent cascading failures if Stripe's API is unavailable. The fallback mechanism for offline transactions (OVS) must be independent of the online Stripe API.
 
-### 5.5 Knowledge Gaps & Assumptions
+### 5.6. Knowledge Gaps & Assumptions
 
  KNOWLEDGE_GAP: The exact retention period for financial events in the event bus is not specified. ASSUMPTION: 7-year retention for financial records is required for SOC2 Type II compliance. Owner: Compliance Officer. Evidence needed: Specific jurisdictional requirements for financial data retention.
  KNOWLEDGE_GAP: The specific error codes and retry policies for Stripe API failures are not defined. ASSUMPTION: Standard Stripe API error codes will be used, with a 3-retry policy with exponential backoff. Owner: Engineering Lead. Evidence needed: Stripe API documentation for latest error codes.
  ASSUMPTION: The MealCreditEvent schema will be versioned, with v1.0 being the initial version. Owner: Platform Architect. Evidence needed: Agreement from all service owners on schema versioning strategy.
+
+---
+
+## VP decision
+
+**Decision:** Approved
+
+---
+
+## VP feedback
+
+(No feedback)

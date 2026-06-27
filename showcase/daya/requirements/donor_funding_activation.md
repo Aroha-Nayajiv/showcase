@@ -1,8 +1,10 @@
 # Donor Onboarding & Funding Activation
 
+## 1. Donor Onboarding & Funding Activation
+
 This section defines the product requirements for the Donor (ACT-80C62C7814) journey (JNY-62D850E94B), covering account creation, secure payment integration, and initial funding configuration.
 
-### 1.1 Account Creation & Identity Verification
+### 1.1. Account Creation & Identity Verification
 
 Goal: Enable the Donor to create a secure account while establishing the necessary identity foundation for financial compliance.
 
@@ -19,7 +21,7 @@ Edge Cases & Error States:
 - Duplicate Email: If the email is already registered, the system shall prompt the user to log in or recover their account, rather than revealing the existence of the account to prevent email enumeration.
 - Weak Password: The system shall provide real-time feedback on password strength before submission.
 
-### 1.2 Secure Payment Method Integration
+### 1.2. Secure Payment Method Integration
 
 Goal: Enable the Donor to link a funding source securely, ensuring zero raw card data touches MealCredit servers.
 
@@ -36,7 +38,7 @@ Edge Cases & Error States:
 - Declined Card: If the payment provider declines the card, the system shall display a generic error message ("We were unable to process your payment method. Please try a different card or contact your bank.") to avoid revealing specific decline reasons.
 - Plaid/Stripe API Failure: If the payment provider API is unavailable, the system shall display a "Service Temporarily Unavailable" message and allow the user to retry later.
 
-### 1.3 Initial Funding & Donation Configuration
+### 1.3. Initial Funding & Donation Configuration
 
 Goal: Enable the Donor to configure their funding preferences and make their first donation.
 
@@ -53,7 +55,7 @@ Edge Cases & Error States:
 - Insufficient Funds: If the Donor's linked payment method fails during the initial funding attempt, the system shall prompt them to add a new payment method.
 - Configuration Save Failure: If the system fails to save the Donor's donation preferences, it shall retain the default "Open Pool" configuration and notify the user of the sync issue.
 
-### 1.4 Sibling Dependencies
+### 1.4. Sibling Dependencies
 
 Beneficiary Eligibility & Voucher Redemption: This artifact defers to the Beneficiary Eligibility & Voucher Redemption artifact for the specific rules governing which beneficiaries are eligible to receive funds from the Donor's pool.
 Merchant Onboarding & POS Integration: This artifact defers to the Merchant Onboarding & POS Integration artifact for the details of how merchants accept and clear the culinary credits funded by the Donor.
@@ -62,7 +64,11 @@ Dispute Resolution & Fraud Investigation: This artifact defers to the Dispute Re
 
 ---
 
-### 2.1 User Stories & Acceptance Criteria
+## 2. Secure Payment Method Integration
+
+This section defines the product requirements for linking primary payment methods via Plaid/Stripe, ensuring the experience aligns with the Payment Processing Surface (SUR-5B18C8719F) and satisfies the Implied concern: Enforce PCI-DSS Level 1 compliance by ensuring zero raw card data touches MealCredit servers, relying entirely on Stripe Elements/Plaid (CON-66390130AA).
+
+### 2.1. User Stories & Acceptance Criteria
 
 #### US-2.1: Link Primary Credit/Debit Card via Stripe Elements
 
@@ -101,27 +107,27 @@ Acceptance Criteria:
 3. Remove Method: The donor must be able to remove a linked payment method, with a confirmation dialog to prevent accidental deletion.
 4. Error Handling: If a linked card is declined or a bank account is closed, the UI must clearly notify the donor and prompt them to update their payment method.
 
-### 2.2 Edge Cases & Error Flows
+### 2.2. Edge Cases & Error Flows
 
 1. Card Declined Pre-Auth: If the $0.01 pre-authorization fails, the UI must display a clear, non-technical error message (e.g., "Your card was declined. Please check your details or try a different card.") and provide a "Try Again" button that re-opens the Stripe Element.
 2. Plaid Link Session Timeout: If the Plaid Link session times out, the UI must gracefully close the modal and prompt the donor to "Link Bank Account Again."
 3. Network Failure During Tokenization: If the network fails while sending the token to the MealCredit server, the UI must display a "Connection Error" message and allow the donor to retry without re-entering their card details (by re-using the existing Stripe Element).
 4. Duplicate Payment Method: If the donor attempts to link a card that is already linked (detected via Stripe's duplicate detection), the UI must inform the donor that the card is already linked and skip the confirmation step.
 
-### 2.3 Data Residency & Security Constraints
+### 2.3. Data Residency & Security Constraints
 
 Data Residency: All payment method tokens and associated donor PII must be stored in accordance with the Implied concern: Data residency and jurisdictional compliance for user data across multiple metropolitan regions (CON-30EA97016B). This implies that donor data from SF, NYC, and Chicago must be stored in AWS regions compliant with local data sovereignty laws.
 Secure Client-Side Storage: Any sensitive tokens or session identifiers stored on the Expo mobile device must use SecureStore (CON-34312C6DC9) to prevent token theft or cloning.
 SOC2 Type II Planning: The access control policies for viewing linked payment methods must be designed to support SOC2 Type II structural planning (CON-81FB01F06B), ensuring that only authorized personnel (Platform Administrator ACT-086A974D63) can access audit logs related to payment method changes.
 
-### 2.4 Knowledge Gaps & Assumptions
+### 2.4. Knowledge Gaps & Assumptions
 
 KNOWLEDGE_GAP: The exact fee structure for ACH vs. Credit Card transactions is not specified. This will impact the donor's choice of payment method and the UI's recommendation engine. Owner: Product/Finance.
 KNOWLEDGE_GAP: The specific Plaid products to be used (e.g., Auth vs. Transactions) are not defined. This impacts the depth of KYC and the ability to verify account ownership. Owner: Product/Compliance.
 ASSUMPTION: Stripe Connect is the chosen payment processor for the platform, as implied by the technical architecture references (Stripe Webhooks CON-06232374D9, PCI-DSS Level 1 CON-66390130AA). This assumption is necessary to specify Stripe Elements and Plaid Link integration details.
 ASSUMPTION: The "Default" payment method is a donor-controlled setting, not a platform-controlled one. This aligns with the donor-centric onboarding journey.
 
-### 2.5 Handoff to Design
+### 2.5. Handoff to Design
 
 UI Components: Design must create wireframes for the Stripe Element integration, Plaid Link modal, and Payment Method Management dashboard.
 Accessibility: Ensure all payment entry fields and error messages are accessible via screen readers and keyboard navigation.
@@ -131,7 +137,11 @@ This section provides the complete product specification for secure payment meth
 
 ---
 
-### 3.1 Micro-Donation Round-Ups
+## 3. DonorModule Funding Engine Configuration
+
+This section defines the product requirements for the DonorModule funding engine, enabling the Donor (ACT-80C62C7814) to configure how their financial contributions are processed, allocated, and tracked. The engine supports micro-donation round-ups, directed impact preferences, and open pool allocations, ensuring a frictionless and transparent funding experience.
+
+### 3.1. Micro-Donation Round-Ups
 
 User Story: As a Donor (ACT-80C62C7814), I want to automatically round up my everyday purchases to the nearest dollar (or custom increment) so that I can contribute to the platform's mission without feeling the financial impact of each individual donation.
 
@@ -146,7 +156,7 @@ Edge Cases & Error Flows:
 - Insufficient Funds: If the Donor's linked payment method is declined for a round-up, the system must immediately notify the Donor via push notification and in-app alert, prompting them to update their payment method or disable round-ups.
 - Transaction Reversal: If the original purchase is reversed or refunded, the corresponding round-up amount must be automatically reversed and credited back to the Donor's MealCredit balance.
 
-### 3.2 Directed Impact Preferences
+### 3.2. Directed Impact Preferences
 
 User Story: As a Donor (ACT-80C62C7814), I want to direct my donations to specific NGOs or impact categories (e.g., "SF Bay Area Food Banks," "Youth Nutrition Programs") so that I can ensure my contributions align with my personal values and desired social outcomes.
 
@@ -161,7 +171,7 @@ Edge Cases & Error Flows:
 - NGO Unavailability: If a selected NGO is no longer active or has reached its funding cap for a specific program, the system must notify the Donor and prompt them to select an alternative NGO or category.
 - Compliance Check: All directed impact preferences must be validated against the Implied concern: Comply with financial regulations governing quasi-cash instruments (CON-B1DFEBEC8C) to ensure no funds are directed to prohibited entities.
 
-### 3.3 Open Pool Allocations
+### 3.3. Open Pool Allocations
 
 User Story: As a Donor (ACT-80C62C7814), I want to contribute to an open pool of funds that is distributed among all partner NGOs based on their current needs and capacity, so that I can support the platform's overall mission without having to choose specific recipients.
 
@@ -174,7 +184,25 @@ Acceptance Criteria:
 Edge Cases & Error Flows:
 - Pool Insufficiency: If the open pool is depleted, the system must notify the Donor and prompt them to either contribute more to the pool or switch to directed impact preferences.
 
-### 4.1 Immutable Impact Receipts
+### 3.4. Multi-Modal Interaction Paths
+
+User Story: As a Donor (ACT-80C62C7814), I want to interact with the DonorModule funding engine using multiple input methods (voice, tap, scan) so that I can configure and monitor my donations in the most convenient way for my current context.
+
+Acceptance Criteria:
+1. Voice Commands: The mobile app must support voice commands for common funding actions (e.g., "Enable round-ups," "Show my impact receipts").
+2. Tap-to-View: The Donor can tap on a transaction in their history to view detailed impact information and related receipts.
+3. Scan-to-Configure: The Donor can scan a QR code on a partner receipt to instantly view the round-up amount and confirm the donation.
+4. Accessibility: All multi-modal interactions must comply with WCAG 2.1 AA standards, ensuring accessibility for users with visual or motor impairments.
+
+Edge Cases & Error Flows:
+- Voice Recognition Failure: If a voice command is not recognized, the system must provide a clear error message and suggest alternative phrasing or fall back to the text-based interface.
+- QR Code Expiry: If a QR code is scanned after its validity period, the system must prompt the Donor to generate a new code or view the transaction history directly.
+
+## 4. Impact Tracking & Immutable Receipts
+
+This section defines the product requirements for the Donor (ACT-80C62C7814) to view immutable impact receipts and track their Donation-to-Redemption Velocity (DRV). The core product challenge is providing donors with tangible proof of their impact while strictly adhering to the anonymity and data isolation constraints required to eliminate social stigma and comply with FTC guidelines.
+
+### 4.1. Immutable Impact Receipts
 
 The platform must generate an immutable, verifiable receipt for every funding event. This receipt serves as the primary trust mechanism for the Donor, confirming that their contribution has been successfully processed and allocated.
 
@@ -197,7 +225,7 @@ Constraints & Edge Cases:
 - Privacy: The receipt must NOT contain any PII of the Beneficiary (ACT-ADA6716160) or the specific Merchant (ACT-AF904DCFF9) where the credits were eventually spent. It only confirms the allocation to the pool.
 - Failure State: If the funding event fails (e.g., bank decline), no receipt is generated. The Donor is notified of the failure and prompted to retry.
 
-### 4.2 Donation-to-Redemption Velocity (DRV) Tracking
+### 4.2. Donation-to-Redemption Velocity (DRV) Tracking
 
 The DRV metric allows the Donor to see the speed and efficiency with which their donated credits are being utilized by Beneficiaries. This provides a sense of immediate impact and liquidity health.
 
@@ -214,7 +242,7 @@ Constraints & Edge Cases:
 - Data Residency: DRV metrics must be segmented by metro footprint (SF, NYC, Chicago) to comply with data residency requirements (CON-30EA97016B, CON-4093C26BCC). A Donor funding the SF pool should only see SF DRV metrics.
 - Low Volume Edge Case: If there are insufficient redemption events in a pool to calculate a statistically significant DRV (e.g., fewer than 10 redemptions in the last 24 hours), the dashboard should display "Insufficient data to calculate velocity" rather than a misleading average.
 
-### 4.3 Anonymized Correlation & Analytics
+### 4.3. Anonymized Correlation & Analytics
 
 The underlying product logic must ensure that the correlation between donor impact and beneficiary redemption is strictly anonymized. This is critical for maintaining the platform's mission to decouple food assistance from social stigma.
 
@@ -227,7 +255,7 @@ Knowledge Gaps:
 - `KNOWLEDGE_GAP: Analytics - The specific threshold for "statistically significant" DRV data (e.g., minimum number of redemptions) must be established by the Product and Data teams.`
 - `KNOWLEDGE_GAP: Data Retention - The specific data retention policy for donor transaction history vs. anonymous redemption analytics (CON-4820FAD5A9, CON-6F604D5455) must be defined to ensure compliance with financial regulations (CON-B1DFEBEC8C).`
 
-### 4.4 Multi-Modal Interaction for Impact
+### 4.4. Multi-Modal Interaction for Impact
 
 The Donor should be able to view their impact receipts and DRV metrics through multiple interaction paths, ensuring accessibility and convenience.
 
@@ -242,7 +270,7 @@ Acceptance Criteria:
 Constraints & Edge Cases:
 - Offline Fallback: If the Donor's device is offline, the app should cache the last known DRV and receipt data. Upon reconnection, it should sync any new data. The offline fallback interface must be intuitive (CON-387CDD9AEB, CON-FA7A13E601).
 
-### 4.5 Jurisdictional Data Residency (CON-30EA97016B)
+### 5.1. Jurisdictional Data Residency (CON-30EA97016B)
 
 Objective: Ensure that all Donor PII and financial data are stored and processed within the specific metropolitan footprint (SF, NYC, or Chicago) where the Donor resides, preventing cross-border or cross-jurisdictional data leakage.
 
@@ -266,7 +294,7 @@ User Stories & Acceptance Criteria:
   The onboarding consent screen must explicitly state that data is stored within the [Assigned Metro Footprint] data center.
   The privacy policy must clearly define the data residency boundaries for each metro footprint.
 
-### 4.6 Quasi-Cash Financial Compliance (CON-B1DFEBEC8C)
+### 5.2. Quasi-Cash Financial Compliance (CON-B1DFEBEC8C)
 
 Objective: Ensure the platform complies with financial regulations governing quasi-cash instruments, specifically regarding unclaimed property and escheatment laws. This prevents the platform from inadvertently holding dormant funds without proper legal handling.
 
@@ -299,7 +327,7 @@ User Stories & Acceptance Criteria:
   The report must be segmented by jurisdiction (SF, NYC, CHI) to facilitate accurate state filing.
   KNOWLEDGE_GAP: The specific data fields required for unclaimed property reporting in each jurisdiction (SF, NYC, CHI) must be established by the Compliance team. `ASSUMPTION: Standard fields (Name, Address, SSN/Last 4, Balance)` are used as a placeholder; this requires legal evidence.
 
-### 4.7 Secure Client-Side Storage for Offline Tokens (CON-34312C6DC9)
+### 5.3. Secure Client-Side Storage for Offline Tokens (CON-34312C6DC9)
 
 Objective: Ensure that offline tokens and sensitive donor configuration data are securely stored on the Expo mobile device using the platform's SecureStore implementation, preventing token theft, cloning, or unauthorized access if the device is compromised.
 
@@ -323,7 +351,7 @@ User Stories & Acceptance Criteria:
   The application must automatically purge SecureStore entries upon explicit user logout or after a defined inactivity period.
   The system must support remote token revocation via the backend, which will invalidate SecureStore tokens upon the next successful sync.
 
-### 4.8 DonorModule Configuration: Open Pool Distribution Logic
+### 5.4. DonorModule Configuration: Open Pool Distribution Logic
 
 Objective: Define the product behavior for the "Open Pool" donation configuration, ensuring that funds directed to the global or regional pool are correctly allocated and tracked without being tied to a specific NGO or merchant type.
 
@@ -346,10 +374,22 @@ User Stories & Acceptance Criteria:
   The DRV dashboard must clearly distinguish between directed impact DRV and Open Pool DRV.
   Open Pool DRV metrics must be aggregated and anonymized, adhering to the same FTC compliance standards (CON-B3D71A437D, CON-C22D030D21) as directed impact metrics.
 
-### 4.9 Summary of Unresolved Questions
+### 5.5. Summary of Unresolved Questions
 
 `KNOWLEDGE_GAP: Analytics - The specific threshold for "statistically significant" DRV data (e.g., minimum number of redemptions) must be established by the Product and Data teams.`
 `KNOWLEDGE_GAP: Data Retention - The specific data retention policy for donor transaction history vs. anonymous redemption analytics (CON-4820FAD5A9, CON-6F604D5455) must be defined to ensure compliance with financial regulations (CON-B1DFEBEC8C).`
 `KNOWLEDGE_GAP: Voice Interaction - The specific voice commands and integration points for the "Future State" voice interaction requirement (CON-2D70EDCDEE, CON-FC09C32F32) must be defined in a later phase.`
 `KNOWLEDGE_GAP: Dormant Account Threshold - The exact number of days constituting a "Dormant Account" must be established by the Compliance team based on the specific regulations of SF, NYC, and CHI. `ASSUMPTION: 12 months` is used as a placeholder for design purposes; this value is reversible and requires legal evidence.`
 `KNOWLEDGE_GAP: Unclaimed Property Reporting Fields - The specific data fields required for unclaimed property reporting in each jurisdiction (SF, NYC, CHI) must be established by the Compliance team. `ASSUMPTION: Standard fields (Name, Address, SSN/Last 4, Balance)` are used as a placeholder; this requires legal evidence.`
+
+---
+
+## VP decision
+
+**Decision:** Approved
+
+---
+
+## VP feedback
+
+(No feedback)

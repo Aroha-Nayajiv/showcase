@@ -4,7 +4,7 @@
 
 This section defines the product requirements for the initial business verification and identity screening phase of the Merchant Onboarding & POS Integration journey. It ensures that all Merchant Partners (Restaurants) (ACT-AF904DCFF9) are legally vetted to handle MealCredit quasi-cash instruments before they are granted access to the POS integration layer.
 
-### 1.1 Onboarding Entry & Jurisdiction Detection
+### 1.1. Onboarding Entry & Jurisdiction Detection
 
 User Story: As a prospective Restaurant Partner, I want to begin the onboarding process by simply entering my business name and location, so that the system can automatically determine the specific financial regulations (KYC/AML) I must comply with based on my operating jurisdiction (SF, NYC, or Chicago).
 
@@ -13,7 +13,7 @@ The Merchant Onboarding entry point (JNY-356F465DB3) must capture the primary bu
 The system must dynamically load the required KYC/AML data fields based on the detected jurisdiction (SF, NYC, Chicago) to satisfy CON-5BFA25E8F9 (Manage Stripe Connected Account liability and KYC compliance across multiple jurisdictions).
 If the business address falls outside the three initial metropolitan footprints, the system must display a clear "Service Not Available" state, deferring to the Merchant Onboarding & POS Integration scope boundary.
 
-### 1.2 Business Verification Data Collection
+### 1.2. Business Verification Data Collection
 
 User Story: As a Restaurant Partner, I need to provide specific business details (EIN, DBA, ownership structure) so that the platform can perform the necessary AML screening and establish the legal entity for Stripe Connect integration.
 
@@ -23,7 +23,7 @@ The product must require the collection of the "Doing Business As" (DBA) name if
 The product must require the collection of primary ownership details (name, DOB, address) for any individual owning 25% or more of the business, in alignment with standard AML beneficial ownership rules.
 KNOWLEDGE_GAP: The exact percentage threshold for beneficial ownership (e.g., 25% vs 50%) must be established by the Compliance team to ensure alignment with CON-B1DFEBEC8C (Comply with financial regulations governing quasi-cash instruments, specifically regarding unclaimed property and escheatment laws).
 
-### 1.3 Identity Screening Integration (Stripe Connect)
+### 1.3. Identity Screening Integration (Stripe Connect)
 
 User Story: As a Restaurant Partner, I want to complete my identity verification through a secure, branded flow that integrates with Stripe Connect, so that I can be approved for payouts without the platform ever handling sensitive raw identity documents directly.
 
@@ -32,7 +32,7 @@ The product must abstract the Stripe Connect onboarding flow into a seamless, mu
 The system must ensure that no raw PII or sensitive identity documents are stored on MealCredit servers, relying entirely on Stripe Elements/Connected Accounts for payment processing, satisfying CON-66390130AA (Enforce PCI-DSS Level 1 compliance by ensuring zero raw card data touches MealCredit servers).
 The product must handle Stripe's asynchronous verification status updates, providing clear UI states for "Pending Review," "Approved," and "Rejected."
 
-### 1.4 Approval and Rejection States
+### 1.4. Approval and Rejection States
 
 User Story: As a Restaurant Partner, I need to receive clear, actionable feedback if my KYC/AML verification is rejected, so that I can correct the information and resubmit without starting the entire onboarding process over.
 
@@ -41,7 +41,7 @@ If the KYC/AML verification fails, the Merchant Dashboard must display a specifi
 The product must allow Merchants to resubmit corrected information without losing previously entered business details.
 The product must log all KYC/AML verification attempts and outcomes to AWS CloudTrail for SOC2 Type II evidence, as required by CON-BB253DF0A2 (Log all administrative ledger operations and infrastructure changes to AWS CloudTrail for SOC2 Type II evidence).
 
-### 1.5 Sibling Deferrals
+### 1.7. Sibling Deferrals
 
 Beneficiary Eligibility & Voucher Redemption: The specific rules for how a Merchant's approved status impacts their ability to receive MealCredit vouchers are defined in the Beneficiary Eligibility & Voucher Redemption artifact.
 Donor Onboarding & Funding Activation: The funding source for the MealCredit vouchers is defined in the Donor Onboarding & Funding Activation artifact.
@@ -50,7 +50,7 @@ Dispute Resolution & Fraud Investigation: The specific fraud investigation workf
 
 ---
 
-### 1.6 Merchant Onboarding Journey (JNY-356F465DB3)
+### 2.1. Merchant Onboarding Journey (JNY-356F465DB3)
 
 The Merchant Onboarding & POS Integration journey is a linear, multi-step flow designed to minimize drop-off while ensuring strict KYC/KYB (Know Your Customer/Business) compliance. The product must guide the Merchant through identity verification, business data collection, and payout configuration.
 
@@ -63,7 +63,7 @@ Acceptance Criteria:
 4. Rejection Handling: If KYC verification fails, the Merchant must receive a clear, non-technical error message explaining the reason (e.g., "ID image was blurry," "EIN does not match records") and be allowed to retry without losing previously entered data.
 5. PCI-DSS Compliance: The Merchant must never be presented with a form to enter raw credit card numbers. All payment instrument data is collected via Stripe Elements or hosted fields.
 
-### 1.7 Jurisdictional Compliance (SF, NYC, Chicago)
+### 2.2. Jurisdictional Compliance (SF, NYC, Chicago)
 
 The platform must enforce strict data isolation and compliance rules based on the Merchant's physical location. The product must ensure that the Connected Account is configured correctly for each jurisdiction.
 
@@ -78,7 +78,7 @@ Chicago (Illinois): Must collect IL-specific tax identification numbers.
 3. Unclaimed Property: The system must track unclaimed property laws for each jurisdiction. If a Merchant's payout is held for more than the statutory period, the system must flag the account for escheatment review.
 KNOWLEDGE_GAP: The exact statutory period for unclaimed property escheatment must be established by the Legal team to ensure alignment with CON-B1DFEBEC8C (Comply with financial regulations governing quasi-cash instruments, specifically regarding unclaimed property and escheatment laws).
 
-### 1.8 Payout Configuration & Scheduling
+### 2.3. Payout Configuration & Scheduling
 
 The product must define how Merchants configure their payout preferences and how the platform handles the automated transfer of funds from the Stripe Connected Account to the Merchant's bank account.
 
@@ -91,7 +91,7 @@ KNOWLEDGE_GAP: The default payout schedule for new Merchants must be established
 3. Payout Delays: The system must enforce a holding period for new Merchants (e.g., 7 days) to mitigate fraud risk. This holding period must be clearly communicated during onboarding.
 4. Payout Errors: If a payout fails due to bank account issues, the system must notify the Merchant via email and in-app notification, providing a direct link to update their banking details.
 
-### 1.9 Liability & Risk Management
+### 2.4. Liability & Risk Management
 
 The product must ensure that the platform's liability is minimized by leveraging Stripe Connect's liability shift features. The Merchant must be fully aware of their responsibilities regarding chargebacks and fraud.
 
@@ -102,7 +102,7 @@ Acceptance Criteria:
 2. Chargeback Education: The system must provide a brief, interactive tutorial on how to handle chargebacks, including the importance of retaining proof of delivery (e.g., signed receipts, photos of the meal).
 3. Fraud Monitoring: The system must integrate with Stripe Radar to automatically flag suspicious transactions. Merchants must be able to view their fraud score and transaction history in the Merchant Edge Dashboard.
 
-### 1.10 Integration with POS Systems
+### 2.5. Integration with POS Systems
 
 The product must define the contract for how POS systems interact with the MealCredit platform to process anonymous credit redemptions. This integration must be robust, low-latency, and secure.
 
@@ -115,14 +115,14 @@ KNOWLEDGE_GAP: The exact POS clearance latency threshold must be established by 
 3. Offline Fallback: In the event of a network outage, the POS system must be able to process transactions using a time-bound, HMAC-signed QR code. The product must define the user experience for this offline mode, ensuring it is intuitive and accessible.
 4. Reconciliation: The system must provide a daily reconciliation report to the Merchant, detailing all transactions, fees, and net payouts. This report must be accessible via the Merchant Edge Dashboard.
 
-### 1.11 Edge Cases & Error Flows
+### 2.7. Edge Cases & Error Flows
 
 1. KYC Rejection: If the Merchant's KYC is rejected, the system must provide a clear reason and allow them to resubmit. The Merchant's account must be in a 'Pending Verification' state until approved.
 2. Bank Account Mismatch: If the Merchant's bank account details do not match the legal business name, the system must flag the account for manual review by the Platform Administrator.
 3. POS Integration Failure: If the POS integration fails to connect, the system must notify the Merchant and provide troubleshooting steps. The Merchant must be able to retry the connection from the dashboard.
 4. Payout Failure: If a payout fails, the system must hold the funds in the Stripe Connected Account and notify the Merchant. The Merchant must be able to update their banking details and retry the payout.
 
-### 1.12 Accessibility & UX Standards
+### 2.8. Accessibility & UX Standards
 
 The Merchant Edge Dashboard must adhere to WCAG 2.1 AA standards, ensuring keyboard-only navigation and low-vision readability. This is critical for ensuring that all Merchants, regardless of ability, can manage their accounts effectively.
 
@@ -131,7 +131,18 @@ Acceptance Criteria:
 2. Screen Reader Compatibility: All form fields, error messages, and status updates must be properly labeled for screen readers.
 3. High Contrast Mode: The dashboard must support high-contrast modes to assist users with low vision.
 
-### 2.1 Design Philosophy & Accessibility Mandate
+### 2.9. Sibling Deferrals
+
+Beneficiary Eligibility & Voucher Redemption: This artifact's voucher issuance defers to JNY-E82B8A88D8 for specific eligibility rules; see that artifact for the full treatment.
+Donor Onboarding & Funding Activation: This artifact's funding source defers to JNY-62D850E94B for donor impact flows; see that artifact for the full treatment.
+NGO Governance & Beneficiary Offboarding: This artifact's NGO verification defers to JNY-4C4BA15817 for offboarding workflows; see that artifact for the full treatment.
+Dispute Resolution & Fraud Investigation: This artifact's fraud investigation defers to JNY-2B038C9362 for adjudication processes; see that artifact for the full treatment.
+
+---
+
+## 3. Merchant Edge Dashboard UX
+
+### 3.1. Design Philosophy & Accessibility Mandate
 The Merchant Edge Dashboard is the primary operational interface for the Merchant (ACT-AF904DCFF9) to manage their restaurant's participation in the MealCredit platform. Given the diverse nature of restaurant staff (including individuals with varying levels of technical proficiency and potential visual or motor impairments), the dashboard must strictly adhere to WCAG 2.1 AA standards. This is not merely a compliance checkbox but a core usability requirement to ensure that all restaurant employees can effectively process transactions and manage finances.
 
 Accessibility Standards:
@@ -139,7 +150,7 @@ Keyboard-Only Navigation: All interactive elements (buttons, forms, tables, moda
 Low-Vision Readability: The interface must support dynamic text resizing up to 200% without loss of content or functionality. Color must not be the sole means of conveying information (e.g., error states must include icons and text labels, not just red borders).
 Screen Reader Compatibility: All dynamic content updates (e.g., real-time transaction notifications) must be announced to screen readers using ARIA live regions.
 
-### 2.2 Dashboard Layout & Information Architecture
+### 3.2. Dashboard Layout & Information Architecture
 The dashboard is structured into three primary views: Overview, Transactions, and Payouts. This structure is designed to provide immediate financial visibility while allowing deep dives into specific operational details.
 
 #### 3.2.1. Overview View (Home)
@@ -189,7 +200,7 @@ Status: Completed, Pending, or Failed.
 - Bank Account Management:
 - A secure section to view and update the linked bank account details (managed via Stripe Connect's secure UI, ensuring PCI-DSS compliance). The dashboard itself does not store or display raw bank account numbers.
 
-### 2.3 Real-Time Financial Visibility & Offline Fallback Integration
+### 3.3. Real-Time Financial Visibility & Offline Fallback Integration
 
 The dashboard must provide real-time visibility into transaction status, even in the event of network interruptions, by integrating with the offline QR/barcode token management interface.
 
@@ -205,7 +216,7 @@ The dashboard must provide real-time visibility into transaction status, even in
   - A dedicated section within the "Transactions" view allows the Merchant to view the status of their offline QR/barcode tokens.
   - This includes a list of active tokens, their expiration times, and a log of any failed redemption attempts due to token replay or expiration.
 
-### 2.4 Error States & Empty States
+### 3.4. Error States & Empty States
 
 Clear, actionable error and empty states are critical for maintaining Merchant trust and operational efficiency.
 
@@ -219,11 +230,11 @@ Clear, actionable error and empty states are critical for maintaining Merchant t
 
 ---
 
-## 3. Offline Fallback QR/Barcode Token System
+## 4. Offline Fallback QR/Barcode Token System
 
 This section defines the product logic and user experience for the offline fallback QR/barcode token system. This capability ensures that Merchant Partners (Restaurants) can continue to accept MealCredit redemptions during network outages, maintaining operational continuity and trust with Beneficiaries.
 
-### 3.1 Product Objective & Scope
+### 4.1. Product Objective & Scope
 
 The Offline Fallback Token System allows a Merchant to generate a time-bound, cryptographically signed QR code that a Beneficiary can present to clear a transaction without real-time connectivity to the MealCredit core. The system must balance three competing priorities:
 1. **Operational Continuity:** Ensure zero downtime for Merchants during network failures.
@@ -232,13 +243,13 @@ The Offline Fallback Token System allows a Merchant to generate a time-bound, cr
 
 **Scope Boundary:** This artifact defines the product behavior, token lifecycle, and Merchant/Beneficiary UX. The technical implementation of the cryptographic signing (e.g., specific HMAC algorithms) is deferred to the Design phase, but the product must mandate the security properties (time-bound, non-reusable).
 
-### 3.2 Actor Roles & Responsibilities
+### 4.2. Actor Roles & Responsibilities
 
 - **Merchant (ACT-AF904DCFF9):** Initiates the offline mode, generates the fallback token, and reviews pending offline transactions upon reconnection.
 - **Beneficiary (ACT-ADA6716160):** Presents the offline token for redemption. The Beneficiary must have sufficient credit balance (verified locally or via cached state) to initiate the request.
 - **Platform System:** Validates the token signature and reconciles the transaction asynchronously once connectivity is restored.
 
-### 3.3 User Journey: Offline Redemption Flow
+### 4.3. User Journey: Offline Redemption Flow
 
 #### 4.3.1. Merchant Initiates Offline Mode
 
@@ -258,7 +269,7 @@ The Offline Fallback Token System allows a Merchant to generate a time-bound, cr
 2. **Verification:** The Merchant's device performs a local cryptographic verification of the Beneficiary's token signature. This ensures the token is valid and has not been tampered with.
 3. **Confirmation:** Upon successful local verification, the Merchant's device displays "Payment Accepted (Offline)." The transaction is stored locally in a secure, pending queue.
 
-### 3.4 Merchant Edge Dashboard: Offline Transaction Management
+### 4.5. Merchant Edge Dashboard: Offline Transaction Management
 
 The Merchant Edge Dashboard (CON-6C177D0102) must provide clear visibility into offline transactions.
 
@@ -270,23 +281,33 @@ The Merchant Edge Dashboard (CON-6C177D0102) must provide clear visibility into 
 2. **Reconciliation Status:** Upon reconnection, the dashboard updates the status of each pending transaction to "Settled" or "Failed" (if a double-spend is detected).
 3. **Accessibility:** The dashboard must support keyboard-only navigation and high-contrast modes to ensure accessibility for all Merchant staff (CON-6C177D0102, CON-CD9BDF7662).
 
-### 3.5 Error Handling & Edge Cases
+### 4.6. Error Handling & Edge Cases
 
 1. **Double-Spend Detected:** If the platform detects that a token has been used more than once during reconciliation, the transaction is marked as "Failed." The Merchant is notified, and the Beneficiary's credit is restored. The Merchant must then manually refund the Beneficiary (e.g., via cash or alternative payment).
 2. **Extended Outage:** If the outage persists for an extended period, the system may rotate the signing key more frequently to limit the window of vulnerability. The product must define the maximum allowable offline window (e.g., 24 hours) after which offline mode is disabled.
 3. **Beneficiary Balance Insufficient:** If the Beneficiary's local cached balance is insufficient, the app should prompt them to wait for connectivity or use an alternative payment method. The product must define how "cached balance" is updated and synchronized.
 
-### 3.6 Knowledge Gaps & Assumptions
+### 4.7. Knowledge Gaps & Assumptions
 
 - **KNOWLEDGE_GAP:** Offline Window Duration: The exact maximum duration for which offline mode can be sustained (e.g., 1 hour, 24 hours) is not yet defined. This impacts the key rotation strategy and the risk of double-spending. Owner: Product Lead / Security Architect. Evidence Needed: Risk assessment of extended offline periods.
 - **ASSUMPTION:** Local Balance Caching: It is assumed that the Beneficiary's mobile app caches the user's credit balance locally to allow for offline validation. Owner: Product Lead. Evidence Needed: Confirmation of local storage strategy in the Beneficiary app spec.
 - **ASSUMPTION:** Merchant Device Capability: It is assumed that Merchant devices (tablets/POS) have sufficient local storage and processing power to handle cryptographic verification and store pending transactions. Owner: Technical Architect. Evidence Needed: Hardware requirements for Merchant POS integration.
 
-## 4. Merchant Payout Error Handling Flow
+### 4.8. Acceptance Criteria
+
+1. **AC-1:** Merchant can activate "Offline Mode" and generate a valid QR code within 5 seconds of network loss detection.
+2. **AC-2:** Beneficiary can present a valid offline token that is accepted by the Merchant's device without real-time connectivity.
+3. **AC-3:** The system prevents replay attacks by enforcing time-bound validity and single-use constraints.
+4. **AC-4:** Upon reconnection, all pending offline transactions are automatically reconciled with the core platform.
+5. **AC-5:** The Merchant Edge Dashboard clearly displays the status of all pending offline transactions and provides clear instructions for handling double-spend failures.
+
+---
+
+## 5. Merchant Payout Error Handling Flow
 
 This section defines the product requirements for the Merchant Payout Error Handling Flow (JNY-90B07623FB). It details how the platform detects, communicates, and resolves failures in the automated financial settlement process for Merchant Partners (ACT-AF904DCFF9). The goal is to ensure financial transparency, maintain trust, and minimize operational friction for restaurant partners.
 
-### 4.1 Payout Lifecycle & Failure Detection
+### 5.1. Payout Lifecycle & Failure Detection
 
 The platform initiates automated payouts to Merchant Partners via Stripe Connect. Failures are detected through two primary channels:
 
@@ -298,7 +319,7 @@ The platform initiates automated payouts to Merchant Partners via Stripe Connect
 - **Stripe Processing Error:** Internal Stripe errors (e.g., insufficient balance in Stripe Connect account, API timeouts).
 - **Compliance Hold:** Payouts frozen due to AML/KYC flags or regulatory reviews.
 
-### 4.2 Merchant Notification & Visibility
+### 5.2. Merchant Notification & Visibility
 
 When a payout fails, the Merchant must be immediately informed through the Merchant Edge Dashboard (accessible via web and tablet). The dashboard must provide clear, actionable status updates.
 
@@ -312,7 +333,7 @@ When a payout fails, the Merchant must be immediately informed through the Merch
 - All error messages and status indicators must meet WCAG 2.1 AA standards, including high-contrast modes and screen reader compatibility (CON-68497304B1, CON-CD9BDF7662).
 - The dashboard must support keyboard-only navigation for all critical actions (CON-6C177D0102, CON-D0DEFC531A).
 
-### 4.3 Resolution Workflows
+### 5.3. Resolution Workflows
 
 The platform must provide clear pathways for Merchants to resolve common payout errors.
 
@@ -331,7 +352,7 @@ The platform must provide clear pathways for Merchants to resolve common payout 
 - **Merchant Action:** No immediate action required. The system automatically retries the payout up to three times over a 48-hour period.
 - **System Action:** If all retries fail, the payout is marked as "Failed" and a support ticket is automatically created for the Platform Administrator to investigate.
 
-### 4.4 Financial Reconciliation & Discrepancies
+### 5.4. Financial Reconciliation & Discrepancies
 
 To ensure financial integrity, the platform must perform daily reconciliation between the internal ledger and Stripe settlement reports.
 
@@ -343,10 +364,22 @@ To ensure financial integrity, the platform must perform daily reconciliation be
 **Audit Trail:**
 - All payout events, errors, and resolutions must be logged in an append-only cryptographic log in Aurora PostgreSQL for SOC2 Type II evidence (CON-1762EA5021, CON-6061FCCA83, CON-BB253DF0A2, CON-FBBBF07295).
 
-### 4.5 Acceptance Criteria
+### 5.6. Acceptance Criteria
 
 1. **AC-1:** The Merchant Dashboard displays a clear error message and status indicator for any failed payout within 5 minutes of the failure event.
 2. **AC-2:** Merchants can update their banking details via a secure, PCI-DSS Level 1 compliant form directly from the error notification.
 3. **AC-3:** The system automatically retries failed payouts due to technical errors up to three times over 48 hours.
 4. **AC-4:** All payout events and resolutions are logged in an append-only audit trail for SOC2 Type II compliance.
 5. **AC-5:** The Merchant Dashboard meets WCAG 2.1 AA accessibility standards, including keyboard navigation and screen reader compatibility.
+
+---
+
+## VP decision
+
+**Decision:** Approved
+
+---
+
+## VP feedback
+
+(No feedback)

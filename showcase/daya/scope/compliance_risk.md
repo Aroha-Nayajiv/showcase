@@ -1,6 +1,6 @@
 # Compliance, Risk & Governance Inception Artifact
 
-### 1.1 San Francisco (SF) Footprint
+### 1.1. San Francisco (SF) Footprint
 
 **Primary Regulatory Drivers:**
 *   **California Consumer Privacy Act (CCPA) / California Privacy Rights Act (CPRA):** As the foundational privacy law, it mandates strict consumer rights (access, deletion, opt-out of sale/sharing). For MealCredit, this directly impacts the 'Absolute Anonymization' strategy, requiring that beneficiary data be treated as 'Sensitive Personal Information' (SPI) with enhanced protections.
@@ -12,18 +12,56 @@
 *   **Anonymization Standard:** To comply with CPRA's 'Sensitive Personal Information' rules, beneficiary demographic data must be cryptographically segregated from the public financial ledger. The Platform Administrator (ACT-086A974D63) must not have access to raw PII, only to hashed tokens required for system operations.
 *   **Merchant Compliance:** SF restaurants (Merchant Partners) must be contractually bound to PCI-DSS Level 1 compliance (CON-66390130AA) and must not store any beneficiary PII on their local POS systems.
 
-### 1.4 Assumptions and Knowledge Gaps
+### 1.2. New York City (NYC) Footprint
+
+**Primary Regulatory Drivers:**
+*   **New York State Department of Financial Services (NYDFS) Cybersecurity Regulation (23 NYCRR 500):** As a fintech platform handling quasi-cash instruments, MealCredit may be subject to NYDFS oversight, particularly regarding data governance and incident response.
+*   **NYC Local Law 158 (Data Breach Notification):** Requires notification to the NY Attorney General within 30 days of discovery, which is stricter than some other jurisdictions.
+*   **Financial Consumer Protection:** NYC has robust local laws governing quasi-cash instruments, requiring clear disclosure of terms and conditions to beneficiaries.
+
+**Compliance Obligations:**
+*   **Data Residency:** To mitigate the risk of cross-border data transfer issues and ensure compliance with NYDFS expectations, all NYC beneficiary data must be stored in AWS data centers located within the US East (N. Virginia) or US East (Ohio) regions.
+*   **Quasi-Cash Instrument Compliance:** The platform must adhere to CON-B1DFEBEC8C, ensuring that unclaimed property and escheatment laws are strictly followed. This requires a robust tracking mechanism for dormant credits, which must be implemented without linking PII to donor impact receipts (CON-23A501C051).
+*   **Anonymization Standard:** NYC's strict data breach notification laws necessitate a 'Zero-Knowledge' posture for the financial ledger. Transaction blinding or batching must be implemented to obscure metadata that could be used for de-anonymization attacks (CON-C22D030D21).
+
+### 1.3. Chicago (Chicago) Footprint
+
+**Primary Regulatory Drivers:**
+*   **Illinois Biometric Information Privacy Act (BIPA):** If the Expo mobile application (SUR-43E71C4E2B) uses any biometric authentication (e.g., FaceID, TouchID) for beneficiary login, BIPA's strict consent and retention requirements apply. This is a critical risk area for the Beneficiary (ACT-ADA6716160) actor.
+*   **Illinois Consumer Fraud and Deceptive Business Practices Act:** Requires clear and non-deceptive disclosure of all terms, particularly regarding the 'anonymous' nature of the credits.
+*   **Local Data Privacy Ordinances:** Chicago may have specific data privacy ordinances that align with or exceed state-level requirements.
+
+**Compliance Obligations:**
+*   **Data Residency:** All Chicago beneficiary data must be stored in AWS data centers located within the US East (N. Virginia) or US East (Ohio) regions to ensure proximity and compliance with local data sovereignty expectations.
+*   **Biometric Data Handling:** If biometric data is collected, it must be stored locally on the device (using Expo's SecureStore, CON-C42F7B521B) and never transmitted to MealCredit servers. A clear, explicit consent mechanism must be implemented before any biometric data is accessed.
+*   **Anonymization Standard:** Chicago's consumer fraud laws require that the 'anonymous' nature of the credits is not misleading. The platform must ensure that no metadata analysis can link beneficiaries to donors (CON-C22D030D21), and this must be clearly communicated in the user interface.
+
+### 1.4. Assumptions and Knowledge Gaps
 
 *   **ASSUMPTION:** The platform will initially operate only within the US, so international regulations (GDPR, etc.) are out of scope for this specific micro-goal.
 *   **ASSUMPTION:** The 'quasi-cash' nature of the credits is accepted as a given, requiring MTL analysis. REJECTED ALTERNATIVE: Treating all three cities as a single 'US' jurisdiction, which would ignore critical local nuances like SF's strict data privacy ordinances and NYC's specific financial consumer protection laws.
 *   **KNOWLEDGE_GAP:** Specific data retention periods for donor transaction history vs. anonymous redemption analytics (CON-4820FAD5A9) are not yet defined. Legal must establish these periods before ratification.
 *   **KNOWLEDGE_GAP:** The exact 'unclaimed property' thresholds for each jurisdiction (SF, NYC, Chicago) are not yet defined. Legal must establish these thresholds before ratification.
 
-## 1. Absolute Anonymization and Data Segregation Strategy
+### 1.5. Validation Criteria
+
+The deliverable is validated by ensuring every identified regulation is mapped to a specific architectural control or policy. The 'done' criteria is a ratified Compliance Matrix that explicitly states which data resides where and which regulatory body has jurisdiction over each data type.
+
+---
+
+## 2. Absolute Anonymization and Data Segregation Strategy
 
 This section defines the binding compliance and risk boundaries for the MealCredit platform to ensure absolute beneficiary anonymity, strictly enforcing NFR-SEC-01. The strategy is designed to eliminate social stigma by decoupling beneficiary identity from financial transactions, ensuring compliance with FTC guidelines on anonymity (CON-C22D030D21) and cryptographically segregating demographic data from public ledger entries (CON-92F07E31B0).
 
-### 1.2 Metadata Analysis and De-anonymization Prevention
+### 2.1 Cryptographic Segregation Architecture
+
+To satisfy the requirement that beneficiary demographic status and legal names are cryptographically segregated from public ledger data (CON-92F07E31B0), the platform will implement a strict 'Zero-Knowledge' data model. The financial ledger (managed by the Transaction & Financial Engine, CAP-TRANSACTION-FINANCIAL-ENGINE) will never store, process, or have access to raw Personally Identifiable Information (PII).
+
+*   **Data Partitioning:** Beneficiary PII (names, addresses, demographic status) will be stored in a dedicated, highly restricted vault (e.g., AWS KMS encrypted storage) accessible only by the NGO Operator (ACT-09E028AEB0) for eligibility verification. The MealCredit core platform will only hold a hashed, non-reversible token representing the beneficiary.
+*   **Access Control:** The Platform Administrator (ACT-086A974D63) will have no access to raw beneficiary PII. Access to the segregation layer is restricted to the NGO Operator role, ensuring that the platform itself remains an anonymous intermediary.
+*   **Ledger Integrity:** All financial transactions on the ledger will reference only the hashed beneficiary token and the Merchant (ACT-AF904DCFF9) identifier. This ensures that the financial trail is completely blind to beneficiary identity.
+
+### 2.2 Metadata Analysis and De-anonymization Prevention
 
 To comply with FTC guidelines on anonymity and prevent de-anonymization attacks through metadata analysis (CON-C22D030D21), the platform will enforce strict data minimization and obfuscation protocols on all transactional metadata.
 
@@ -33,13 +71,13 @@ To comply with FTC guidelines on anonymity and prevent de-anonymization attacks 
 
 ---
 
-### 1.3 Liability Boundaries
+### 3.1 Liability Boundaries
 
 *   **Platform Liability:** MealCredit acts as the platform facilitating the transaction but does not hold funds in its own name for extended periods. The platform's liability is limited to the integrity of the transaction routing and the accuracy of the credit distribution logic. Liability for fraudulent transactions initiated by Donors is managed through Stripe's fraud detection tools, with the final financial liability resting with the Donor's issuing bank, subject to Stripe's platform policies.
 *   **Merchant Liability:** Merchant Partners (ACT-AF904DCFF9) are fully responsible for the fulfillment of the culinary credits. Any disputes arising from the quality of service, refusal of service, or failure to redeem credits are the direct liability of the Merchant. The platform provides the dispute resolution framework (CAP-DISPUTE-RESOLUTION-CHARGEBACK-MANAGEMENT) but does not assume financial liability for merchant performance.
 *   **NGO Operator Liability:** NGO Operators (ACT-09E028AEB0) are responsible for the accurate onboarding and eligibility verification of Beneficiaries (ACT-ADA6716160). They bear no direct financial liability for payment processing but are accountable for the integrity of the beneficiary data that triggers credit distribution.
 
-### 1.4 Cross-Jurisdictional KYC and Financial Compliance
+### 3.2 Cross-Jurisdictional KYC and Financial Compliance
 
 As outlined in CON-62097EBBF3, the platform must manage Stripe Connected Account liability and Know Your Customer (KYC) compliance across SF, NYC, and Chicago. This requires:
 
@@ -49,7 +87,9 @@ As outlined in CON-62097EBBF3, the platform must manage Stripe Connected Account
 
 ---
 
-### 2.1 Data Retention and Cryptographic Segregation (CON-4820FAD5A9)
+## 4. Data Retention and Cryptographic Segregation
+
+### 4.1 Data Retention and Cryptographic Segregation (CON-4820FAD5A9)
 
 To satisfy the 'Absolute Anonymization' requirement (NFR-SEC-01) and FTC guidelines (CON-C22D030D21), MealCredit must enforce strict data retention policies that cryptographically segregate Beneficiary demographic data from public financial ledger data. This ensures that donor impact receipts can be correlated with redemption events without linking PII.
 
@@ -70,13 +110,13 @@ The 'Data Persistence Layer' (SUR-FA61592CD4) must implement a 'Two-Store' archi
 **Cross-Reference:**
 This artifact's data segregation strategy defers to the 'Technical Architecture & Decision Foundations' artifact for the specific implementation of the 'Two-Store' architecture and UUIDv4 mapping logic; see that artifact for the full treatment.
 
-### 2.2 Unresolved Governance Gaps
+### 4.2 Unresolved Governance Gaps
 
 *   **KNOWLEDGE_GAP:** The exact dormancy period for culinary credits in San Francisco, New York City, and Chicago has not been ratified by Legal. ASSUMPTION: 12 months is used as a conservative baseline, but this must be validated against local unclaimed property laws.
 *   **KNOWLEDGE_GAP:** The specific banking partner holding the donor trust account has not been selected. The escheatment liability model depends on this partner's MTL coverage in each jurisdiction.
 *   **KNOWLEDGE_GAP:** The 'Platform Administrator' (ACT-086A974D63) access policy for the PII Vault has not been fully defined. ASSUMPTION: Access is restricted to hashed tokens only, but the exact RBAC permissions need to be ratified by the 'NGO Operator' (ACT-09E028AEB0) and Legal.
 
-### 2.3 Ratification and Next Steps
+### 4.3 Ratification and Next Steps
 
 This compliance posture must be ratified by Legal and the 'Platform Administrator' (ACT-086A974D63) before the Design phase begins. The 'Technical Architecture & Decision Foundations' artifact must then implement the 'Two-Store' architecture and UUIDv4 mapping to enforce these policies.
 
@@ -87,11 +127,11 @@ This compliance posture must be ratified by Legal and the 'Platform Administrato
 
 ---
 
-## 3. SOC2 Type II Structural Planning and Cryptographic Audit Framework
+## 5. SOC2 Type II Structural Planning and Cryptographic Audit Framework
 
 This section synthesizes the SOC2 Type II structural planning requirements (CON-81FB01F06B) and defines the append-only cryptographic log auditing (CON-6061FCCA83) for all financial ledger mutations. It establishes the governance framework for infrastructure-as-code (IaC) and access control policies, ensuring that compliance is baked into the operational fabric of the MealCredit platform across its three metropolitan footprints (SF, NYC, Chicago).
 
-### 3.1 Access Control Policies
+### 5.1 Access Control Policies
 
 Access control must be strictly governed by the principle of least privilege, aligned with the actor roles defined in the project (Platform Administrator, NGO Operator, Dispute Adjudicator, Donor, Beneficiary, Merchant).
 
@@ -99,7 +139,7 @@ Access control must be strictly governed by the principle of least privilege, al
 *   **Just-In-Time (JIT) Access:** For highly privileged operations (e.g., database schema changes, key rotation), JIT access must be implemented. This minimizes the attack surface by ensuring that elevated privileges are only granted for a limited, audited duration.
 *   **Multi-Factor Authentication (MFA):** MFA is mandatory for all human access to production environments, including the Platform Administrator and Dispute Adjudicator (ACT-7BA340FF76) roles.
 
-### 3.2 Append-Only Cryptographic Log Auditing
+### 5.2 Append-Only Cryptographic Log Auditing
 
 To ensure the integrity of all financial ledger mutations and support absolute beneficiary anonymity, an append-only cryptographic log auditing system is mandated (CON-6061FCCA83). This system ensures that once a financial transaction is recorded, it cannot be altered or deleted, providing a tamper-evident trail for all financial activities.
 
@@ -117,7 +157,7 @@ The audit log must support the absolute anonymization of beneficiary data (NFR-S
 *   **Hashed Identifiers:** Beneficiary identities in the audit log must be represented by cryptographic hashes or anonymous UUIDs, not raw names or PII. This ensures that the audit trail cannot be used to de-anonymize beneficiaries.
 *   **Segregation of Duties:** Access to the mapping between hashed identifiers and raw PII must be strictly controlled and segregated from the financial ledger audit log. This prevents any single actor from linking financial transactions to specific individuals.
 
-### 3.3 Validation and Ratification
+### 5.3 Validation and Ratification
 
 This SOC2 Type II structural planning and cryptographic audit framework is validated by its ability to provide continuous, tamper-evident evidence of compliance. The 'done' criteria is the ratification of the IaC policies, access control matrix, and audit log structure by the legal and compliance stakeholders.
 
@@ -130,3 +170,17 @@ This SOC2 Type II structural planning and cryptographic audit framework is valid
 | **Audit Logging** | Append-only, cryptographically hashed ledger for all financial mutations. | Immutable log with hash chaining, AWS CloudTrail integration. | Log integrity hashes, CloudTrail event history. |
 | **Data Segregation** | PII must be cryptographically segregated from financial audit logs. | Hashed identifiers in logs, separate PII storage with restricted access. | Log content analysis, PII access control logs. |
 | **Data Residency** | Data must reside within specified jurisdictions. | Region-specific S3 buckets and RDS instances. | AWS resource configuration, region tags. |
+
+# Compliance, Risk & Governance Inception Artifact
+
+---
+
+## VP decision
+
+**Decision:** Approved
+
+---
+
+## VP feedback
+
+- Section 1.1 Data Residency: Convert the specific AWS region mapping (US West Oregon/N. California) to a KNOWLEDGE_GAP - the requirement does not mandate specific AWS regions, only that data residency constraints be enforced.

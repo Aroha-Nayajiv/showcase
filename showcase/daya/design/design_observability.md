@@ -1,6 +1,10 @@
 # Observability & Monitoring Design
 
-### 1.1 Trace Context Propagation
+## 1. AWS X-Ray Distributed Tracing Strategy
+
+This section defines the distributed tracing architecture for the MealCredit platform, ensuring end-to-end visibility of donor funding and beneficiary redemption flows across the Expo client, GraphQL API, and gRPC financial services. The strategy prioritizes PCI-DSS Level 1 compliance by strictly preventing PII leakage into trace data.
+
+### 1.1. Trace Context Propagation
 
 To maintain a unified trace across heterogeneous service boundaries, the platform adopts the W3C TraceContext standard (traceparent header) for HTTP/HTTPS traffic and gRPC metadata for internal service communication.
 
@@ -8,7 +12,7 @@ To maintain a unified trace across heterogeneous service boundaries, the platfor
  GraphQL API (Orchestration Layer): The GraphQL API acts as the primary trace context carrier. It extracts the traceparent header from incoming client requests and propagates it to downstream gRPC financial services. If a traceparent header is missing (e.g., internal service-to-service calls), the API generates a new valid W3C TraceContext ID.
  gRPC Financial Services: The gRPC services (Transaction & Financial Engine, Dispute Resolution) must extract the trace context from gRPC metadata (specifically the traceparent key) and inject it into outgoing calls to Aurora PostgreSQL and Stripe APIs. This ensures that the financial transaction trace remains linked to the original client request.
 
-### 1.2 AWS X-Ray SDK Integration
+### 1.2. AWS X-Ray SDK Integration
 
 AWS X-Ray SDKs will be integrated into the Node.js (GraphQL API) and Go (gRPC services) runtimes to automatically capture subsegments for database calls, external API interactions, and service boundaries.
 
@@ -17,7 +21,7 @@ AWS X-Ray SDKs will be integrated into the Node.js (GraphQL API) and Go (gRPC se
  Aurora PostgreSQL: X-Ray will be enabled for Aurora PostgreSQL to capture database-level metrics and query performance. Database calls will be automatically instrumented by the X-Ray SDK, linking them to the parent trace.
  Stripe API: Calls to the Stripe API (for webhook processing and payment intent creation) will be captured as external subsegments. The X-Ray SDK will automatically mask sensitive card data in accordance with PCI-DSS requirements.
 
-### 1.3 PII Sanitization and Data Isolation
+### 1.3. PII Sanitization and Data Isolation
 
 Strict data isolation constraints (CON-0A0288EED4, CON-92F07E31B0) must be enforced at the tracing layer to prevent PII or beneficiary demographic data from being exposed in monitoring dashboards or logs.
 
@@ -25,7 +29,7 @@ Strict data isolation constraints (CON-0A0288EED4, CON-92F07E31B0) must be enfor
  Annotation Policy: Only non-PII business keys (e.g., anonymous_voucher_id, donor_pool_id, merchant_id) will be captured as X-Ray annotations. These annotations are searchable and filterable in the X-Ray console but do not contain sensitive data.
  Service Map Visibility: The AWS X-Ray Service Map will be configured to display only service names and request counts, ensuring that no PII is visible in the architectural visualization.
 
-### 1.4 Sampling Strategy
+### 1.4. Sampling Strategy
 
 To balance observability depth with cost and latency, a tiered sampling strategy will be implemented:
 
@@ -33,7 +37,17 @@ To balance observability depth with cost and latency, a tiered sampling strategy
  Health Sampling: 10% of all successful requests will be sampled to provide a representative view of healthy traffic patterns and performance baselines.
  Critical Path Sampling: 100% of requests to critical endpoints (e.g., `/redemption/scan`, `/donor/fund`) will be sampled to ensure complete visibility into high-value user journeys.
 
-### 2.1 Aurora PostgreSQL Append-Only Ledger Schema
+### 1.5. Validation and Acceptance Criteria
+
+ End-to-End Traceability: A single end-to-end trace must be retrievable in the AWS X-Ray console for a completed beneficiary redemption, showing the Expo client request, GraphQL API processing, gRPC financial service call, and Aurora PostgreSQL ledger update.
+ PII Verification: No PII (e.g., beneficiary names, donor PII) must be present in the raw trace segments. This will be verified by inspecting the raw trace data in the X-Ray console.
+ Context Propagation: Trace context must be correctly propagated across all service boundaries (Expo -> GraphQL -> gRPC -> Aurora/Stripe) without breaks or orphaned segments.
+
+## 2. CloudWatch Metric and Log Schema for Financial Ledger Auditing
+
+This section defines the CloudWatch metric and log schema for financial ledger auditing, ensuring all mutations are captured with append-only cryptographic log auditing in Aurora PostgreSQL. This design directly supports the project's compliance and trust objectives, specifically Implied concern: Implement append-only cryptographic log auditing in Aurora PostgreSQL for all financial ledger mutations. (CON-1762EA5021) and Implied concern: Log all administrative ledger operations and infrastructure changes to AWS CloudTrail for SOC2 Type II evidence. (CON-BB253DF0A2).
+
+### 2.1. Aurora PostgreSQL Append-Only Ledger Schema
 
 To guarantee the immutability of financial records, the ledger will utilize a dedicated ledger_audit_log table. This table is designed to be append-only, meaning no UPDATE or DELETE operations are permitted on its rows. Every financial mutation (e.g., credit issuance, redemption, refund) is recorded as a new row.
 
@@ -56,7 +70,7 @@ Immutability Enforcement:
 
 A PostgreSQL TRIGGER function will be implemented on all financial tables to automatically insert records into ledger_audit_log on INSERT, UPDATE, and DELETE operations. Additionally, a database-level REVOKE statement will be executed to remove UPDATE and DELETE permissions on the ledger_audit_log table for all application roles, ensuring that only the database superuser (or an automated CI/CD pipeline with explicit approval) can modify it, and only for forensic recovery purposes.
 
-### 2.2 CloudWatch Log Schema for Ledger Auditing
+### 2.2. CloudWatch Log Schema for Ledger Auditing
 
 CloudWatch Logs will ingest structured JSON logs from the application layer and database triggers. These logs will provide real-time visibility into ledger mutations and their cryptographic integrity.
 
@@ -82,7 +96,64 @@ Data Isolation & PII Protection:
 
 To adhere to Implied concern: Implement strict data isolation where beneficiary demographic status and legal names are cryptographically segregated from public ... (CON-92F07E31B0) and Implied concern: Adhere to FTC guidelines on anonymity, ensuring no de-anonymization attacks can link beneficiaries to donors through metadata anal... (CON-C22D030D21), the CloudWatch log schema will strictly exclude any PII or beneficiary demographic data. The metadata field will only contain anonymized identifiers (e.g., anonymous_voucher_id) and non-sensitive operational data. Any attempt to log PII will be caught by a pre-log sanitization layer in the application code, which will redact sensitive fields before the log event is emitted.
 
-### 2.6 Knowledge Gaps and Assumptions
+### 2.3. CloudWatch Custom Metrics for Ledger Integrity
+
+Custom metrics will be published to CloudWatch to monitor the health and integrity of the financial ledger in real-time. These metrics will be used for automated alerting and SOC2 Type II evidence generation.
+
+Metric 1: LedgerMutationCount
+
+Namespace: `MealCredit/Financial`
+Metric Name: LedgerMutationCount
+Dimensions: OperationType, MetroRegion, ActorRole
+Unit: Count
+Description: The number of financial ledger mutations per operation type, metro region, and actor role.
+Alert Threshold: `> 0` for ERROR log levels.
+
+Metric 2: HashChainIntegrityFailures
+
+Namespace: `MealCredit/Financial`
+Metric Name: HashChainIntegrityFailures
+Dimensions: ServiceName
+Unit: Count
+Description: The number of times a cryptographic hash chain verification failed during a ledger mutation.
+Alert Threshold: `> 0` (Immediate critical alert).
+
+Metric 3: AuditLogLatencyP99
+
+Namespace: `MealCredit/Financial`
+Metric Name: AuditLogLatencyP99
+Dimensions: ServiceName
+Unit: Milliseconds
+Description: The p99 latency for writing to the ledger_audit_log table.
+Alert Threshold: `> 500ms` (Indicates potential performance degradation in the audit logging process).
+
+Metric 4: CreditPoolUtilizationRate
+
+Namespace: `MealCredit/Financial`
+Metric Name: CreditPoolUtilizationRate
+Dimensions: MetroRegion
+Unit: Percent
+Description: The percentage of the total credit pool that has been utilized in a given metro region. This supports Implied concern: Monitor Credit Pool Utilization Rate with automated alerts triggering when thresholds exceed 85%. (CON-2059B17FB2).
+Alert Threshold: `> 85%` (Warning), `> 95%` (Critical).
+
+### 2.4. SOC2 Type II Evidence Integration
+
+To streamline SOC2 Type II compliance, CloudWatch Logs will be integrated with AWS CloudTrail. All administrative ledger operations (e.g., manual adjustments by a Platform Administrator (ACT-086A974D63)) and infrastructure changes will be logged to CloudTrail. CloudWatch Logs will then ingest these CloudTrail logs, creating a unified audit trail.
+
+Integration Pattern:
+
+1. CloudTrail: Captures all API calls to AWS services and application-level administrative actions.
+2. CloudWatch Logs: Ingests CloudTrail logs via a CloudWatch Logs subscription filter.
+3. CloudWatch Metrics: Custom metrics are derived from both application logs and CloudTrail logs to provide a holistic view of system integrity.
+
+This integration ensures that all administrative actions are immutable, traceable, and readily available for SOC2 Type II audits, supporting Implied concern: Ensure SOC2 Type II structural planning is baked into the infrastructure-as-code and access control policies. (CON-81FB01F06B).
+
+### 2.5. Validation and Verification
+
+- Done Criteria: A single end-to-end trace can be retrieved in the X-Ray console for a completed beneficiary redemption, showing the Expo client request, GraphQL API processing, gRPC financial service call, and Aurora PostgreSQL ledger update. No PII is present in the trace data. Trace context is correctly propagated across all service boundaries.
+- Validation: Verify that no PII is present in the trace data by inspecting the raw trace segments. Confirm that trace context is correctly propagated across all service boundaries.
+
+### 2.6. Knowledge Gaps and Assumptions
 
 KNOWLEDGE_GAP: Audit Log Retention Period - The exact retention period for the ledger_audit_log table and CloudWatch Logs must be established by the Compliance & Legal team to align with financial regulations governing quasi-cash instruments, specifically regarding unclaimed property and escheatment laws (Implied concern: Comply with financial regulations governing quasi-cash instruments, specifically regarding unclaimed property and escheatment laws... (CON-B1DFEBEC8C)).
 ASSUMPTION: SHA-256 Hashing Algorithm - SHA-256 is assumed to be the approved cryptographic hashing algorithm for the ledger chain. If a different algorithm is mandated by PCI-DSS Level 1 or SOC2 Type II requirements, this must be updated. Owner: Security Architecture & Access Control.
@@ -90,7 +161,11 @@ ASSUMPTION: Aurora PostgreSQL Trigger Performance - It is assumed that the overh
 
 ---
 
-### 3.1 Credit Pool Utilization Rate (CPU) Architecture
+## 3. Real-Time Metric Collection Architecture
+
+This section defines the real-time metric collection architecture for the MealCredit platform, specifically targeting the Credit Pool Utilization Rate and Donation-to-Redemption Velocity (DRV). The architecture leverages the event-driven serverless backbone to ensure sub-second metric aggregation, enabling automated alerting for liquidity health and operational anomalies across the SF, NYC, and Chicago metropolitan footprints.
+
+### 3.1. Credit Pool Utilization Rate (CPU) Architecture
 
 The Credit Pool Utilization Rate is a critical liquidity metric that tracks the percentage of total donor-funded credits that have been redeemed within a specific regional pool. This metric directly impacts the platform's ability to honor redemption requests and requires high-frequency monitoring to prevent liquidity shortfalls.
 
@@ -117,7 +192,7 @@ To proactively manage liquidity, the following alert thresholds are established,
 | Critical | > 85% | Automated Alert Trigger; Initiate emergency donor funding request workflow; Notify NGO Operator (ACT-09E028AEB0) and Platform Administrator | PagerDuty / SMS / Email |
 | Emergency | > 95% | Halt New Credit Issuance (if configured); Escalate to Executive Leadership | Executive PagerDuty |
 
-### 3.2 Donation-to-Redemption Velocity (DRV) Architecture
+### 3.2. Donation-to-Redemption Velocity (DRV) Architecture
 
 The Donation-to-Redemption Velocity (DRV) measures the speed at which donated funds are converted into redeemed credits. This metric is vital for monitoring liquidity health against the 14-day target and ensuring that donor funds are being utilized effectively to support beneficiaries.
 
@@ -129,7 +204,7 @@ The Donation-to-Redemption Velocity (DRV) measures the speed at which donated fu
 2. Stream Processing: A dedicated Lambda function consumes both event streams, maintaining a rolling window state (stored in DynamoDB or Redis) to calculate the current DRV for each metro_region.
 3. Storage: Metrics are stored with a 1-hour granularity for real-time dashboards.
 
-### 3.3 Stripe Webhook Processing Latency
+### 3.3. Stripe Webhook Processing Latency
 
 To ensure a seamless user experience, the platform must monitor the latency of Stripe webhook processing, which triggers the credit issuance and POS clearance flows.
 
@@ -147,7 +222,15 @@ To ensure a seamless user experience, the platform must monitor the latency of S
 
 This section defines the specific distributed tracing standards for asynchronous gRPC financial transactions and synchronous GraphQL CRUD operations, fulfilling the design phase acceptance criteria for observability contracts.
 
-### 4.2 Asynchronous gRPC Tracing Standards
+### 4.1. Synchronous GraphQL Tracing Standards
+
+For the synchronous GraphQL API layer, tracing must adhere to the W3C TraceContext standard to ensure seamless propagation from the Expo client through the API Orchestration Layer (SUR-85E4A5B6E7) to downstream services.
+
+ Header Propagation: The `traceparent` header must be injected by the Expo client and extracted by the GraphQL API resolvers. The API must propagate this context to all downstream gRPC calls.
+ Span Naming Convention: GraphQL spans must follow the pattern `GraphQL/{OperationType}/{FieldName}` (e.g., `GraphQL/Mutation/redemptionScan`).
+ Error Handling: Any GraphQL resolver error must be captured as a span event with the error details, ensuring that the root cause of a failed transaction is visible in the X-Ray service map.
+
+### 4.2. Asynchronous gRPC Tracing Standards
 
 For the asynchronous gRPC financial services, tracing must utilize gRPC metadata to propagate context across service boundaries, ensuring that financial ledger mutations are linked to the originating client request.
 
@@ -155,14 +238,14 @@ For the asynchronous gRPC financial services, tracing must utilize gRPC metadata
  Span Naming Convention: gRPC spans must follow the pattern `gRPC/{ServiceName}/{MethodName}` (e.g., `gRPC/FinancialService/ProcessRedemption`).
  Timeout and Retry Tracing: If a gRPC call times out or is retried, the X-Ray SDK must capture the retry attempt as a subsegment, allowing operators to distinguish between transient network issues and persistent business logic failures.
 
-### 4.3 Cross-Service Trace Correlation
+### 4.3. Cross-Service Trace Correlation
 
 To ensure end-to-end visibility, the platform must implement a trace correlation strategy that links synchronous and asynchronous spans.
 
  Correlation Key: A unique `correlation_id` (UUIDv4) must be generated for each donor funding or beneficiary redemption event. This ID must be included in both the GraphQL request and the gRPC metadata, allowing X-Ray to stitch together the synchronous and asynchronous spans into a single logical transaction view.
  Service Map Visualization: The AWS X-Ray Service Map must be configured to display the correlation between the GraphQL API and gRPC services, providing a clear visual representation of the financial transaction flow.
 
-### 4.4 AWS CloudTrail Integration for Administrative Auditing
+### 4.1. AWS CloudTrail Integration for Administrative Auditing
 
 AWS CloudTrail will be configured to capture all management events and data events related to the MealCredit platform's infrastructure and data layers. This provides the foundational audit trail for SOC2 Type II compliance.
 
@@ -188,7 +271,38 @@ Log File Validation: CloudTrail will be configured with log file validation enab
 S3 Storage: CloudTrail logs will be stored in a dedicated, encrypted S3 bucket with strict access controls. This bucket will be versioned and enabled with Object Lock to prevent deletion or modification of logs for the required retention period.
 Retention Period: Logs will be retained for a minimum of 7 years, aligning with SOC2 Type II audit requirements. [KNOWLEDGE_GAP: retention_period - Compliance team must establish the exact retention period required by SOC2 Type II auditors for financial and administrative logs.]
 
-### 4.6 SOC2 Type II Evidence Generation
+### 4.2. CloudWatch Logs Integration for Application Auditing
+
+CloudWatch Logs will be used to capture structured application logs from the MealCredit platform's services, providing detailed context for administrative actions and financial transactions.
+
+#### 4.2.1. Log Group Structure
+
+CloudWatch Logs will be organized into logical log groups:
+
+`/mealcredit/admin/operations`: Logs related to administrative actions, including user management, role assignments, and system configuration changes.
+`/mealcredit/financial/ledger`: Logs related to financial ledger operations, including credit pool updates, donor funding activations, and beneficiary redemptions.
+`/mealcredit/infrastructure/deployments`: Logs related to infrastructure changes, including CI/CD pipeline executions, IaC deployments, and service updates.
+
+#### 4.2.2. Log Entry Schema
+
+All logs will adhere to a structured JSON schema to facilitate automated evidence generation and querying:
+
+timestamp: ISO 8601 formatted timestamp of the event.
+event_id: Unique identifier for the event, correlated with distributed tracing (X-Ray trace ID).
+actor_id: Identifier of the actor performing the action (e.g., Platform Administrator, NGO Operator).
+action_type: Type of action performed (e.g., CREATE, UPDATE, DELETE, APPROVE).
+resource_type: Type of resource affected (e.g., User, LedgerEntry, Configuration).
+resource_id: Identifier of the affected resource.
+metadata: Additional context-specific metadata (e.g., old values, new values, approval reason).
+ip_address: IP address of the actor (if applicable).
+user_agent: User agent string of the actor (if applicable).
+
+#### 4.2.3. Log Ingestion and Forwarding
+
+- Application Logging: All services (GraphQL API, gRPC Financial Services) will be configured to emit logs in the defined structured JSON format to CloudWatch Logs.
+- CloudTrail to CloudWatch: CloudTrail logs will be forwarded to CloudWatch Logs for centralized analysis and correlation with application logs. This enables cross-referencing of infrastructure changes with application-level actions.
+
+### 4.3. SOC2 Type II Evidence Generation
 
 The integration of CloudTrail and CloudWatch Logs will support the generation of SOC2 Type II evidence through automated reporting and monitoring.
 
@@ -203,13 +317,21 @@ Data Integrity Reports: Automated reports will be generated from CloudTrail data
 - Anomalous Activity Detection: CloudWatch Alarms will be configured to detect anomalous activity, such as unauthorized access attempts, unusual API call patterns, or unexpected data modifications. [KNOWLEDGE_GAP: alert_thresholds - Security team must establish specific thresholds for anomalous activity detection based on SOC2 Type II requirements.]
 - Compliance Violation Alerts: Alerts will be configured to notify the compliance team of any potential SOC2 Type II violations, such as logs being deleted or modified, or unauthorized access to sensitive resources.
 
-### 4.8 Cross-Reference and Deferrals
+### 4.4. Data Isolation and PII Protection in Logs
+
+To ensure compliance with data isolation constraints (CON-0A0288EED4, CON-92F07E31B0) and PCI-DSS Level 1 requirements, all logs will be sanitized to remove PII and sensitive data before storage.
+
+PII Redaction: All logs will be processed through a PII redaction layer before being written to CloudWatch Logs or S3. This layer will identify and redact fields such as beneficiary names, donor PII, and payment card details.
+Anonymization: Beneficiary-related data will be anonymized in logs, using hashed identifiers or UUIDs instead of raw PII. This ensures that beneficiary demographic status and legal names are cryptographically segregated from public logs (CON-0A0288EED4, CON-92F07E31B0).
+PCI-DSS Compliance: No raw card data will be present in any logs. All payment-related events will reference Stripe token IDs or transaction IDs, ensuring PCI-DSS Level 1 compliance (CON-66390130AA, CON-C4F0E02638).
+
+### 4.5. Cross-Reference and Deferrals
 
 Distributed Tracing: This artifact's logging design integrates with the distributed tracing strategy defined in the Distributed Tracing & Log Aggregation artifact. Trace IDs from X-Ray will be included in all log entries to enable end-to-end correlation.
 Financial Ledger Data Model: This artifact's logging design references the financial ledger data model defined in the Financial Ledger Data Model artifact. Log entries will reference ledger entry IDs to provide context for financial transactions.
 Security Architecture: This artifact's PII redaction and data isolation strategies align with the security architecture defined in the Security Architecture & Access Control artifact.
 
-### 4.9 Validation and Testing
+### 4.7. Validation and Testing
 
 Log Integrity Verification: Regular tests will be conducted to verify the integrity of CloudTrail and CloudWatch Logs, ensuring that logs are not tampered with or deleted.
 PII Redaction Testing: Automated tests will be conducted to verify that PII is correctly redacted from all logs before storage.
@@ -220,7 +342,11 @@ This design ensures that the MealCredit platform meets SOC2 Type II compliance r
 
 ---
 
-### 5.1 End-to-End Trace Integrity Validation
+## 5. Observability Validation Plan
+
+This section defines the validation strategy to ensure the MealCredit observability architecture (AWS X-Ray, CloudWatch, Aurora PostgreSQL) accurately reflects system state, maintains PCI-DSS Level 1 and SOC2 Type II compliance, and guarantees that no raw card data or PII leaks into monitoring surfaces.
+
+### 5.1. End-to-End Trace Integrity Validation
 
 The validation plan ensures that distributed traces correctly propagate context across the Expo client, GraphQL API, and gRPC financial services, verifying the integrity of the donor-to-beneficiary flow.
 
@@ -235,7 +361,7 @@ The validation plan ensures that distributed traces correctly propagate context 
   Method: Trigger a Stripe webhook event (simulated) and verify that the traceparent from the original donor funding activation (JNY-62D850E94B) is propagated to the webhook handler.
   Success Criteria: The X-Ray service map must link the webhook handler segment to the original donor funding segment via the shared trace ID.
 
-### 5.2 Financial Ledger Audit Integrity Validation
+### 5.2. Financial Ledger Audit Integrity Validation
 
 This validates the append-only cryptographic log auditing mechanism in Aurora PostgreSQL (CON-1762EA5021, CON-6061FCCA83) to ensure financial mutations are immutable and verifiable.
 
@@ -249,7 +375,7 @@ This validates the append-only cryptographic log auditing mechanism in Aurora Po
   Method: Write a validation script that iterates through the ledger_audit_log table, recalculating the SHA-256 hash for each entry based on the previous entry's hash and the current mutation data.
   Success Criteria: The calculated hash for every entry must match the stored cryptographic_hash field. Any mismatch indicates tampering and must trigger an immediate SOC2 Type II incident alert.
 
-### 5.3 Real-Time Metric Accuracy Validation
+### 5.3. Real-Time Metric Accuracy Validation
 
 This validates the accuracy and latency of key business and operational metrics, including Credit Pool Utilization, Donation-to-Redemption Velocity (DRV), and Stripe Webhook Processing Latency.
 
@@ -268,7 +394,7 @@ This validates the accuracy and latency of key business and operational metrics,
   Method: Simulate high-volume Stripe webhook events (1000 events/minute) and measure the end-to-end processing time from webhook receipt to financial ledger update.
   Success Criteria: The p99 latency must remain below 250ms, and the average latency must be below 150ms. If thresholds are exceeded, the system must trigger an automated alert to the Platform Administrator (ACT-086A974D63).
 
-### 5.4 Data Isolation and PII Leakage Validation
+### 5.4. Data Isolation and PII Leakage Validation
 
 This ensures that no PII or raw card data touches MealCredit servers or appears in monitoring dashboards, adhering to PCI-DSS Level 1 and FTC guidelines on anonymity (CON-66390130AA, CON-B3D71A437D).
 
@@ -282,7 +408,7 @@ This ensures that no PII or raw card data touches MealCredit servers or appears 
   Method: Inspect the Aurora PostgreSQL database and CloudWatch logs for any instances of raw card data. Verify that all card data is tokenized by Stripe before being passed to the MealCredit platform.
   Success Criteria: Zero instances of raw card data found in the database or logs. All card references must be Stripe token IDs.
 
-### 5.5 Validation Automation and CI/CD Integration
+### 5.5. Validation Automation and CI/CD Integration
 
  Automated Validation Pipeline:
   Objective: Integrate observability validation tests into the CI/CD pipeline to ensure continuous compliance.
@@ -294,6 +420,18 @@ This ensures that no PII or raw card data touches MealCredit servers or appears 
   Method: Configure CloudWatch Alarms to trigger on any PII leakage or raw card data detection. Integrate these alarms with the incident response workflow.
   Success Criteria: Immediate alerting to the Platform Administrator (ACT-086A974D63) and Security Team in the event of a compliance violation.
 
-### 5.6 Deliverable Summary
+### 5.7. Deliverable Summary
 
 This validation plan provides a comprehensive framework for verifying the accuracy, integrity, and compliance of the MealCredit observability architecture. It ensures that the system can be trusted to operate at scale while maintaining the highest standards of data privacy and financial auditability.
+
+---
+
+## VP decision
+
+**Decision:** Approved
+
+---
+
+## VP feedback
+
+- Section 4.1.3: Convert the '7 years' retention period to KNOWLEDGE_GAP - the specific retention window must be established by the Compliance & Legal team and is not mandated by SOC2 Type II.

@@ -2,13 +2,13 @@
 
 ## 1. Beneficiary-Platform Dispute Flow (JNY-2B038C9362)
 
-### 1.1 Core Principles
+### 1.2. Core Principles
 1. **Dignity and Frictionless Access**: The interface must be simple, non-judgmental, and accessible. A Beneficiary (ACT-ADA6716160) should not feel stigmatized when reporting an issue.
 2. **Absolute Anonymity**: The dispute submission must not require PII. The system must rely on transactional metadata (e.g., transaction hash, timestamp, merchant ID) to correlate the dispute with the ledger.
 3. **PCI-DSS Level 1 Compliance**: The dispute interface must never accept, store, or transmit raw card data. All financial references must be tokenized or hashed.
 4. **SOC2 Type II Structural Planning**: All dispute interactions must be logged to AWS CloudTrail (CON-FBBBF07295) for auditability, ensuring that the Platform Administrator (ACT-086A974D63) can investigate without accessing beneficiary PII.
 
-### 1.2 User Stories
+### 1.3. User Stories
 
 #### Story 1.1: Frictionless Dispute Initiation
 As a Beneficiary (ACT-ADA6716160),
@@ -42,7 +42,7 @@ So that I know if my credits have been restored or if the issue was not valid, w
 - The notification does not reveal the outcome details (e.g., "Credits Restored" vs. "Dispute Denied") to prevent potential social bias or stigma. Instead, it provides a generic message (e.g., "Your report has been reviewed.").
 - If credits are restored, they are automatically added to the Beneficiary (ACT-ADA6716160)'s balance without requiring further action.
 
-### 1.3 Edge Cases and Error Flows
+### 1.4. Edge Cases and Error Flows
 
 1. **Duplicate Dispute Submission**:
    - **Scenario**: A Beneficiary (ACT-ADA6716160) submits multiple disputes for the same transaction.
@@ -56,7 +56,7 @@ So that I know if my credits have been restored or if the issue was not valid, w
    - **Scenario**: A Beneficiary (ACT-ADA6716160) submits a high volume of disputes that are later determined to be fraudulent.
    - **Handling**: The Platform Administrator (ACT-086A974D63) can flag the account for review based on aggregated, anonymized dispute patterns. The Beneficiary (ACT-ADA6716160) is not notified of the fraud flag to prevent retaliation or gaming of the system.
 
-### 1.4 Assumptions
+### 1.5. Assumptions
 - **ASSUMPTION**: Transaction Hash Uniqueness - The transaction hash is assumed to be globally unique and sufficient to identify a specific transaction without PII. Evidence needed: Verification from the Transaction & Financial Engine (CAP-TRANSACTION-FINANCIAL-ENGINE) that hashes are collision-resistant and unique.
 - **ASSUMPTION**: Push Notification Delivery - The system assumes that push notifications are reliably delivered to the Beneficiary (ACT-ADA6716160)'s device. Evidence needed: Confirmation from the Client Interface Layer (SUR-43E71C4E2B) that notification delivery rates meet the 99.99% uptime target (CON-BF1CD5707E).
 
@@ -64,10 +64,10 @@ So that I know if my credits have been restored or if the issue was not valid, w
 
 ## 2. Merchant-Beneficiary Refund Flow (JNY-E5F45D37C6)
 
-### 2.1 Purpose and Scope
+### 2.1. Purpose and Scope
 This section defines the product-level workflow for the Merchant-Beneficiary Refund Flow (JNY-E5F45D37C6). The primary objective is to enable Merchant (ACT-AF904DCFF9) partners to reverse transactions for Beneficiary (ACT-ADA6716160) users in cases of error, while strictly maintaining the platform's core value proposition: absolute anonymity and dignity. The flow must prevent any exposure of Beneficiary PII (legal names, demographic status) to the Merchant, adhering to Implied concern: Implied concern: Implement strict data isolation where beneficiary demographic status and legal names are cryptographically segreg... (CON-0A0288EED4) and Implied concern: Implied concern: Implement strict data isolation where beneficiary demographic status and legal names are cryptographically segregated from public ... (CON-92F07E31B0).
 
-### 2.2 Trigger Conditions for Refunds
+### 2.2. Trigger Conditions for Refunds
 Refunds are initiated only under specific, verifiable conditions to prevent fraud and ensure financial integrity (Implied concern: Handling of financial edge cases such as double-spending prevention and voided transactions (CON-61EC670500)). The Merchant interface will only allow refund initiation for the following scenarios:
 
 1. **Double-Scan/Double-Tap**: The Beneficiary's credit was deducted twice for a single transaction due to a POS latency issue (Implied concern: Implied concern: Ensure Stripe Webhook Processing Latency averages below 150ms from card tap to merchant ledger entry. (CON-06232374D9)).
@@ -110,13 +110,13 @@ So that I am aware of the correction without feeling stigmatized or exposed.
 - The Beneficiary can view the restored credit in their Redemption History as a "Refunded" entry, linked to the original transaction hash.
 - The notification is delivered via Server-Sent Events (SSE) for real-time updates, ensuring low latency (Implied concern: Implied concern: Maintain p99 latency below 250ms for voucher creation and scanning callbacks under 10,000 concurrent connections. (CON-6D5E21557B)).
 
-### 2.3 Compliance and Security Constraints
+### 2.5. Compliance and Security Constraints
 
 - **PCI-DSS Level 1**: The refund flow must not involve any raw card data. All transactions are processed through Stripe Elements and Stripe Issuing virtual cards, ensuring zero raw card data touches MealCredit servers (Implied concern: Implied concern: Enforce PCI-DSS Level 1 compliance by ensuring zero raw card data touches MealCredit servers, relying entirely on Stripe Elements/... (CON-66390130AA)).
 - **SOC2 Type II**: All refund actions are logged in AWS CloudTrail for auditability (Implied concern: Implied concern: Log all administrative ledger operations and infrastructure changes to AWS CloudTrail for SOC2 Type II evidence. (CON-BB253DF0A2)).
 - **Anonymity**: The refund flow must not allow the Merchant to infer the Beneficiary's identity through metadata analysis (Implied concern: Implied concern: Adhere to FTC guidelines on anonymity, ensuring no de-anonymization attacks can link beneficiaries to donors through metadata anal... (CON-C22D030D21)).
 
-### 2.4 Knowledge Gaps
+### 2.6. Knowledge Gaps
 
 - **KNOWLEDGE_GAP**: The exact time window for Merchant-initiated refunds (e.g., 5 minutes, 24 hours) must be established by the Platform Administrator to balance user experience with fraud prevention.
 - **KNOWLEDGE_GAP**: The specific error codes and messages for the POS interface when a refund is denied (e.g., transaction already refunded, transaction expired) must be defined by the Design phase.
@@ -167,7 +167,7 @@ So that the Platform can adjust the Beneficiary's credit pool and update the led
 
 This section defines the product scope for the Dispute Resolution & Chargeback Management capability (CAP-DISPUTE-RESOLUTION-CHARGEBACK-MANAGEMENT). It establishes the rules for handling financial reversals initiated by external payment processors (e.g., Stripe) and internal platform disputes, ensuring strict adherence to PCI-DSS Level 1 and SOC2 Type II compliance while maintaining absolute beneficiary anonymity.
 
-### 4.1 Chargeback Lifecycle & Rules
+### 4.1. Chargeback Lifecycle & Rules
 
 The platform must support a fully automated chargeback lifecycle for transactions processed via Stripe Issuing. When a Beneficiary (ACT-ADA6716160) disputes a transaction with their card issuer, the platform must receive a webhook notification and automatically trigger a credit reversal.
 
@@ -176,7 +176,7 @@ The platform must support a fully automated chargeback lifecycle for transaction
 - **Dispute Window**: The platform must enforce a strict dispute window of [KNOWLEDGE_GAP: Dispute Resolution & Chargeback Management - Product Owner must establish the exact number of days allowed for a Beneficiary to contest a transaction after redemption].
 - **Evidence Submission**: If the Merchant wishes to contest the chargeback, they must be able to upload evidence (e.g., signed receipt, POS logs) within [KNOWLEDGE_GAP: Dispute Resolution & Chargeback Management - Product Owner must establish the number of days allowed for Merchant evidence submission].
 
-### 4.2 Anonymity & Data Isolation in Disputes
+### 4.2. Anonymity & Data Isolation in Disputes
 
 To prevent de-anonymization attacks (CON-B3D71A437D), all dispute-related data must be handled with extreme care.
 
@@ -184,11 +184,29 @@ To prevent de-anonymization attacks (CON-B3D71A437D), all dispute-related data m
 - **Data Retention**: Dispute-related logs and evidence must be retained for [KNOWLEDGE_GAP: Dispute Resolution & Chargeback Management - Product Owner must establish the data retention period for dispute evidence in compliance with financial regulations]. After this period, all data must be cryptographically hashed or purged.
 - **PCI-DSS Level 1 Compliance**: No raw card data may be stored or processed by the platform. All dispute evidence must be reviewed through a secure, isolated interface that does not cache or log sensitive payment information.
 
+### 4.3. Fraud Investigation Integration
+
+The Dispute Resolution & Chargeback Management capability must integrate with the Fraud Detection & Fraud Prevention Screening capability (CAP-FRAUD-DETECTION-FRAUD-PREVENTION-SCREENING) to identify patterns of fraudulent activity.
+
+- **Pattern Detection**: The system must automatically flag transactions that exhibit signs of fraud, such as multiple chargebacks from the same Beneficiary within a short timeframe or unusual redemption patterns from a specific Merchant.
+- **Flagging Mechanism**: When a potential fraud pattern is detected, the transaction must be automatically flagged for review by the NGO Operator (ACT-09E028AEB0) and the Platform Administrator (ACT-086A974D63). The flag must include a risk score and a summary of the suspicious activity, without revealing the Beneficiary's identity.
+- **Resolution Workflow**: The NGO Operator must be able to investigate the flagged transaction and recommend a resolution (e.g., approve the chargeback, reject the chargeback, or escalate to the Platform Administrator). The Platform Administrator must have the final authority to approve or reject the resolution.
+
+### 4.4. Compliance & Audit Trail
+
+All dispute and chargeback actions must be logged in an append-only cryptographic log (CON-1762EA5021) to ensure a tamper-proof audit trail for SOC2 Type II compliance.
+
+- **Immutable Logging**: Every action taken during the dispute lifecycle (e.g., chargeback received, evidence uploaded, resolution approved) must be recorded in the immutable log with a timestamp, actor ID, and action hash.
+- **Audit Access**: Only the Platform Administrator and authorized compliance auditors may access the full audit log. Access must be logged and monitored.
+- **Regulatory Reporting**: The platform must be able to generate reports on dispute rates, chargeback volumes, and fraud incidents for regulatory reporting purposes. These reports must be anonymized and aggregated to prevent de-anonymization.
+
+---
+
 ## 5. Fraud Detection & Fraud Prevention Screening
 
 This section defines the product scope for the Fraud Detection & Fraud Prevention Screening capability (CAP-FRAUD-DETECTION-FRAUD-PREVENTION-SCREENING). It establishes the automated screening triggers and criteria for flagging suspicious activity across all defined flows, ensuring the platform maintains trust while protecting the anonymity of the Beneficiary (ACT-ADA6716160).
 
-### 5.1 Automated Screening Triggers
+### 5.1. Automated Screening Triggers
 
 The system must automatically flag transactions and user behaviors that deviate from established baseline patterns. These triggers are designed to catch fraud without requiring manual intervention for every transaction.
 
@@ -206,7 +224,7 @@ The system must automatically flag transactions and user behaviors that deviate 
   - **Device Fingerprinting**: A single device attempting to create multiple Beneficiary accounts or log into multiple accounts simultaneously.
   - **Bot-like Behavior**: Automated patterns in API requests or user interactions that suggest the use of bots or scripts to exploit the system.
 
-### 5.2 Criteria for Flagging Suspicious Activity
+### 5.2. Criteria for Flagging Suspicious Activity
 
 When a trigger is hit, the system must flag the activity for review by the Platform Administrator (ACT-086A974D63) or the Dispute Adjudicator (ACT-7BA340FF76). The flagging criteria must be clear and actionable.
 
@@ -224,7 +242,7 @@ When a trigger is hit, the system must flag the activity for review by the Platf
   - **Minor Velocity Deviation**: A transaction that slightly exceeds normal velocity patterns but is within acceptable bounds.
   - **Unusual but Plausible Behavior**: A transaction that is unusual but does not clearly indicate fraud (e.g., a Beneficiary redeeming credits at a new Merchant type).
 
-### 5.3 Screening Across Defined Flows
+### 5.3. Screening Across Defined Flows
 
 The fraud detection system must be integrated into all key user journeys to ensure comprehensive coverage.
 
@@ -240,13 +258,33 @@ The fraud detection system must be integrated into all key user journeys to ensu
   - The NGO Operator (ACT-09E028AEB0) must have access to a dashboard that highlights flagged activities related to their Beneficiaries or Merchants. This allows for proactive investigation and management of fraud risks.
   - The Dispute Adjudicator (ACT-7BA340FF76) must be able to review flagged activities and make decisions on whether to block accounts, freeze funds, or escalate to law enforcement if necessary.
 
-### 5.5 Follow-Up Questions
+### 5.4. Knowledge Gaps
+
+- **KNOWLEDGE_GAP**: Fraud Thresholds - Specific numerical thresholds for velocity anomalies (e.g., redemptions per hour) and geographic impossibility must be established by the Product Owner based on initial MVP data.
+- **KNOWLEDGE_GAP**: Fraud Scoring Model - The specific algorithm or model used to calculate fraud confidence scores (High, Medium, Low) must be defined by the Data Science team.
+- **KNOWLEDGE_GAP**: Law Enforcement Integration - The process for escalating confirmed fraud to law enforcement and the data that can be shared must be defined by the Legal and Compliance team.
+
+### 5.5. Follow-Up Questions
 
 - **Question**: Who owns the definition of fraud thresholds and scoring models?
   - **Why Critical**: These definitions are critical for the effectiveness of the fraud detection system.
   - **Answerable**: False
   - **Blocking**: True
+  - **Source Role**: Executor
 - **Question**: What is the process for appealing a fraud flag?
   - **Why Critical**: Users (Beneficiaries and Merchants) need a clear path to appeal false positives.
   - **Answerable**: False
   - **Blocking**: False
+  - **Source Role**: Executor
+
+---
+
+## VP decision
+
+**Decision:** Approved
+
+---
+
+## VP feedback
+
+(No feedback)

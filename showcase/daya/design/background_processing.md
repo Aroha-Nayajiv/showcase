@@ -1,6 +1,10 @@
 # Background Processing & Async Workers
 
-### 1.1 TransactionEvent Schema
+## 1. Asynchronous Financial Event Schema
+
+This section defines the canonical event schemas for the asynchronous financial backbone of MealCredit. These schemas decouple the high-latency financial reconciliation and merchant settlement processes from the low-latency Pseudo-Anonymous Redemption Engine, ensuring sub-150ms latency for POS card taps while maintaining strict ledger consistency.
+
+### 1.1. TransactionEvent Schema
 
 The TransactionEvent is published by the Pseudo-Anonymous Redemption Engine immediately after a successful POS clearance. It carries the necessary context for the Financial Reconciliation Engine to process the ledger update asynchronously.
 
@@ -28,11 +32,78 @@ Design Rationale:
 - Idempotency: The idempotency_key is critical for handling retries from the payment processor (e.g., Stripe) without double-processing transactions.
 - Decoupling: By including donor_pool_id and metro_region, the Financial Reconciliation Engine can update the correct credit pool and track regional metrics without needing to query the Redemption Engine.
 
+### 1.2. PayoutEvent Schema
+
+The PayoutEvent is published by the Financial Reconciliation Engine after it has aggregated daily transaction logs, matched them against settlement reports, and generated a settlement report for automated payouts to Merchant Partners.
+
+Schema Definition:
+
+| Field | Type | Required | Description | Example |
+| :--- | :--- | :--- | :--- | :--- |
+| event_id | string | Yes | Unique identifier for this event instance (UUIDv4). | `"660e8400-e29b-41d4-a716-446655440001"` |
+| event_version | string | Yes | Schema version for backward compatibility. | `"1.0"` |
+| event_type | string | Yes | Constant value identifying the event. | `"PAYOUT_INITIATED"` |
+| timestamp | string | Yes | ISO 8601 UTC timestamp of the event creation. | `"2024-05-21T02:00:00.000Z"` |
+| payout_id | string | Yes | Unique identifier for the payout batch (UUIDv4). | `"880e8400-e29b-41d4-a716-446655440002"` |
+| merchant_id | string | Yes | Unique identifier for the Merchant Partner receiving the payout. | `"MERCHANT-001"` |
+| stripe_connect_account_id | string | Yes | Stripe Connected Account ID for the merchant. | `"acct_1234567890"` |
+| total_amount | number | Yes | Total payout amount in minor currency units. | 15000 |
+| currency | string | Yes | ISO 4217 currency code. | `"USD"` |
+| settlement_period_start | string | Yes | Start of the settlement period (ISO 8601 UTC). | `"2024-05-20T00:00:00.000Z"` |
+| settlement_period_end | string | Yes | End of the settlement period (ISO 8601 UTC). | `"2024-05-20T23:59:59.999Z"` |
+| transaction_count | number | Yes | Number of transactions included in this payout. | 10 |
+| status | string | Yes | Current status of the payout. | `"PENDING"` |
+| metadata | object | No | Additional contextual data (e.g., fee breakdown). | `{"platform_fee": 500, "net_amount": 14500}` |
+
+Design Rationale:
+- Security: The stripe_connect_account_id is used to route the payout securely via Stripe Connect, ensuring that sensitive financial tokens are not stored in plain text in the event logs.
+- Traceability: The settlement_period_start and settlement_period_end fields allow for precise reconciliation of daily logs against payout batches.
+- Status Tracking: The status field enables the Merchant Payout Failure & Error Handling artifact to track and retry failed payouts.
+
+### 1.3. Event Bus Integration
+
+These events are published to the Amazon EventBridge bus. The TransactionEvent is routed to the Financial Reconciliation Engine, while the PayoutEvent is routed to the Merchant Notification Service and the Financial Reconciliation Engine for status updates.
+
+Routing Rules:
+- TransactionEvent -> FinancialReconciliationEngine (via SQS FIFO queue for ordered processing).
+- PayoutEvent -> MerchantNotificationService (via SNS for real-time alerts) and FinancialReconciliationEngine (for status tracking).
+
+Error Handling:
+- Failed events are routed to a Dead Letter Queue (DLQ) for manual inspection and retry.
+- Idempotency checks are performed by the Financial Reconciliation Engine to prevent duplicate processing.
+
+### 1.4. Knowledge Gaps
+
+- `KNOWLEDGE_GAP: Exact event bus implementation details (e.g., specific EventBridge rule syntax, SQS FIFO queue configuration) must be established by the Infrastructure Topology & Deployment Design artifact.`
+- `KNOWLEDGE_GAP: Specific error handling and retry logic for Stripe webhook processing must be established by the Merchant Payout Failure & Error Handling artifact.`
+
+---
+
 ## 2. Financial Reconciliation Engine Architecture
 
 The Financial Reconciliation Engine is the asynchronous backbone of the MealCredit platform, responsible for aggregating transaction logs from the Pseudo-Anonymous Redemption Engine, matching them against the immutable financial ledger, and generating the daily settlement reports required for automated payouts. This design ensures strict ledger consistency while decoupling high-latency financial operations from the sub-150ms real-time POS clearance path.
 
-### 2.2 Immutable Ledger Matching and Consistency
+### 2.1. Event Ingestion and Aggregation
+
+The engine ingests financial events via an asynchronous event bus. To ensure data integrity and order, events are published to an Amazon SQS FIFO queue, which guarantees exactly-once processing and message ordering within a message group ID (e.g., merchant_id or transaction_id).
+
+Event Schema (TransactionEvent):
+- event_id: UUIDv4 (Unique identifier for the event)
+- event_version: String (e.g., "1.0")
+- transaction_id: UUIDv4 (The unique ID of the financial transaction)
+- beneficiary_token: String (Cryptographically hashed/anonymous token, ensuring PII segregation)
+- amount: Decimal (The fractional credit amount spent)
+- currency: String (ISO 4217 code, e.g., "USD")
+- merchant_id: String (Unique identifier for the Merchant Partner)
+- timestamp: ISO 8601 (UTC timestamp of the transaction)
+- idempotency_key: String (To prevent double-processing of events)
+
+Aggregation Logic:
+The engine consumes events from the SQS FIFO queue.
+It applies an idempotency check using the idempotency_key to ensure that no transaction is processed more than once, even in the event of network retries or duplicate webhook deliveries.
+Aggregated transaction logs are stored in the immutable financial ledger (see Sibling Artifact: Financial Ledger Data Model) as append-only records.
+
+### 2.2. Immutable Ledger Matching and Consistency
 
 The core of the reconciliation process is matching the ingested transaction logs against the immutable financial ledger to ensure consistency. This is achieved through a nightly batch job (orchestrated via AWS Step Functions) that performs the following steps:
 
@@ -44,7 +115,7 @@ Consistency Guarantees:
 - Double-Spending Prevention: The idempotency keys and the immutable ledger structure prevent double-spending of credits.
 - Voided Transactions: Voided transactions are recorded as negative entries in the ledger, ensuring that the net balance is accurately reflected.
 
-### 2.3 Daily Settlement Report Generation
+### 2.3. Daily Settlement Report Generation
 
 Once the reconciliation is complete and the ledger is confirmed to be consistent, the engine generates the daily settlement report. This report is the primary input for the automated daily payout process.
 
@@ -61,7 +132,7 @@ Settlement Report Structure:
 Data Flow for DRV Tracking:
 - The settlement report also feeds into the Donation-to-Redemption Velocity (DRV) tracking system. By aggregating redemption events by regional pool, the engine provides the data necessary to monitor liquidity health against the 14-day target (CON-D0F5814F21, CON-F89C70071E).
 
-### 2.4 Reconciliation Discrepancy Remediation Workflow
+### 2.4. Reconciliation Discrepancy Remediation Workflow
 
 When the Financial Reconciliation Engine identifies a discrepancy (e.g., missing transactions, amount mismatches, or hash-checksum failures), it triggers a structured remediation workflow to ensure data integrity before proceeding to payout.
 
@@ -75,11 +146,19 @@ Remediation Workflow:
    - Escalate to the Dispute Adjudicator (ACT-7BA340FF76) if the discrepancy involves a potential fraud or beneficiary dispute.
 5. Audit Trail: All remediation actions are logged with a timestamp, actor ID, and reason code to maintain a complete audit trail for SOC2 Type II compliance (CON-81FB01F06B, CON-E84412A0FA).
 
+### 2.5. Error Handling and Retry Logic
+
+- Idempotency: The use of idempotency_key ensures that retries do not result in duplicate financial entries.
+- Dead Letter Queue (DLQ): Events that fail processing after a configurable number of retries are moved to a Dead Letter Queue for manual inspection and remediation.
+- Alerting: Automated alerts are triggered if the Credit Pool Utilization Rate exceeds 85% (CON-2059B17FB2, CON-7031BE57B3) or if reconciliation discrepancies exceed a defined threshold.
+
+---
+
 ## 3. Automated Daily Payout Orchestration Service
 
 The Automated Daily Payout Orchestration Service is the critical bridge between the asynchronous Financial Reconciliation Engine and the external payment processor (Stripe). Its primary function is to aggregate verified, reconciled transaction logs into batch settlement files, initiate payouts to Merchant Partners (Restaurants) via Stripe Connect, and manage the lifecycle of these payouts including failure handling and reconciliation.
 
-### 3.1 Service Architecture and Data Flow
+### 3.1. Service Architecture and Data Flow
 
 The service operates on a daily batch schedule, triggered by an event from the Financial Reconciliation Engine indicating that the previous day's ledger is finalized and immutable.
 
@@ -90,7 +169,7 @@ The service operates on a daily batch schedule, triggered by an event from the F
 5. State Management: The service updates the local payouts table with the Stripe payout_id and sets the status to PENDING. It then publishes a PayoutInitiatedEvent to the event bus.
 6. Reconciliation: The service subscribes to Stripe Webhooks for payout.succeeded and payout.failed events. Upon receiving a success webhook, it updates the local payout status to COMPLETED. Upon failure, it updates the status to FAILED and triggers the `Merchant Payout Failure & Error Handling` artifact's workflow.
 
-### 3.2 API Contracts
+### 3.2. API Contracts
 
 #### 3.2.1. Initiate Payouts (Internal gRPC)
 
@@ -98,13 +177,34 @@ This endpoint is called by the Financial Reconciliation Engine upon daily ledger
 
 Request:
 
-- **reconciliation_date**: 2024-05-20
-- {'merchant_id': 'MERCH-001', 'payout_id': 'PAYOUT-001', 'idempotency_key': 'payout_idemp_001_20240520', 'total_amount': 15000, 'transaction_count': 50}
+
+{
+ "reconciliation_date": "2024-05-20",
+ "settlements": [
+ {
+ "merchant_id": "MERCH-001",
+ "payout_id": "PAYOUT-001",
+ "idempotency_key": "payout_idemp_001_20240520",
+ "total_amount": 15000,
+ "transaction_count": 50
+ }
+ ]
+}
+
 
 Response:
 
-- **batch_id**: BATCH-20240520-001
-- {'merchant_id': 'MERCH-001', 'payout_id': 'PAYOUT-001', 'status': 'PENDING'}
+
+{
+ "batch_id": "BATCH-20240520-001",
+ "payouts": [
+ {
+ "merchant_id": "MERCH-001",
+ "payout_id": "PAYOUT-001",
+ "status": "PENDING"
+ }
+ ]
+}
 
 #### 3.2.2. Stripe Webhook Handler (Internal gRPC)
 
@@ -112,31 +212,50 @@ This endpoint processes Stripe webhooks to update payout status.
 
 Request (Stripe Webhook Payload):
 
-- **event_type**: payout.succeeded
-- **payout_id**: po_1234567890
-- **amount**: 15000
-- **currency**: USD
-- **arrival_date**: 2024-05-22
+
+{
+ "event_type": "payout.succeeded",
+ "payout_id": "po_1234567890",
+ "amount": 15000,
+ "currency": "USD",
+ "arrival_date": "2024-05-22"
+}
+
 
 Response:
 
-- **status**: processed
-- **new_status**: COMPLETED
 
-### 3.4 Security and Compliance
+{
+ "status": "processed",
+ "new_status": "COMPLETED"
+}
+
+### 3.3. Idempotency and Retry Logic
+
+To ensure financial consistency and prevent duplicate payouts, the service implements strict idempotency:
+
+1. Idempotency Key: Each payout request to Stripe includes a unique idempotency_key derived from the payout_id (UUIDv4). This ensures that if the service retries a request due to a network timeout, Stripe will not create duplicate payouts.
+2. Retry Policy: Failed payout requests (e.g., due to Stripe API rate limits or temporary outages) are retried with exponential backoff. The retry policy is defined as:
+ - Initial delay: 1 second
+ - Max retries: 5
+ - Max delay: 1 hour
+ - Jitter: Randomized between 0 and 1 second to prevent thundering herd.
+3. Dead Letter Queue: If a payout fails after all retries, it is moved to a Dead Letter Queue (DLQ) for manual review and automated error handling (referencing the `Merchant Payout Failure & Error Handling` artifact).
+
+### 3.4. Security and Compliance
 
 - Data Isolation: Payout requests only include the merchant_id and stripe_connect_account_id. No beneficiary PII or donor information is included in the payout payload, ensuring strict data isolation (CON-0A0288EED4).
 - Secure Vault Access: The service retrieves Stripe API keys and stripe_connect_account_id secrets from a secure vault (e.g., AWS Secrets Manager) at runtime. Secrets are never stored in the application code or configuration files.
 - Audit Logging: All payout initiation, success, and failure events are logged to an append-only cryptographic log in Aurora PostgreSQL (CON-1762EA5021, CON-6061FCCA83) for SOC2 Type II compliance (CON-81FB01F06B, CON-E84412A0FA).
 
-### 3.5 Knowledge Gaps and Assumptions
+### 3.5. Knowledge Gaps and Assumptions
 
 - `KNOWLEDGE_GAP: Payout Frequency and Thresholds: The project requirement mentions "daily batch settlements" but does not specify minimum payout thresholds or exact payout schedules (e.g., next-day, T+2). The `Merchant Payout Failure & Error Handling` artifact should define these thresholds.`
 - `KNOWLEDGE_GAP: Stripe Connect Account Onboarding: The process for onboarding Merchant Partners onto Stripe Connect (KYC, verification) is not detailed in this artifact. It is assumed that the `Integration Adapters & External Contracts` artifact covers the Stripe API integration, but the onboarding workflow itself is a separate concern.`
 - `ASSUMPTION: Stripe API Version: The service assumes the use of the latest stable Stripe API version. The exact API version must be confirmed by the `Integration Adapters & External Contracts` artifact.`
 - `ASSUMPTION: Currency: The service assumes all payouts are in USD. If multi-currency support is required in the future, the settlements payload must include a currency field for each merchant, and the Stripe API call must be updated accordingly.`
 
-### 3.6 Integration with Sibling Artifacts
+### 3.6. Integration with Sibling Artifacts
 
 - Financial Reconciliation Engine: Consumes DailyLedgerFinalizedEvent and provides PayoutInitiatedEvent.
 - Merchant Payout Failure & Error Handling: Receives PayoutFailedEvent for manual review and automated remediation.
@@ -148,7 +267,11 @@ This design ensures that the payout orchestration service is robust, secure, and
 
 ---
 
-### 4.1 Retry Strategy
+## 4. Error Handling and Retry Mechanisms for Async Workers
+
+This section defines the robust error handling, retry logic, and dead-letter queue (DLQ) architecture for the MealCredit async worker ecosystem. It ensures that high-throughput financial reconciliation and merchant settlement remain resilient against transient failures, payment processor unavailability, and reconciliation discrepancies, while maintaining strict data isolation and auditability.
+
+### 4.1. Retry Strategy
 
 All async workers (Financial Reconciliation Engine, Payout Orchestration Service) adhere to a standardized retry strategy to handle transient failures:
 
@@ -156,7 +279,7 @@ All async workers (Financial Reconciliation Engine, Payout Orchestration Service
 - Jitter: Random jitter is added to retry delays to prevent thundering herd problems.
 - Max Retries: A maximum number of retries is enforced before moving to the DLQ.
 
-### 4.2 Dead Letter Queue (DLQ) Management
+### 4.2. Dead Letter Queue (DLQ) Management
 
 Events that fail after all retries are moved to a DLQ. The DLQ is monitored by the Platform Administrator (ACT-086A974D63) for manual intervention.
 
@@ -164,7 +287,7 @@ Events that fail after all retries are moved to a DLQ. The DLQ is monitored by t
 - Remediation: Based on the root cause, the event is either re-processed, corrected, or discarded.
 - Alerting: Automated alerts are triggered if the DLQ size exceeds a defined threshold.
 
-### 4.3 Circuit Breaker Pattern
+### 4.3. Circuit Breaker Pattern
 
 To prevent cascading failures, the Payout Orchestration Service implements a circuit breaker pattern when interacting with the Stripe API.
 
@@ -172,7 +295,11 @@ To prevent cascading failures, the Payout Orchestration Service implements a cir
 - Half-Open State: After a timeout, the circuit breaker enters a half-open state, allowing a single request to test the downstream service.
 - Closed State: If the test request succeeds, the circuit breaker closes, and normal operation resumes.
 
-### 5.1 DRV Tracking Data Flow
+## 5. Donation-to-Redemption Velocity (DRV) and Credit Pool Utilization
+
+This section defines the data flow and architectural considerations for tracking the Donation-to-Redemption Velocity (DRV) and monitoring Credit Pool Utilization, ensuring liquidity health and preventing ledger stagnation.
+
+### 5.1. DRV Tracking Data Flow
 
 The DRV metric measures the speed at which donated funds are redeemed by beneficiaries. It is a key indicator of program effectiveness and liquidity health.
 
@@ -182,11 +309,39 @@ Data Flow:
 3. Velocity Calculation: The DRV is calculated as the ratio of total redeemed amount to total donated amount over a rolling 14-day window (CON-D0F5814F21, CON-F89C70071E).
 4. Storage: DRV metrics are stored in a time-series database (e.g., Amazon Timestream) for efficient querying and visualization.
 
-### 7. Error Handling, Retry Logic, and Dead-Letter Queue Architecture
+### 5.2. Credit Pool Utilization Alerts
+
+The Credit Pool Utilization Rate monitors the percentage of available credits that have been redeemed. Automated alerts are triggered when thresholds are exceeded to prevent liquidity issues.
+
+Alerting Rules:
+- Threshold: Alerts are triggered when the Credit Pool Utilization Rate exceeds 85% (CON-2059B17FB2, CON-7031BE57B3).
+- Notification: Alerts are sent to the Platform Administrator (ACT-086A974D63) and the NGO Operator (ACT-09E028AEB0) via SNS.
+- Action: The Platform Administrator can initiate emergency credit top-ups or adjust donation flows to rebalance the pool.
+
+### 5.3. Knowledge Gaps
+
+- `KNOWLEDGE_GAP: The exact formula for calculating DRV (e.g., simple ratio vs. weighted average) must be defined by the Product Strategy artifact.`
+- `KNOWLEDGE_GAP: The specific time-series database technology and retention policy for DRV metrics must be defined by the Infrastructure Topology & Deployment Design artifact.`
+
+---
+
+## 6. Integration with Sibling Artifacts
+
+This artifact integrates with the following sibling artifacts to ensure end-to-end financial integrity:
+
+- Financial Ledger Data Model: Provides the source of truth for transaction amounts and merchant balances.
+- Merchant Payout Failure & Error Handling: Receives PayoutFailedEvent for manual review and automated remediation.
+- Integration Adapters & External Contracts: Defines the Stripe API client library, error codes, and webhook signature verification.
+- Security Architecture & Access Control: Defines the secure vault access patterns for Stripe secrets.
+- Infrastructure Topology & Deployment Design: Defines the event bus, queue, and database infrastructure.
+
+This design ensures that the async worker ecosystem is robust, secure, and compliant with the project's financial and data privacy requirements.
+
+### 4. Error Handling, Retry Logic, and Dead-Letter Queue Architecture
 
 This section defines the asynchronous error handling, retry strategies, and dead-letter queue (DLQ) mechanisms for the Financial Reconciliation, Payout Orchestration, and DRV Tracking workers. It ensures financial consistency, prevents silent data loss, and provides clear remediation paths for the Platform Administrator.
 
-#### 7.1 Retry Strategy and Exponential Backoff
+#### 4.1. Retry Strategy and Exponential Backoff
 
 To handle transient failures (e.g., network timeouts, temporary payment processor unavailability), all async workers (Financial Reconciliation, Payout Orchestration, DRV Tracking) will implement a standardized exponential backoff with jitter strategy.
 
@@ -205,7 +360,7 @@ To handle transient failures (e.g., network timeouts, temporary payment processo
 - All retryable operations MUST be idempotent. Each event processed by an async worker MUST include a unique `idempotency_key` (UUIDv4).
 - Workers MUST check for the existence of the `idempotency_key` in the financial ledger before processing. If the key exists, the event is acknowledged as successfully processed, and no duplicate ledger mutation occurs.
 
-#### 7.2 Dead-Letter Queue (DLQ) Structure
+#### 4.2. Dead-Letter Queue (DLQ) Structure
 
 Events that exceed the maximum retry count or encounter permanent errors are routed to a dedicated Dead-Letter Queue (DLQ). This ensures that no financial event is silently lost and provides a clear path for manual or automated remediation by the Platform Administrator.
 
@@ -216,6 +371,7 @@ Events that exceed the maximum retry count or encounter permanent errors are rou
 
 **DLQ Event Schema:**
 Each message in the DLQ MUST contain the original event payload plus metadata about the failure:
+
 
 {
   "original_event": {
@@ -232,11 +388,12 @@ Each message in the DLQ MUST contain the original event payload plus metadata ab
   }
 }
 
+
 **Data Isolation in DLQ:**
 - Beneficiary PII MUST NOT be stored in the DLQ. Only hashed `beneficiary_token` and anonymized transaction data are permitted.
 - Access to the DLQ is restricted to the Platform Administrator role via IAM policies.
 
-#### 7.3 Alerting Triggers for Platform Administrator
+#### 4.3. Alerting Triggers for Platform Administrator
 
 The Platform Administrator MUST be alerted immediately when events enter the DLQ or when retry thresholds are approached, to prevent financial discrepancies from accumulating.
 
@@ -257,7 +414,7 @@ The Platform Administrator MUST be alerted immediately when events enter the DLQ
 **Alerting Implementation:**
 - This artifact's alerting design defers to the `Observability & Monitoring Design` artifact for the specific implementation of CloudWatch Alarms and SNS topics. This artifact defines the what and when, not the how of the monitoring infrastructure.
 
-#### 7.4 Reconciliation Failure Handling and Remediation Workflow
+#### 4.4. Reconciliation Failure Handling and Remediation Workflow
 
 When a transaction fails reconciliation (e.g., mismatch between POS event and Stripe settlement report), the system MUST log the discrepancy and trigger a manual review process. This section explicitly defines the remediation workflow for the Platform Administrator.
 
@@ -280,7 +437,7 @@ When a transaction fails reconciliation (e.g., mismatch between POS event and St
    - **IGNORED (False Positive):** If the discrepancy is determined to be a false positive (e.g., duplicate reporting), the Administrator marks it as `IGNORED` with a justification note.
 5. **Archival:** Resolved, Escalated, or Ignored discrepancies are archived for SOC2 Type II audit evidence. The `ReconciliationDiscrepancyEvent` is removed from the active DLQ view but retained in the immutable ledger.
 
-#### 7.5 Payment Processor Unavailability Handling
+#### 4.5. Payment Processor Unavailability Handling
 
 In the event of a prolonged Stripe API outage, the Payout Orchestration Worker MUST gracefully degrade and prevent financial loss.
 
@@ -295,12 +452,12 @@ In the event of a prolonged Stripe API outage, the Payout Orchestration Worker M
 - While the circuit is open, the Payout Orchestration Worker continues to process internal ledger updates but pauses external Stripe API calls.
 - The Platform Administrator is alerted via the DLQ Volume Spike alert (Section 4.3).
 
-#### 7.6 Data Retention and Auditability
+#### 4.6. Data Retention and Auditability
 
 - **DLQ Retention:** DLQ messages are retained for 14 days. After 14 days, they are automatically archived to Amazon S3 for long-term storage (SOC2 Type II evidence).
 - **Audit Log:** All DLQ entries, manual resolutions, and circuit breaker state changes are logged to an append-only cryptographic log in Aurora PostgreSQL (CON-1762EA5021, CON-6061FCCA83) for auditability.
 
-#### 7.7 Summary of Error Handling Flow
+#### 4.8. Summary of Error Handling Flow
 
 1. **Event Received:** Async Worker receives event from EventBridge/SQS.
 2. **Idempotency Check:** Worker checks for `idempotency_key` in ledger.
@@ -315,11 +472,37 @@ This error handling framework ensures that MealCredit's financial backbone is re
 
 ---
 
-## 8. Data Persistence Layer for Async Workers
+## 5. Data Persistence Layer for Async Workers
 
 This section defines the database schemas and persistence strategies for the asynchronous worker ecosystem. The design ensures strict financial consistency, supports the immutable ledger requirements (CON-1762EA5021, CON-6061FCCA83), and enables efficient aggregation for the Financial Reconciliation Engine.
 
-### 8.2 Reconciliation State Schema
+### 5.1. Immutable Financial Ledger Schema
+
+The core of the async worker persistence is the immutable financial ledger. This table stores every financial mutation (donation, redemption, payout) as an append-only record. It is the single source of truth for all financial reconciliation.
+
+**Table: financial_ledger_entries**
+
+| Column Name | Data Type | Constraints | Description |
+| :--- | :--- | :--- | :--- |
+| `entry_id` | UUID | PK, NOT NULL | Unique identifier for the ledger entry. |
+| `entry_hash` | VARCHAR(64) | NOT NULL | SHA-256 hash of the previous entry's hash and current data. Ensures immutability. |
+| `previous_entry_hash` | VARCHAR(64) | NOT NULL | Hash of the immediately preceding ledger entry. |
+| `transaction_id` | UUID | NOT NULL, UNIQUE | ID of the originating transaction (e.g., from Stripe or POS). |
+| `event_type` | ENUM | NOT NULL | Type of event: `DONATION_RECEIVED`, `CREDIT_ISSUED`, `REDEMPTION_INITIATED`, `REDEMPTION_COMPLETED`, `PAYOUT_INITIATED`, `PAYOUT_COMPLETED`. |
+| `actor_id` | UUID | NOT NULL | ID of the actor involved (Donor, Beneficiary, Merchant, NGO). |
+| `actor_type` | ENUM | NOT NULL | Type of actor: `DONOR`, `BENEFICIARY`, `MERCHANT`, `NGO`. |
+| `amount_cents` | BIGINT | NOT NULL | Amount in smallest currency unit (e.g., cents). |
+| `currency` | CHAR(3) | NOT NULL | ISO 4217 currency code (e.g., USD). |
+| `metadata_json` | JSONB | | Additional context (e.g., `donation_round_up`, `pos_terminal_id`). |
+| `created_at` | TIMESTAMP | NOT NULL, DEFAULT NOW() | Timestamp of the ledger entry creation. |
+| `reconciliation_status` | ENUM | NOT NULL | Status: `PENDING_RECONCILIATION`, `RECONCILED`, `DISCREPANCY_FOUND`. |
+
+**Design Rationale:**
+- **Immutability:** The `entry_hash` and `previous_entry_hash` fields create a cryptographic chain. Any attempt to modify a past entry will break the hash chain, making tampering immediately detectable.
+- **Append-Only:** No UPDATE or DELETE operations are permitted on this table. Corrections are made via new entries with a `CORRECTION` event type.
+- **Efficiency:** Indexes on `transaction_id`, `actor_id`, and `created_at` support efficient querying for reconciliation and reporting.
+
+### 5.2. Reconciliation State Schema
 
 The Financial Reconciliation Engine uses this schema to track the state of daily reconciliation processes. It maps external payment processor settlements (e.g., Stripe) to internal ledger entries.
 
@@ -354,7 +537,7 @@ The Financial Reconciliation Engine uses this schema to track the state of daily
 - **Traceability:** Each line item links a processor transaction to a specific ledger entry, providing full auditability.
 - **Discrepancy Handling:** The `match_status` and `discrepancy_notes` fields allow for manual or automated investigation of mismatches, supporting the remediation workflow in Section 4.4.
 
-### 8.3 Payout History Schema
+### 5.3. Payout History Schema
 
 This schema tracks the status and details of merchant payouts. It is updated by the Payout Worker as it interacts with the payment processor (e.g., Stripe).
 
@@ -377,7 +560,7 @@ This schema tracks the status and details of merchant payouts. It is updated by 
 - **Idempotency:** The `stripe_payout_id` allows the Payout Worker to safely retry failed payouts without creating duplicates.
 - **Status Tracking:** The `status` field provides clear visibility into the payout lifecycle, supporting the `Merchant Payout Error Handling Flow` (JNY-90B07623FB).
 
-### 8.4 Donation-to-Redemption Velocity (DRV) Tracking
+### 5.4. Donation-to-Redemption Velocity (DRV) Tracking
 
 To support the `Donation-to-Redemption Velocity (DRV)` metric (CON-D0F5814F21, CON-F89C70071E), we maintain a materialized view that aggregates credit issuance and redemption data by region and time window.
 
@@ -395,7 +578,7 @@ To support the `Donation-to-Redemption Velocity (DRV)` metric (CON-D0F5814F21, C
 - **Aggregation:** This view pre-aggregates data, enabling efficient querying for the `Track Donation-to-Redemption Velocity (DRV)` concern (CON-D0F5814F21).
 - **Regional Isolation:** The `region` column supports the `Regional Pool` logic for DRV tracking, allowing for metro-specific analysis.
 
-### 8.5 Data Retention and Archival
+### 5.5. Data Retention and Archival
 
 To comply with data retention policies (CON-4820FAD5A9, CON-6F604D5455) and manage storage costs, historical data will be archived to cold storage (e.g., Amazon S3 Glacier) after a defined period.
 
@@ -403,17 +586,24 @@ To comply with data retention policies (CON-4820FAD5A9, CON-6F604D5455) and mana
 - **Archival:** After 13 months, data is moved to S3 Glacier in a compressed, encrypted format. The primary database retains only summary-level aggregates for reporting.
 - **Access:** Archived data can be restored for audit or legal purposes, subject to approval from the Platform Administrator (ACT-086A974D63).
 
-### 8.6 Performance and Scalability
+### 5.7. Performance and Scalability
 
 - **Indexing:** Strategic indexes are created on frequently queried columns (e.g., `transaction_id`, `actor_id`, `created_at`) to ensure fast lookups.
 - **Partitioning:** The `financial_ledger_entries` table is partitioned by `created_at` (monthly) to improve query performance and simplify archival.
 - **Connection Pooling:** The async workers use connection pooling to manage database connections efficiently, especially under high load.
 
-## 9. gRPC and Event Bus Contracts for Async Workers
+### 5.8. Knowledge Gaps
+
+- `KNOWLEDGE_GAP: Exact data retention period for donor transaction history vs. anonymous redemption analytics must be established by the Compliance team.`
+- `KNOWLEDGE_GAP: Specific encryption key management strategy (e.g., AWS KMS key rotation schedule) must be defined by the Security team.`
+
+---
+
+## 3. gRPC and Event Bus Contracts for Async Workers
 
 This section defines the asynchronous gRPC and event bus contracts for financial ledger mutations, ensuring strict consistency between the synchronous payment processing layer and the asynchronous reconciliation workers.
 
-### 9.1 gRPC Service Definition
+### 3.1. gRPC Service Definition
 
 The `FinancialLedgerService` exposes gRPC endpoints for async workers to query ledger state and push reconciliation results. This service is internal-only and secured via mTLS.
 
@@ -473,13 +663,15 @@ message ReconciliationBatchResponse {
   string error_message = 2;
 }
 
-### 9.2 Event Bus Contracts (Amazon EventBridge)
+
+### 3.2. Event Bus Contracts (Amazon EventBridge)
 
 Async workers publish and consume events via Amazon EventBridge. All events MUST follow the CloudEvents 1.0 specification.
 
 #### 3.2.1. Event: FinancialMutationEvent
 
 Published by the synchronous payment processing layer when a new financial transaction occurs (e.g., donation, redemption). Consumed by the Financial Reconciliation and DRV Tracking workers.
+
 
 {
   "source": "mealcredit.payment_processor",
@@ -504,33 +696,55 @@ Published by the synchronous payment processing layer when a new financial trans
   }
 }
 
+
 #### 3.2.2. Event: ReconciliationBatchCompletedEvent
 
 Published by the Financial Reconciliation Worker when a daily reconciliation batch is completed. Consumed by the Payout Orchestration Worker to trigger payouts for reconciled merchants.
 
-- **source**: mealcredit.reconciliation_engine
-- **type**: reconciliation.batch.completed
-- **specversion**: 1.0
-- **id**: uuid-v4
-- **time**: ISO-8601
-- **subject**: batch_id
-- **datacontenttype**: application/json
-- **data**: {'batch_id': 'uuid-v4', 'batch_date': 'YYYY-MM-DD', 'total_reconciled_cents': 5000000, 'status': 'COMPLETED', 'discrepancy_count': 0}
+
+{
+  "source": "mealcredit.reconciliation_engine",
+  "type": "reconciliation.batch.completed",
+  "specversion": "1.0",
+  "id": "uuid-v4",
+  "time": "ISO-8601",
+  "subject": "batch_id",
+  "datacontenttype": "application/json",
+  "data": {
+    "batch_id": "uuid-v4",
+    "batch_date": "YYYY-MM-DD",
+    "total_reconciled_cents": 5000000,
+    "status": "COMPLETED",
+    "discrepancy_count": 0
+  }
+}
+
 
 #### 3.2.3. Event: PayoutInitiatedEvent
 
 Published by the Payout Orchestration Worker when a payout is initiated to Stripe. Consumed by the Financial Reconciliation Worker to update the ledger status.
 
-- **source**: mealcredit.payout_orchestrator
-- **type**: payout.initiated
-- **specversion**: 1.0
-- **id**: uuid-v4
-- **time**: ISO-8601
-- **subject**: payout_id
-- **datacontenttype**: application/json
-- **data**: {'payout_id': 'uuid-v4', 'merchant_id': 'uuid-v4', 'amount_cents': 250000, 'currency': 'USD', 'stripe_payout_id': 'po_stripe_123', 'idempotency_key': 'uuid-v4'}
 
-### 9.3 Idempotency and Retry Logic for Stripe Webhooks
+{
+  "source": "mealcredit.payout_orchestrator",
+  "type": "payout.initiated",
+  "specversion": "1.0",
+  "id": "uuid-v4",
+  "time": "ISO-8601",
+  "subject": "payout_id",
+  "datacontenttype": "application/json",
+  "data": {
+    "payout_id": "uuid-v4",
+    "merchant_id": "uuid-v4",
+    "amount_cents": 250000,
+    "currency": "USD",
+    "stripe_payout_id": "po_stripe_123",
+    "idempotency_key": "uuid-v4"
+  }
+}
+
+
+### 3.3. Idempotency and Retry Logic for Stripe Webhooks
 
 To ensure financial consistency, all Stripe webhook processing and merchant payouts MUST be idempotent. The `idempotency_key` field in the gRPC and EventBridge contracts is critical for this.
 
@@ -542,7 +756,7 @@ To ensure financial consistency, all Stripe webhook processing and merchant payo
 - **Transient Errors:** If a Stripe API call fails with a transient error (e.g., 429, 500), the worker retries with exponential backoff (Section 4.1).
 - **Permanent Errors:** If a Stripe API call fails with a permanent error (e.g., 400, 401), the event is routed to the DLQ (Section 4.2).
 
-### 9.4 Data Flow for DRV Tracking and Credit Pool Utilization Alerts
+### 3.4. Data Flow for DRV Tracking and Credit Pool Utilization Alerts
 
 The DRV Tracking Worker consumes `FinancialMutationEvent` events to calculate the Donation-to-Redemption Velocity (DRV) and monitor Credit Pool Utilization.
 
@@ -555,3 +769,15 @@ The DRV Tracking Worker consumes `FinancialMutationEvent` events to calculate th
 
 **Knowledge Gap:**
 - `KNOWLEDGE_GAP: The exact threshold for Credit Pool Utilization Rate (85%) is a design assumption. The Compliance team must confirm if this threshold aligns with regulatory requirements for quasi-cash instruments (CON-226A13FFB8, CON-B1DFEBEC8C).`
+
+---
+
+## VP decision
+
+**Decision:** Approved
+
+---
+
+## VP feedback
+
+(No feedback)

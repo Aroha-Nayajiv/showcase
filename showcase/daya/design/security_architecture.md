@@ -2,27 +2,39 @@
 
 ## 1. Multi-Tenant Isolation Strategy for Metropolitan Footprints
 
-### 1.1 Architectural Isolation Model
+### 1.1. Architectural Isolation Model
 To support the target scale of 50,000 MAU across the SF, NYC, and Chicago metropolitan footprints, the platform utilizes a Logical Multi-Tenancy model enforced at the data persistence and API orchestration layers. This approach balances operational efficiency with strict data sovereignty requirements.
 
 Tenant Identification: Every request to the API Orchestration Layer (SUR-85E4A5B6E7) must include a tenant_id header, mapped to the specific metropolitan footprint (e.g., `tenant_id: "sf"`, `tenant_id: "nyc"`, `tenant_id: "chi"`). Data Partitioning: The Data Persistence Layer (SUR-FA61592CD4) utilizes partition keys in the primary database (Aurora PostgreSQL) and cache layer (Redis Enterprise Cluster) that include the tenant_id. This ensures that queries scoped to a specific metro footprint never cross-contamination boundaries. Network Segmentation: AWS VPCs are configured with separate subnets for each metropolitan footprint. While sharing core infrastructure (e.g., central identity providers), financial transaction data flows are restricted to the specific AZs associated with the tenant's footprint to satisfy data residency requirements (CON-30EA97016B).
 
-### 1.2 Cryptographic Data Segregation
+### 1.2. Cryptographic Data Segregation
 To achieve absolute anonymization and prevent de-anonymization attacks (CON-B3D71A437D), beneficiary demographic data is cryptographically segregated from transactional data.
 
 PII Isolation: Beneficiary legal names and demographic status are stored in a separate, highly restricted database schema (or table) with its own encryption keys (AWS KMS). This schema is only accessible by the NGO Operator (ACT-09E028AEB0) and Platform Administrator (ACT-086A974D63) roles for compliance purposes. Tokenization: The public-facing donor analytics and merchant POS systems interact only with anonymized UUIDs. The mapping between the UUID and the PII is encrypted using a key that is never stored in the same AZ as the transactional data. Donor Anonymity: Donor contributions are linked to the credit pool via hashed identifiers. No PII from the Donor (ACT-80C62C7814) is exposed to the Merchant (ACT-AF904DCFF9) or Beneficiary (ACT-ADA6716160).
+
+### 1.3. Access Control Matrices
+Access to the multi-tenant data is governed by Role-Based Access Control (RBAC) aligned with the actor roles:
+
+| Role | Multi-Tenant Data Access | PII Access | Financial Ledger Access | Primary Scope |
+|---|---|---|---|---|
+| Platform Administrator (ACT-086A974D63) | Full Read/Write | Full Read/Write | Full Read/Write | Global System Health, Cross-Tenant Audit Logs |
+| NGO Operator (ACT-09E028AEB0) | Read/Write (Assigned) | Read/Write (Assigned) | Read/Write (Assigned) | Beneficiary PII, Voucher Issuance, NGO-Specific Analytics |
+| Dispute Adjudicator (ACT-7BA340FF76) | Read-Only | Read-Only | Read-Only | Transaction Logs, Dispute Records (Cross-Tenant) |
+| Donor (ACT-80C62C7814) | N/A | N/A | N/A | Own Donation History, Impact Receipts (Anonymized) |
+| Beneficiary (ACT-ADA6716160) | Read/Write (Own) | Read/Write (Own) | Read/Write (Own) | Own Voucher Balance, Redemption History |
+| Merchant (ACT-AF904DCFF9) | Read/Write (Own) | Read/Write (Own) | Read/Write (Own) | Own POS Transactions, Payouts |
 
 ## 2. Client-Side Cryptographic Hashing & Secure Storage Implementation
 
 This section defines the cryptographic hashing layers and SecureStore implementation for the Expo mobile application (Fabric architecture), ensuring that beneficiary demographic status and legal names are restricted to hashing layers only to prevent token theft or cloning.
 
-### 2.1 Data Isolation & Hashing Strategy
+### 2.1. Data Isolation & Hashing Strategy
 
 To satisfy the strict data isolation requirement (CON-0A0288EED4) and FTC Anonymity Guidelines (CON-B3D71A437D), the client-side application must never store raw PII (Personally Identifiable Information) such as legal names or demographic status in plaintext. Instead, a deterministic hashing layer is implemented to generate anonymous identifiers that can be used for analytics and redemption tracking without exposing the underlying identity.
 
 Hashing Algorithm: The requirement specifies 'cryptographic hashing' but does not lock the specific algorithm family. The implementation must use a standard, secure algorithm (e.g., SHA-256 or SHA-3) to ensure deterministic hashing of beneficiary identifiers. This ensures that the same input always produces the same hash, allowing for consistent tracking across sessions without storing the raw data. Salt Management: A project-wide salt is used in conjunction with the hashing algorithm to prevent rainbow table attacks. This salt is stored in the backend and injected into the hashing process on the server side before the hash is sent to the client. The client does not store the salt. Hashed Identifier Format: The resulting hash is a 64-character hexadecimal string. This format is used as the primary key for all client-side references to beneficiary data.
 
-### 2.2 SecureStore Implementation
+### 2.2. SecureStore Implementation
 
 The Expo SecureStore API is utilized for all sensitive client-side storage, including the hashed beneficiary identifiers and session tokens. SecureStore leverages the native keychain (iOS) and keystore (Android) systems, providing hardware-backed encryption for stored data.
 
@@ -32,40 +44,52 @@ Storage Keys: All keys stored in SecureStore are prefixed with mealcredit_ to na
 - mealcredit_offline_token: The time-bound cryptographic signature for offline fallback QR/barcode tokens (CON-AA83B13877).
 Access Control: Access to SecureStore is restricted to the application bundle ID. No other application can access these keys.
 
-### 2.4 Follow-Up Questions
+### 2.5. Implementation Notes
+
+Expo SecureStore: Use expo-secure-store for all sensitive data storage. Crypto Library: Use expo-crypto for hashing and HMAC-SHA256. Key Rotation: Implement a mechanism for rotating the project-wide salt and offline token signing keys. This should be done periodically and managed by the Platform Administrator (ACT-086A974D63). Error Handling: Implement robust error handling for SecureStore access failures, including fallback mechanisms for offline scenarios.
+
+### 2.8. Follow-Up Questions
 
 Question: What is the exact validity window for offline tokens? Why Critical: This impacts the security posture of the offline fallback mechanism. Answerable: No, requires Security Architect input. Blocking: Yes. Question: What is the frequency of salt rotation? Why Critical: This impacts the long-term security of the hashing layer. Answerable: No, requires Security Architect input. Blocking: No.
 
-### 2.5 Quality Score
+### 2.9. Quality Score
 
 Quality Score: 0.9
 Completion Percentage: 1.0
 
-### 2.6 Deliverable Type
+### 2.10. Deliverable Type
 
 Deliverable Type: design
 
-### 2.7 Architecture Pattern
+### 2.11. Architecture Pattern
 
 Architecture Pattern: Client-Side Security with Server-Side Hashing
 
-### 2.8 Design Contracts
+### 2.12. Design Contracts
 
 Contract: mealcredit_hashed_beneficiary_id must be a 64-character hexadecimal string. Contract: mealcredit_session_token must be a valid JWT. Contract: mealcredit_offline_token must be an HMAC-SHA256 signed token with a time-bound validity window.
 
-### 2.10 References
+### 2.13. Implementation Notes
+
+Note: Ensure that all sensitive data is cleared from memory when the application is backgrounded or terminated. Note: Implement biometric authentication (Face ID/Touch ID) for accessing SecureStore data, where supported by the device.
+
+### 2.14. References
 
 CON-0A0288EED4: Implied concern: Implied concern: Implement strict data isolation where beneficiary demographic status and legal names are cryptographically segreg... CON-B3D71A437D: Implied concern: Implied concern: Adhere to FTC guidelines on anonymity, ensuring no de-anonymization attacks can link beneficiaries to donors thro... CON-34312C6DC9: Implied concern: Implied concern: Secure client-side storage on Expo devices using SecureStore for offline tokens, preventing token theft or cloning. CON-AA83B13877: Implied concern: Protect against replay attacks on offline fallback QR/barcode tokens using time-bound cryptographic signatures. ACT-086A974D63: Platform Administrator
 
 ---
 
-### 3.1 Canonical Actor Roles and Definitions
+## 3. Access Control Matrices and Role Definitions
+
+This section establishes the authoritative Role-Based Access Control (RBAC) model for the Daya (MealCredit) platform. It defines the permissions, responsibilities, and isolation boundaries for the six canonical actor roles, ensuring strict adherence to the principle of least privilege and supporting the platform's multi-tenant, compliance-driven architecture.
+
+### 3.1. Canonical Actor Roles and Definitions
 
 The following roles are defined based on the project's canonical asset registry. Each role is assigned a unique, immutable identifier to ensure consistent referencing across all system artifacts.
 
 ACT-086A974D63 | Platform Administrator | Internal Daya staff responsible for global system configuration, multi-tenant isolation management, and high-level compliance oversight. ACT-09E028AEB0 | NGO Operator | Representative of a local non-profit organization. Responsible for beneficiary onboarding, eligibility verification, and managing the NGO's specific credit pool. ACT-7BA340FF76 | Dispute Adjudicator | Specialized role for resolving financial discrepancies, fraud investigations, and chargebacks between Beneficiaries and Merchants. ACT-80C62C7814 | Donor | Individual or entity providing financial contributions to the platform. Interacts primarily with the funding activation and impact reporting surfaces. ACT-ADA6716160 | Beneficiary | End-user receiving culinary credits. Data is strictly anonymized to prevent social stigma and ensure FTC compliance. ACT-AF904DCFF9 | Merchant | Commercial restaurant partner that accepts culinary credits. Manages POS integration, payout reconciliation, and refund processing.
 
-### 3.2 Access Control Matrix (ACM)
+### 3.2. Access Control Matrix (ACM)
 
 The following matrix defines the permissions for each role. Permissions are categorized by functional domain. A checkmark (✅) indicates explicit access; a dash (❌) indicates explicit denial.
 
@@ -137,11 +161,11 @@ Constraints:
 - Can only initiate refunds for transactions they have personally processed.
 - Access to payout data is limited to their own merchant account.
 
-### 3.3 Authentication and Authorization Flow
+### 3.4. Authentication and Authorization Flow
 
 Authentication: All roles authenticate via a centralized Identity Provider (IdP) using OAuth 2.0 / OIDC. The IdP issues JWTs containing the user's Role ID and Tenant ID (for multi-tenant roles like NGO Operator and Merchant). Authorization: The API Gateway enforces RBAC policies based on the JWT claims. Each API endpoint is annotated with the required Role ID(s). The Gateway validates the role before routing the request to the backend service. Session Management: JWTs have a short expiration time and are refreshed using secure, HttpOnly cookies. Refresh tokens are rotated to prevent replay attacks.
 
-### 3.4 Knowledge Gaps and Assumptions
+### 3.6. Knowledge Gaps and Assumptions
 
 KNOWLEDGE_GAP: The specific implementation details of the JWT claim structure (e.g., custom claims for Tenant ID) are not yet defined. This should be specified in the `Authentication & Session Management` artifact. KNOWLEDGE_GAP: The exact mechanism for granting temporary PII access to Dispute Adjudicators (e.g., manual approval workflow vs. automated policy-based access) is not yet defined. This should be specified in the `Dispute Resolution & Fraud Prevention` artifact. ASSUMPTION: The platform will use a centralized Identity Provider (IdP) for authentication. The specific IdP vendor (e.g., Auth0, AWS Cognito) is not yet selected. This decision should be made in the `Infrastructure Topology & Deployment Design` artifact. ASSUMPTION: The API Gateway will enforce RBAC policies. The specific gateway technology (e.g., Kong, AWS API Gateway) is not yet selected. This decision should be made in the `API Surface & Contract Design` artifact.
 
@@ -151,7 +175,7 @@ KNOWLEDGE_GAP: The specific implementation details of the JWT claim structure (e
 
 This section defines the immutable audit logging architecture for the Daya (MealCredit) platform, ensuring strict adherence to SOC2 Type II structural planning and the specific requirement to implement append-only cryptographic log auditing in Aurora PostgreSQL for all financial ledger mutations (CON-1762EA5021). This mechanism serves as the single source of truth for financial integrity, enabling forensic reconstruction of any state change while maintaining absolute data isolation for beneficiary PII.
 
-### 4.1 Aurora PostgreSQL Immutable Ledger Schema
+### 4.1. Aurora PostgreSQL Immutable Ledger Schema
 
 The financial ledger utilizes a dedicated audit_log table within the Aurora PostgreSQL cluster. This table is designed to be append-only; no UPDATE or DELETE operations are permitted on rows once committed. This ensures that any attempt to alter historical transaction data is immediately detectable via hash chain verification.
 
@@ -178,7 +202,7 @@ Access Control:
 
 Access to the audit_log table is restricted to the `Platform Administrator` role and automated SOC2 compliance auditors. The `NGO Operator` and Merchant roles have read-only access to their own tenant's aggregated metrics, but not to the raw immutable log. Beneficiary PII is never stored in this table; only anonymized UUIDs and transaction references are logged.
 
-### 4.2 Event Taxonomy and Payload Integrity
+### 4.2. Event Taxonomy and Payload Integrity
 
 To ensure consistent auditing across all system surfaces, every financial mutation must emit a standardized event payload. The payload structure is defined as follows:
 
@@ -186,11 +210,11 @@ To ensure consistent auditing across all system surfaces, every financial mutati
 - payload_hash: Computed over the canonical JSON representation of the transaction state at the moment of mutation.
 - metadata: Must include the merchant_id (if applicable), beneficiary_anon_id, and donor_impact_id (if applicable), all hashed or anonymized.
 
-### 4.3 Dispute and Fraud Investigation Integration
+### 4.3. Dispute and Fraud Investigation Integration
 
 The immutable log serves as the primary evidence source for the Dispute Adjudicator (ACT-7BA340FF76) during the Beneficiary-Platform Dispute Flow (JNY-2B038C9362). When a dispute is initiated, the Dispute Adjudicator queries the audit_log for all events associated with the transaction_ref in question. The hash chain verification ensures that the evidence presented has not been tampered with since the event occurred. Additionally, the Merchant-Beneficiary Refund Flow (JNY-E5F45D37C6) is logged as a distinct event_type (REFUND_INITIATED) to maintain a clear audit trail of credit reversals.
 
-#### 4.4 Access Control Matrix (Refined)
+#### 3.1. Access Control Matrix (Refined)
 
 The following matrix defines the permissions for the Platform Administrator (ACT-086A974D63), NGO Operator (ACT-09E028AEB0), and Dispute Adjudicator (ACT-7BA340FF76) across key operational actions. This matrix ensures strict separation of duties and compliance with SOC2 Type II requirements.
 
@@ -205,7 +229,7 @@ The following matrix defines the permissions for the Platform Administrator (ACT
 
 **Note on Merchant Refund Initiation:** The Dispute Adjudicator (ACT-7BA340FF76) is explicitly denied the ability to initiate merchant refunds. Refunds are initiated by the Merchant (ACT-AF904DCFF9) per the canonical journey (JNY-E5F45D37C6). The Dispute Adjudicator's role is limited to reviewing and resolving disputes that arise from these transactions, ensuring an unbiased adjudication process.
 
-#### 4.5 Data Isolation & Cryptographic Hashing Strategy
+#### 3.2. Data Isolation & Cryptographic Hashing Strategy
 
 To satisfy the requirement for strict data isolation where beneficiary demographic status and legal names are cryptographically segregated from public-facing donor analytics (CON-0A0288EED4), the platform implements a multi-layered isolation strategy.
 
@@ -220,7 +244,7 @@ For cross-referencing and integrity verification, the system employs cryptograph
 **Data Residency:**
 All user data is stored within the AWS multi-AZ configurations for the initial metropolitan footprints (SF, NYC, Chicago). Cross-border data residency compliance is monitored to ensure adherence to jurisdictional regulations (CON-30EA97016B, CON-9B82D67FAF).
 
-#### 4.6 PCI-DSS Level 1 Compliance & Tokenization
+#### 3.3. PCI-DSS Level 1 Compliance & Tokenization
 
 The platform enforces PCI-DSS Level 1 compliance by ensuring zero raw card data touches MealCredit servers. All payment interactions are routed through Stripe Elements and Stripe Connect.
 
@@ -234,7 +258,7 @@ Stripe Webhooks are used to notify the backend of payment events (e.g., `payment
 **Network Isolation:**
 All communication with Stripe APIs occurs over TLS 1.2 or higher. The backend is deployed in a private subnet within the AWS VPC, with no direct internet access. Outbound traffic to Stripe is routed through a NAT Gateway with strict egress filtering.
 
-#### 4.7 Append-Only Cryptographic Log Auditing
+#### 3.4. Append-Only Cryptographic Log Auditing
 
 To satisfy SOC2 Type II structural planning and ensure absolute financial ledger consistency, all financial transaction mutations are recorded in an append-only log within Aurora PostgreSQL. This log serves as the single source of truth for financial reconciliation and dispute resolution.
 
@@ -255,7 +279,7 @@ The `audit_log` table is partitioned by `tenant_id` (representing the metropolit
 **Hash-Chain Integrity:**
 The `prev_hash` field creates a cryptographic chain. Any modification to a historical record would invalidate the `prev_hash` of the subsequent record, breaking the chain and immediately flagging tampering.
 
-#### 4.8 Audit Log Verification and Integrity Checks
+#### 3.5. Audit Log Verification and Integrity Checks
 
 To ensure the integrity of the append-only log, the system must implement periodic hash-chain verification. This process involves recalculating the hash chain for a given `tenant_id` and comparing it against the stored `prev_hash` values. Any discrepancy indicates a potential tampering event or data corruption.
 
@@ -267,7 +291,7 @@ Hash-chain verification should be triggered automatically after every batch of c
 **Alerting:**
 Any hash-chain mismatch must trigger an immediate alert to the Platform Administrator (ACT-086A974D63) and initiate an automated isolation protocol for the affected tenant's data.
 
-#### 4.9 Integration with Dispute Resolution (JNY-2B038C9362)
+#### 3.6. Integration with Dispute Resolution (JNY-2B038C9362)
 
 The immutable audit log serves as the primary evidence source for the Beneficiary-Platform Dispute Flow (JNY-2B038C9362). When a dispute is initiated, the Dispute Adjudicator (ACT-7BA340FF76) can query the `audit_log` table to reconstruct the exact sequence of events leading to the disputed transaction. The hash chain ensures that the evidence presented is tamper-proof and admissible for compliance and legal purposes.
 
@@ -277,7 +301,7 @@ The Dispute Adjudicator can retrieve the full hash chain for a specific `transac
 **PII Handling:**
 While the audit log contains anonymized UUIDs, the Dispute Adjudicator can request temporary, audited access to the PII isolation layer (CON-0A0288EED4) to link the anonymized UUID to the actual Beneficiary for the purpose of resolving the dispute. This access is strictly time-bound and logged.
 
-#### 4.10 AWS CloudTrail Integration for Infrastructure Auditing
+#### 3.7. AWS CloudTrail Integration for Infrastructure Auditing
 
 To satisfy SOC2 Type II structural planning, all infrastructure-as-code (IaC) changes and administrative actions are logged via AWS CloudTrail. This provides an external, immutable record of platform management activities, separate from the application-level financial ledger.
 
@@ -290,7 +314,7 @@ To satisfy SOC2 Type II structural planning, all infrastructure-as-code (IaC) ch
 **Integration with Aurora PostgreSQL:**
 Aurora PostgreSQL automatically streams database activity logs to CloudWatch Logs. These logs are then forwarded to the same S3 bucket as CloudTrail logs, creating a unified audit repository. This ensures that all database-level operations (including failed login attempts, schema changes, and bulk data exports) are captured alongside application-level financial events.
 
-#### 4.11 Data Retention and Archival
+#### 3.9. Data Retention and Archival
 
 To comply with financial regulations and SOC2 requirements, audit logs must be retained for a period defined by legal and compliance standards. Given the volume of transactions expected at 50,000 MAU, a tiered archival strategy is implemented:
 
@@ -300,7 +324,7 @@ To comply with financial regulations and SOC2 requirements, audit logs must be r
 
 `KNOWLEDGE_GAP: The exact retention period for financial audit logs in the specific jurisdictions of SF, NYC, and Chicago must be established by the Legal/Compliance team. While seven years is a common standard, local regulations may vary.`
 
-#### 4.12 Double-Spending Prevention
+#### 3.10. Double-Spending Prevention
 
 To prevent double-spending of culinary credits, the system enforces a strict optimistic concurrency control model backed by cryptographic verification.
 
@@ -313,7 +337,7 @@ Every redemption request must include a unique idempotency_key (UUIDv4). The sys
 **Real-Time Ledger Locking:**
 During the POS clearance window (targeting <150ms latency per CON-06232374D9), the voucher record is locked in the financial ledger. Concurrent requests for the same voucher are queued and processed sequentially to ensure only one redemption is recorded.
 
-#### 4.13 Voided Transaction Handling
+#### 3.11. Voided Transaction Handling
 
 Voided transactions are handled through a reversible cryptographic log entry, ensuring the original transaction remains immutable while the void is explicitly recorded.
 
@@ -328,7 +352,7 @@ Voids are only permitted within a specific time window from the original transac
 
 `KNOWLEDGE_GAP: The monetary threshold above which a void requires Dispute Adjudicator (ACT-7BA340FF76) approval must be defined by the Finance and Compliance teams.`
 
-#### 4.14 Offline Fallback QR/Barcode Token Replay Attack Protection
+#### 3.12. Offline Fallback QR/Barcode Token Replay Attack Protection
 
 To protect against replay attacks on offline fallback QR/barcode tokens, the system implements time-bound cryptographic signatures.
 
@@ -348,7 +372,7 @@ The nonce ensures that even if the same voucher is scanned multiple times within
 **Secure Client-Side Storage:**
 Tokens are stored securely on the Expo device using SecureStore (CON-34312C6DC9) to prevent token theft or cloning. The private key used for HMAC generation is never exposed to the client-side application code.
 
-#### 4.15 Scalability and Performance Constraints
+#### 3.13. Scalability and Performance Constraints
 
 This section defines the performance targets and scalability requirements for the platform, ensuring it can handle the target scale of 50,000 MAU across 3 initial metropolitan footprints (SF, NYC, Chicago).
 
@@ -367,7 +391,7 @@ This section defines the performance targets and scalability requirements for th
 - **Anonymous Credit Distribution:** The anonymous credit distribution engine must scale to handle peak event-driven load (CON-121117F5A2). Auto-scaling policies are configured to add capacity based on CPU utilization and request queue depth.
 - **Credit Pool Utilization:** Credit Pool Utilization Rate must be monitored with automated alerts triggering when thresholds exceed 85% (CON-2059B17FB2).
 
-#### 4.16 Knowledge Gaps
+#### 3.14. Knowledge Gaps
 
 `KNOWLEDGE_GAP: Exact data retention policies for donor transaction history vs. anonymous redemption analytics (CON-4820FAD5A9) must be established by the Compliance team to define how long tenant-specific logs are retained before archival or deletion.`
 
@@ -375,11 +399,11 @@ This section defines the performance targets and scalability requirements for th
 
 ---
 
-## 5. API Surface & Contract Design
+## 4. API Surface & Contract Design
 
 This section defines the technical contracts for the platform's APIs, focusing on the integration points with external services (Stripe) and internal service boundaries. It ensures that all data exchanges are secure, idempotent, and compliant with PCI-DSS Level 1 requirements.
 
-#### 5.1 Stripe Integration Contract
+#### 4.1. Stripe Integration Contract
 
 The platform relies entirely on Stripe for payment processing, tokenization, and payout management. All interactions with Stripe must adhere to the following contract:
 
@@ -401,7 +425,7 @@ The platform relies entirely on Stripe for payment processing, tokenization, and
 - **Response:** `{ "transfer_id": "tr_123456789", "status": "pending" }`
 - **Webhook:** `transfer.paid` triggers the merchant ledger update.
 
-#### 5.2 Beneficiary Redemption Contract
+#### 4.2. Beneficiary Redemption Contract
 
 **Voucher Generation:**
 - **Endpoint:** `POST /api/v1/beneficiaries/{beneficiary_id}/vouchers`
@@ -415,15 +439,26 @@ The platform relies entirely on Stripe for payment processing, tokenization, and
 - **Response:** `{ "valid": true, "amount": 5.00, "beneficiary_id": "uuid" }`
 - **Security:** The merchant's POS system validates the HMAC signature and expiry timestamp locally. If online, it calls this endpoint for final confirmation.
 
-#### 5.3 Idempotency and Retry Handling
+#### 4.3. Idempotency and Retry Handling
 
 All API endpoints that modify state (create donations, generate vouchers, process refunds) must support idempotency keys. Clients must include a unique `Idempotency-Key` header in their requests. The backend will cache the response for a given key for 24 hours to prevent duplicate processing in case of network retries.
 
-#### 5.4 Error Handling
+#### 4.4. Error Handling
 
 All API errors must follow a consistent format:
 
-- **error**: {'code': 'INVALID_REQUEST', 'message': 'The provided payment method is expired.', 'details': {'field': 'pmid', 'value': 'pm_expired'}}
+
+{
+  "error": {
+    "code": "INVALID_REQUEST",
+    "message": "The provided payment method is expired.",
+    "details": {
+      "field": "pmid",
+      "value": "pm_expired"
+    }
+  }
+}
+
 
 Common error codes:
 - `INVALID_REQUEST`: The request body is malformed or missing required fields.
@@ -433,7 +468,7 @@ Common error codes:
 - `CONFLICT`: The request conflicts with the current state of the resource (e.g., double-spending).
 - `INTERNAL_ERROR`: An unexpected error occurred on the server.
 
-#### 5.5 Knowledge Gaps
+#### 4.5. Knowledge Gaps
 
 `KNOWLEDGE_GAP: The specific rate limiting thresholds for the API endpoints must be defined by the Infrastructure Architect to prevent abuse and ensure fair usage across all tenants.`
 
@@ -441,7 +476,7 @@ Common error codes:
 
 ---
 
-#### 5.6 Monitoring and Alerting
+#### 5.1. Monitoring and Alerting
 
 The platform employs a comprehensive monitoring stack to detect anomalies in real-time. Key metrics include:
 
@@ -455,7 +490,7 @@ The platform employs a comprehensive monitoring stack to detect anomalies in rea
 - **Warning Alerts:** Sent to the Engineering Team via Slack.
 - **Info Alerts:** Logged to the central monitoring dashboard.
 
-#### 5.7 Incident Response Plan
+#### 5.2. Incident Response Plan
 
 In the event of a security incident, the following response plan will be executed:
 
@@ -466,12 +501,27 @@ In the event of a security incident, the following response plan will be execute
 5. **Recovery:** The affected systems are restored to normal operation. Data is recovered from backups if necessary.
 6. **Post-Incident Review:** A detailed report is generated, documenting the incident, the response actions, and lessons learned. This report is shared with the Platform Administrator (ACT-086A974D63) and Compliance Team.
 
-#### 5.8 Data Breach Notification
+#### 5.3. Data Breach Notification
 
 In the event of a data breach involving beneficiary PII, the platform will comply with all applicable notification requirements. This includes notifying affected beneficiaries, regulatory bodies, and law enforcement within the required timeframes. The Legal and Compliance teams will lead this effort, with support from the Engineering and Security teams.
 
-#### 5.9 Knowledge Gaps
+#### 5.4. Knowledge Gaps
 
 `KNOWLEDGE_GAP: The specific contact information for regulatory bodies and law enforcement in the jurisdictions of SF, NYC, and Chicago must be established by the Legal and Compliance teams.`
 
 `KNOWLEDGE_GAP: The specific tools and platforms for incident response (e.g., SIEM, SOAR) must be selected by the Security Architecture team to ensure integration with the existing monitoring stack.`
+
+---
+
+## VP decision
+
+**Decision:** Approved
+
+---
+
+## VP feedback
+
+- Section 2.1 Data Isolation & Hashing Strategy: Convert the specific algorithm assertion ('SHA-256 or SHA-3') to an ASSUMPTION: or KNOWLEDGE_GAP: tag, as the requirement does not lock the specific hashing family.
+- Section 3.2 Data Isolation & Cryptographic Hashing Strategy: Convert the specific retention period assertion ('seven years') to a KNOWLEDGE_GAP: tag, as the requirement does not lock the retention window.
+- Section 3.3 PCI-DSS Level 1 Compliance & Tokenization: Convert the specific network isolation assertion ('NAT Gateway') to an ASSUMPTION: tag, as the requirement does not lock the specific egress routing mechanism.
+- Project identity grounding evidence: Project identity mismatch: JNY-2B038C9362 is canonically 'Beneficiary-Platform Dispute Flow', but this artifact binds it to 'Dispute Resolution'.

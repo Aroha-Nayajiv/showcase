@@ -1,6 +1,10 @@
 # Technical Architecture & Decision Foundations
 
-### 1.1 Architectural Surface Layers
+## 1. Multi-Tenant Scaling Strategy and Architectural Surface Foundations
+
+To transition MealCredit from a single-city MVP to a resilient 50,000 MAU platform across San Francisco, New York, and Chicago, we must establish a binding technical architecture that prioritizes strict data isolation, sub-250ms latency for financial transactions, and absolute beneficiary anonymity. This section defines the multi-tenant scaling strategy and the four Architectural Surface Layers that will serve as the foundation for all subsequent design and development phases.
+
+### 1.2 Architectural Surface Layers
 
 #### 1.2.1 Client Interface Layer (SUR-43E71C4E2B)
 
@@ -42,7 +46,7 @@
 - **Disaster Recovery:** Must have robust disaster recovery procedures for financial ledger consistency in the event of infrastructure failure (CON-94F025D2C8).
 - **Scaling:** The database must support multi-AZ configurations to achieve 99.99% operational uptime (CON-FD21121DD5). Data retention policies must be strictly defined for donor transaction history vs. anonymous redemption analytics (CON-4820FAD5A9).
 
-### 1.2 Binding Technical Constraints
+### 1.3 Binding Technical Constraints
 
 The following technical constraints are binding for all subsequent phases. They are derived directly from the project requirements and compliance obligations.
 
@@ -52,7 +56,15 @@ The following technical constraints are binding for all subsequent phases. They 
 4. **Uptime:** 99.99% operational uptime across AWS multi-AZ configurations for all critical service endpoints (CON-FD21121DD5).
 5. **Scalability:** The system must support 50,000 MAU across 3 metro footprints, with a peak concurrency of 10,000 connections (CON-7F03CF540E).
 
-### 1.4 Cross-Reference to Sibling Artifacts
+### 1.4 Open Architectural Decisions
+
+The following decisions remain open and require resolution in the Design phase. They are critical to the platform's technical viability.
+
+1. **Cross-Border Data Residency:** How will data residency be enforced if the platform expands beyond the initial US metro footprints? (CON-9B82D67FAF)
+2. **Financial Edge Cases:** What is the specific mechanism for handling double-spending prevention and voided transactions in the event of network partitions or race conditions? (CON-61EC670500)
+3. **Offline Token Security:** What is the exact cryptographic algorithm and key rotation policy for time-bound offline QR/barcode tokens? (CON-AA83B13877)
+
+### 1.6 Cross-Reference to Sibling Artifacts
 
 - **Compliance, Risk & Governance:** This artifact's compliance constraints (PCI-DSS, SOC2, data residency) are detailed here at a high level. The full compliance matrix, risk register, and governance policies are owned by the `Compliance, Risk & Governance` artifact.
 - **Product Strategy & Value Proposition:** The scaling strategy (50,000 MAU, 3 metros) is driven by the product strategy. The `Product Strategy & Value Proposition` artifact provides the business rationale for these targets.
@@ -61,6 +73,21 @@ The following technical constraints are binding for all subsequent phases. They 
 This technical architecture provides the binding foundation for the MealCredit platform. It ensures that the transition from MVP to a 50,000 MAU multi-city platform is guided by strict compliance, performance, and scalability constraints. All subsequent design and development work must adhere to these foundations.
 
 ---
+
+## 2. Architectural Surface Layer Mapping
+
+This section maps the four Architectural Surface Layers to their specific technical responsibilities and inter-layer dependencies, ensuring alignment with the multi-tenant architecture and strict compliance constraints (PCI-DSS, SOC2, data residency).
+
+### 2.1 Client Interface Layer (SUR-43E71C4E2B)
+
+**Responsibilities:**
+- **Expo Mobile Application (Fabric Architecture):** Serves as the primary interface for Beneficiaries (ACT-ADA6716160) and Donors (ACT-80C62C7814). Handles UI/UX, accessibility (WCAG), and secure local storage (SecureStore) for offline tokens.
+- **Next.js Web Dashboards:** Serves as the interface for NGO Operators (ACT-09E028AEB0), Merchants (ACT-AF904DCFF9), and Platform Administrators (ACT-086A974D63). Utilizes Server-Sent Events (SSE) for real-time updates.
+- **Offline Fallback:** Implements time-bound cryptographic signatures for offline QR/barcode tokens to prevent replay attacks (CON-AA83B13877).
+
+**Dependencies:**
+- Communicates exclusively with the API Orchestration Layer (SUR-85E4A5B6E7) via secure HTTPS.
+- Relies on the Data Persistence Layer (SUR-FA61592CD4) indirectly through the API Orchestration Layer for all data operations.
 
 ### 2.2 Payment Processing Surface (SUR-5B18C8719F)
 
@@ -110,7 +137,7 @@ This technical architecture provides the binding foundation for the MealCredit p
 
 ---
 
-### 2.6 PCI-DSS Level 1 Compliance and Payment Data Isolation
+### 3.1. PCI-DSS Level 1 Compliance and Payment Data Isolation
 
 The MealCredit platform must achieve PCI-DSS Level 1 compliance, the highest standard for payment security. This is driven by the requirement to handle real-time financial micro-donations and quasi-cash instrument transactions across three metropolitan footprints.
 
@@ -125,7 +152,7 @@ The MealCredit platform must achieve PCI-DSS Level 1 compliance, the highest sta
 - **Technical Implementation:** The `API Orchestration Layer` (SUR-85E4A5B6E7) must enforce strict KYC data collection workflows for Merchant (ACT-AF904DCFF9) and NGO Operator (ACT-09E028AEB0) onboarding. This includes collecting and securely transmitting tax IDs, business addresses, and bank account details to Stripe Connect.
 - **Data Isolation:** KYC data must be stored in a cryptographically segregated database schema, accessible only by the Platform Administrator (ACT-086A974D63) and automated Stripe sync services.
 
-### 2.7 Beneficiary Data Anonymization and Privacy
+### 3.2. Beneficiary Data Anonymization and Privacy
 
 The core mission of MealCredit is to eliminate social stigma. This requires absolute anonymization of beneficiary data, ensuring that no PII can be linked to donation or redemption events.
 
@@ -143,7 +170,7 @@ The core mission of MealCredit is to eliminate social stigma. This requires abso
   - **Aggregation:** Donor impact receipts (CON-23A501C051) must be generated using aggregated, anonymized data sets. No individual beneficiary redemption event can be traced back to a specific donor.
   - **Audit:** Regular third-party audits must be conducted to test for de-anonymization vulnerabilities.
 
-### 2.8 Financial Regulations and Quasi-Cash Instruments
+### 3.3. Financial Regulations and Quasi-Cash Instruments
 
 MealCredit's culinary credits function as quasi-cash instruments, subjecting the platform to specific financial regulations.
 
@@ -156,35 +183,45 @@ MealCredit's culinary credits function as quasi-cash instruments, subjecting the
 
 ---
 
-### 2.9 Event Bus Technology
+### 4.1 Event Bus Technology
 
 - **Decision Axis:** Selection of the event bus technology for the event-driven serverless architecture.
 - **Status:** Open.
 - **Rationale:** The specific event bus technology is not defined in the project requirement and should remain an open decision.
 - **KNOWLEDGE_GAP:** The specific event bus technology (e.g., AWS EventBridge, Kafka, RabbitMQ) must be selected based on throughput requirements and operational complexity. Engineering Lead must evaluate options against the 10,000 concurrent connection target.
 
-### 2.10 Offline Token Cryptography
+### 4.2 Offline Token Cryptography
 
 - **Decision Axis:** Selection of the cryptographic algorithm for offline QR/barcode tokens.
 - **Status:** Open.
 - **Rationale:** The specific cryptographic algorithm for offline tokens is not defined and should remain an open decision.
 - **KNOWLEDGE_GAP:** The specific cryptographic algorithm (e.g., HMAC-SHA256, Ed25519) and key rotation policy for time-bound offline QR/barcode tokens must be defined. Security Lead must select an algorithm that balances security with the low-latency requirements of offline validation.
 
-### 2.11 Financial Ledger Implementation
+### 4.3 Financial Ledger Implementation
 
 - **Decision Axis:** Selection of the ledger implementation strategy for financial mutations.
 - **Status:** Open.
 - **Rationale:** The specific ledger implementation strategy is not defined and should remain an open decision.
 - **KNOWLEDGE_GAP:** The specific ledger implementation strategy (e.g., Append-Only PostgreSQL Log, Distributed Write-Ahead Ledger on DynamoDB) must be selected based on consistency requirements and scalability needs. Engineering Lead must evaluate options against the PCI-DSS Level 1 compliance and 99.99% uptime targets.
 
-### 2.12 POS Vendor and Region Specifics
+### 4.4 POS Vendor and Region Specifics
 
 - **Decision Axis:** Selection of specific POS vendor integrations and AWS region mappings.
 - **Status:** Open.
 - **Rationale:** Specific POS vendor names (e.g., Toast, Clover, Square) and AWS region names (e.g., us-west-2, us-east-1, us-central-1) are invented specifics not grounded in the project requirement.
 - **KNOWLEDGE_GAP:** The specific POS vendor integrations and AWS region mappings must be defined based on merchant preferences and data residency requirements. Operations Lead must establish these mappings before ratification.
 
-### 2.14 Open Decisions and Knowledge Gaps
+### 4.5 Summary of Knowledge Gaps
+
+- **KNOWLEDGE_GAP:** The exact data residency requirements for each metropolitan footprint (SF, NYC, CHI) have not been explicitly defined. Legal must establish these before ratification.
+- **KNOWLEDGE_GAP:** The specific financial regulations governing quasi-cash instruments, particularly regarding unclaimed property and escheatment laws, have not been fully mapped. Legal must provide these constraints.
+- **KNOWLEDGE_GAP:** The exact latency targets for non-financial operations (e.g., NGO governance workflows, donor impact receipts) have not been defined. These should be established in the Design phase.
+- **KNOWLEDGE_GAP:** The specific event bus technology must be selected based on throughput requirements and operational complexity. Engineering Lead must evaluate options against the 10,000 concurrent connection target.
+- **KNOWLEDGE_GAP:** The specific cryptographic algorithm and key rotation policy for time-bound offline QR/barcode tokens must be defined. Security Lead must select an algorithm that balances security with the low-latency requirements of offline validation.
+- **KNOWLEDGE_GAP:** The specific ledger implementation strategy must be selected based on consistency requirements and scalability needs. Engineering Lead must evaluate options against the PCI-DSS Level 1 compliance and 99.99% uptime targets.
+- **KNOWLEDGE_GAP:** The specific POS vendor integrations and AWS region mappings must be defined based on merchant preferences and data residency requirements. Operations Lead must establish these mappings before ratification.
+
+### 3.4. Open Decisions and Knowledge Gaps
 
 This section establishes the binding compliance and privacy constraints for the MealCredit platform. These constraints must be strictly adhered to in all subsequent design and development phases. Any deviation from these constraints requires explicit approval from the Platform Administrator (ACT-086A974D63) and the Legal team.
 
@@ -196,7 +233,11 @@ This section establishes the binding compliance and privacy constraints for the 
 - `KNOWLEDGE_GAP: Specific event bus technology for asynchronous credit issuance is not yet defined. Platform Administrator must select the eventing mechanism (e.g., AWS EventBridge, SNS/SQS) based on throughput requirements.`
 - `KNOWLEDGE_GAP: Specific financial ledger implementation strategy (PostgreSQL vs. DynamoDB) is not yet defined. Platform Administrator must select the ledger technology based on consistency and scalability trade-offs.`
 
-### 3.1 Anonymous Credit Distribution Engine Scalability (CON-121117F5A2)
+## 4. Open Architectural Decisions and Knowledge Gaps
+
+This section defines the binding technical constraints, multi-tenant scaling strategy, and open architectural decisions required to transition MealCredit from an MVP to a resilient 50,000 MAU platform across SF, NYC, and Chicago. It maps the four Architectural Surface Layers (API Orchestration Layer, Client Interface Layer, Data Persistence Layer, Payment Processing Surface) to their respective technical responsibilities and inter-layer dependencies, ensuring alignment with the multi-tenant architecture and strict compliance constraints (PCI-DSS, SOC2, data residency).
+
+### 4.1. Anonymous Credit Distribution Engine Scalability (CON-121117F5A2)
 
 Decision Context: The anonymous credit distribution engine must handle peak event-driven loads (e.g., large donor campaigns) without degrading the real-time POS clearance latency for Beneficiaries (CON-5D64EBC654). The system must decouple donation ingestion from credit issuance to prevent backpressure.
 
@@ -209,7 +250,7 @@ Open Decision:
  Owner: Platform Administrator (ACT-086A974D63).
  Timeline: Resolution required before Design Phase API contract finalization.
 
-### 3.2 Real-Time POS Clearance Latency (CON-5D64EBC654)
+### 4.2. Real-Time POS Clearance Latency (CON-5D64EBC654)
 
 Decision Context: To prevent restaurant queue stagnation, POS clearance must be optimized for real-time performance. The system must handle 10,000 concurrent connections with a p99 latency below 250ms (CON-7F03CF540E).
 
@@ -222,7 +263,7 @@ Open Decision:
  Owner: Platform Administrator (ACT-086A974D63).
  Timeline: Resolution required before Design Phase API contract finalization.
 
-### 3.3 Offline Fallback Mechanisms (CON-AA83B13877)
+### 4.3. Offline Fallback Mechanisms (CON-AA83B13877)
 
 Decision Context: In the event of network outages, the platform must support offline fallback QR/barcode tokens. These tokens must be protected against replay attacks using time-bound cryptographic signatures.
 
@@ -235,7 +276,7 @@ Open Decision:
  Owner: Security Engineer.
  Timeline: Resolution required before Design Phase API contract finalization.
 
-### 3.4 Financial Edge-Case Handling (CON-61EC670500)
+### 4.5. Financial Edge-Case Handling (CON-61EC670500)
 
 Decision Context: The system must handle financial edge cases such as double-spending prevention and voided transactions. The financial ledger must be immutable and auditable.
 
@@ -248,7 +289,7 @@ Open Decision:
  Owner: Platform Administrator (ACT-086A974D63).
  Timeline: Resolution required before Design Phase API contract finalization.
 
-### 3.5 Knowledge Gaps and Assumptions
+### 4.6. Knowledge Gaps and Assumptions
 
 KG-01 | Data Residency Jurisdictions: Specific data residency laws for SF, NYC, and Chicago are not yet confirmed. | May require additional regional deployments or data routing rules. | Legal / Compliance | Before Design Phase
 KG-02 | Stripe Connected Account KYC: KYC requirements for Merchant Partners (Restaurants) across multiple jurisdictions (SF, NYC, Chicago) are not fully defined. | May impact Merchant Onboarding & POS Integration (JNY-356F465DB3) timeline. | Legal / Compliance | Before Design Phase
@@ -256,16 +297,46 @@ KG-03 | POS Gateway Integration: Specific POS gateway APIs for initial Merchant 
 KG-04 | AWS Region Selection: Initial MVP region and multi-region expansion strategy are not yet defined. | Defines initial infrastructure scope and data residency compliance. | Platform Administrator (ACT-086A974D63) | Before Design Phase
 KG-05 | Expo Version: Expo v51 with Fabric architecture is the target frontend stack. | Defines frontend development constraints. | Frontend Lead | Before Design Phase
 
+## 5. Technical Architecture & Decision Foundations Synthesis
+
 This document consolidates the binding technical constraints, multi-tenant scaling strategy, and architectural surface mappings required to transition MealCredit from a single-city MVP to a resilient, event-driven platform supporting 50,000 Monthly Active Users (MAU) across San Francisco, New York, and Chicago.
 
-### 3.6 Multi-Tenant Scaling Strategy
+### 5.1 Multi-Tenant Scaling Strategy
 
 To support 50,000 MAU across three metropolitan footprints, the platform will adopt a Shared Infrastructure, Logical Isolation model. This approach balances the operational efficiency of a single cloud footprint with the strict data residency and compliance requirements of financial services.
 
 Tenant Isolation: Financial data and beneficiary PII will be partitioned by jurisdiction_id (SF, NYC, CHI) within a single Amazon Aurora PostgreSQL cluster. This ensures strict logical isolation without the prohibitive cost of maintaining three separate database clusters. Latency & Throughput Targets:
  POS Clearance: The system must maintain p99 latency below 250ms for voucher creation and scanning callbacks under 10,000 concurrent connections (CON-7F03CF540E). This is achieved by routing high-throughput POS callbacks via asynchronous gRPC services. Webhook Processing: Stripe Webhook processing latency must average below 150ms from card tap to merchant ledger entry (CON-06232374D9). This requires synchronous Stripe API calls for immediate ledger updates, decoupled from non-critical analytics. Caching Strategy: To support the target Cache Hit Ratio (CHR) above 92% for restaurant search queries (CON-EA7C3EFECB), the architecture mandates a Redis Enterprise Cluster. This layer sits between the API Orchestration Layer and the Data Persistence Layer to absorb read-heavy traffic.
 
-### 3.9 Open Architectural Decisions & Knowledge Gaps
+### 5.2 Architectural Surface Mappings
+
+The platform is defined by four distinct Architectural Surfaces, each with specific responsibilities and binding constraints:
+
+1. Client Interface Layer (SUR-43E71C4E2B):
+ Technology: Expo v51 / React Native (Fabric architecture) for mobile; Next.js on Edge runtimes for web dashboards.
+ Responsibility: UI/UX, accessibility (WCAG), and secure local storage (SecureStore) for offline tokens.
+ Constraint: Communicates exclusively with the API Orchestration Layer via secure HTTPS. No direct database access.
+
+2. Payment Processing Surface (SUR-5B18C8719F):
+ Technology: Stripe Issuing and Stripe Connect.
+ Responsibility: Handling all financial transactions, including micro-donations and culinary credit issuance.
+ Constraint: Zero-Touch PCI-DSS Policy. Raw card data must never touch MealCredit servers. All card data is handled exclusively by Stripe Elements and hosted fields. This surface is the sole owner of PCI-DSS Level 1 compliance (CON-66390130AA).
+
+3. API Orchestration Layer (SUR-85E4A5B6E7):
+ Technology: Hybrid architecture - high-throughput CRUD over GraphQL; financial transactions and POS callbacks via asynchronous gRPC services.
+ Responsibility: Business logic, tenant routing, and decoupling the Client Interface from the Payment Processing Surface.
+ Constraint: Acts as the single source of truth for business logic. Must enforce strict data isolation rules before passing requests to the Data Persistence Layer.
+
+4. Data Persistence Layer (SUR-FA61592CD4):
+ Technology: Amazon Aurora PostgreSQL for financial ledgers; Redis Enterprise Cluster for caching.
+ Responsibility: Storing financial transactions, user profiles, and merchant data.
+ Constraint: Must implement append-only cryptographic log auditing for all financial ledger mutations (CON-6061FCCA83). Beneficiary demographic status and legal names must be cryptographically segregated from public data (CON-92F07E31B0).
+
+### 5.3 Binding Compliance & Privacy Constraints
+
+PCI-DSS Level 1: Enforced via the Zero-Touch policy on the Payment Processing Surface. No raw card data touches MealCredit servers (CON-66390130AA). SOC2 Type II: Structural planning is baked into the infrastructure-as-code and access control policies (CON-81FB01F06B). All administrative ledger operations and infrastructure changes must be logged to AWS CloudTrail (CON-FBBBF07295). Data Anonymization: Beneficiary data must be absolutely anonymized to eliminate tracking or social bias. All beneficiary-related data is classified as 'Highly Sensitive' and restricted to cryptographic hashing layers (CON-2788862587). Donor impact receipts must be correlated with beneficiary redemption events without linking PII, using UUIDv4 mapping for analytics (CON-23A501C051). Data Residency: The architecture must support multi-region deployment with clear data routing rules to comply with jurisdictional data residency laws (CON-30EA97016B, CON-9B82D67FAF). The MVP will start in a single region, but the logical isolation model must be designed to support physical separation if required.
+
+### 5.4 Open Architectural Decisions & Knowledge Gaps
 
 The following decisions remain unresolved and must be ratified before the Design phase:
 
@@ -273,11 +344,11 @@ Offline Fallback Mechanism: Should the Pseudo-Anonymous Redemption Engine route 
  Financial Ledger Reconciliation: Should financial ledger reconciliation be handled via an append-only immutable log in PostgreSQL (ACID) with periodic hash-checksums, or a distributed write-ahead ledger on DynamoDB for horizontal scale? (CON-61EC670500)
  Regional Pool Implementation: For the Donation-to-Redemption Velocity (DRV) metric, should the 'Regional Pool' be implemented as a logical isolation layer within a single DynamoDB table or as physically separate DynamoDB tables per metro footprint (SF, NYC, CHI)? (CON-F89C70071E)
 
-## 4. Actor and Journey Traceability Matrix
+## 6. Actor and Journey Traceability Matrix
 
 This section maps the canonical actor roles and user journeys to the architectural surfaces and capabilities defined in the preceding sections, ensuring complete traceability and scope coverage.
 
-### 4.1 Actor Role Bindings
+### 6.1 Actor Role Bindings
 
 Platform Administrator (ACT-086A974D63): Oversees compliance failure recovery, financial reconciliation, and platform-wide configuration.
 NGO Operator (ACT-09E028AEB0): Manages beneficiary eligibility, offboarding, and regional credit pool oversight.
@@ -286,7 +357,7 @@ Donor (ACT-80C62C7814): Initiates micro-donations via round-ups or directed impa
 Beneficiary (ACT-ADA6716160): Redeems anonymous culinary credits at participating merchants.
 Merchant (ACT-AF904DCFF9): Accepts payments, manages POS integration, and handles refunds.
 
-### 4.2 User Journey Mappings
+### 6.2 User Journey Mappings
 
 Donor Onboarding & Funding Activation (JNY-62D850E94B): Handled by the Payment Processing Surface (SUR-5B18C8719F) and API Orchestration Layer (SUR-85E4A5B6E7).
 Beneficiary Eligibility & Voucher Redemption (JNY-E82B8A88D8): Orchestrated by the API Orchestration Layer (SUR-85E4A5B6E7) with caching via Redis (CON-EA7C3EFECB) and ledger updates in Aurora PostgreSQL (CON-6061FCCA83).
@@ -299,7 +370,7 @@ Beneficiary-Platform Dispute Flow (JNY-2B038C9362): Adjudicated by the Dispute A
 Merchant Payout Error Handling Flow (JNY-90B07623FB): Handled by the Merchant Payout Failure & Error Handling capability (CAP-MERCHANT-PAYOUT-FAILURE-ERROR-HANDLING) via the API Orchestration Layer (SUR-85E4A5B6E7).
 Platform-NGO Fraud Investigation Flow (JNY-CA74D631DC): Investigated by the Platform Administrator (ACT-086A974D63) and NGO Operator (ACT-09E028AEB0) using Fraud Detection & Fraud Prevention Screening (CAP-FRAUD-DETECTION-FRAUD-PREVENTION-SCREENING).
 
-### 4.3 Capability Surface Alignment
+### 6.3 Capability Surface Alignment
 
 Identity & Access Management (CAP-IDENTITY-ACCESS-MANAGEMENT): Enforced at the API Orchestration Layer (SUR-85E4A5B6E7) and Client Interface Layer (SUR-43E71C4E2B).
 Transaction & Financial Engine (CAP-TRANSACTION-FINANCIAL-ENGINE): Core logic resides in the API Orchestration Layer (SUR-85E4A5B6E7) with state in the Data Persistence Layer (SUR-FA61592CD4).
@@ -307,3 +378,15 @@ Marketplace & Matchmaking (CAP-MARKETPLACE-MATCHMAKING): Driven by the API Orche
 Compliance, Security & Audit (CAP-COMPLIANCE-SECURITY-AUDIT): Implemented across all surfaces, with specific controls on the Payment Processing Surface (SUR-5B18C8719F) and Data Persistence Layer (SUR-FA61592CD4).
 Merchant & NGO Operations (CAP-MERCHANT-NGO-OPERATIONS): Managed via the API Orchestration Layer (SUR-85E4A5B6E7) and Client Interface Layer (SUR-43E71C4E2B).
 Dispute Resolution & Chargeback Management (CAP-DISPUTE-RESOLUTION-CHARGEBACK-MANAGEMENT): Handled by the Dispute Adjudicator (ACT-7BA340FF76) using data from the Data Persistence Layer (SUR-FA61592CD4).
+
+---
+
+## VP decision
+
+**Decision:** Approved
+
+---
+
+## VP feedback
+
+(No feedback)
