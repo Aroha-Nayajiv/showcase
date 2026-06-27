@@ -10,6 +10,7 @@
 - [design api surface grpc services](design/design_api_surface_grpc_services.md)
 - [design api surface](design/design_api_surface.md)
 - [design data model financial ledger](design/design_data_model_financial_ledger.md)
+- [design data model geo indexing](design/design_data_model_geo_indexing.md)
 - [design data model user state](design/design_data_model_user_state.md)
 - [design frontend presentation](design/design_frontend_presentation.md)
 - [design integration adapters offline tokens](design/design_integration_adapters_offline_tokens.md)
