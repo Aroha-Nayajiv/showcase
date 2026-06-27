@@ -16,6 +16,7 @@
 - [design integration adapters offline tokens](design/design_integration_adapters_offline_tokens.md)
 - [design integration adapters stripe proxy](design/design_integration_adapters_stripe_proxy.md)
 - [design observability](design/design_observability.md)
+- [design security architecture access control](design/design_security_architecture_access_control.md)
 - [infrastructure topology](design/infrastructure_topology.md)
 - [integration adapters](design/integration_adapters.md)
 - [security architecture](design/security_architecture.md)
