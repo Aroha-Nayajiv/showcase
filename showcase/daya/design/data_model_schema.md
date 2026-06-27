@@ -2,21 +2,21 @@
 
 ## 1. Beneficiary Voucher State Schema (DynamoDB)
 
-This section defines the DynamoDB schema for the Beneficiary Voucher State table, optimized for high-velocity reads and writes across the 3 initial metropolitan footprints (SF, NYC, Chicago). The schema enforces strict data isolation (CON-0A0288EED4) by ensuring demographic status is never co-located with voucher redemption tokens in the same partition.
+This section defines the DynamoDB schema for the Beneficiary Voucher State table, optimized for high-velocity reads and writes across the 3 initial metropolitan footprints (SF, NYC, Chicago). The schema enforces strict data isolation ([CON-0A0288EED4](../project_glossary.md#CON-0A0288EED4)) by ensuring demographic status is never co-located with voucher redemption tokens in the same partition.
 
 ### 1.1 Table Configuration
 
 Table Name: MealCredit-VoucherState
 
  Partition Key (PK): BeneficiaryID (String)
-  Rationale: Co-locates all vouchers for a single beneficiary to enable fast balance lookups and real-time state updates during the Beneficiary Eligibility & Voucher Redemption journey (JNY-E82B8A88D8).
+  Rationale: Co-locates all vouchers for a single beneficiary to enable fast balance lookups and real-time state updates during the Beneficiary Eligibility & Voucher Redemption journey ([JNY-E82B8A88D8](../project_glossary.md#JNY-E82B8A88D8)).
  Sort Key (SK): VoucherID (String)
   Rationale: Uniquely identifies each voucher instance (UUIDv4) for the same beneficiary, supporting multiple concurrent vouchers.
  Global Secondary Index (GSI): GSI-MerchantVoucher
   GSI PK: MerchantID (String)
   GSI SK: VoucherID (String)
-  Rationale: Enables the Merchant-Beneficiary Refund Flow (JNY-E5F45D37C6) by allowing merchants to query vouchers they issued to a specific beneficiary without scanning the entire table.
- Provisioned Capacity: Auto-scaling enabled with a target utilization of 75% to handle peak event-driven load (CON-121117F5A2).
+  Rationale: Enables the Merchant-Beneficiary Refund Flow ([JNY-E5F45D37C6](../project_glossary.md#JNY-E5F45D37C6)) by allowing merchants to query vouchers they issued to a specific beneficiary without scanning the entire table.
+ Provisioned Capacity: Auto-scaling enabled with a target utilization of 75% to handle peak event-driven load ([CON-121117F5A2](../project_glossary.md#CON-121117F5A2)).
 
 ### 1.2 Item Schema
 
@@ -38,14 +38,14 @@ Metadata | Map | JSON. Optional metadata (e.g., donorCampaignID, region).
 To satisfy the strict data isolation requirement, demographic status and legal names are never stored in this table. Instead:
 
 1. PII Segregation: Beneficiary demographic data is stored in a separate MealCredit-BeneficiaryProfile table (owned by the User State & Profile Data Model artifact). This table uses BeneficiaryID as its PK.
-2. Access Control: IAM policies restrict access to the MealCredit-BeneficiaryProfile table to the NGO Operator (ACT-09E028AEB0) and Platform Administrator (ACT-086A974D63) roles only. The Merchant (ACT-AF904DCFF9) and Beneficiary (ACT-ADA6716160) roles have no access to this table.
+2. Access Control: IAM policies restrict access to the MealCredit-BeneficiaryProfile table to the NGO Operator ([ACT-09E028AEB0](../project_glossary.md#ACT-09E028AEB0)) and Platform Administrator ([ACT-086A974D63](../project_glossary.md#ACT-086A974D63)) roles only. The Merchant ([ACT-AF904DCFF9](../project_glossary.md#ACT-AF904DCFF9)) and Beneficiary ([ACT-ADA6716160](../project_glossary.md#ACT-ADA6716160)) roles have no access to this table.
 3. Anonymization: The RedemptionToken is generated using a deterministic HMAC-SHA256 hash of the VoucherID and a secret key, ensuring that the token itself does not leak any beneficiary information.
 
 ### 1.4 Index Strategy and Performance
 
  Balance Lookups: Queries against `PK = BeneficiaryID` return all vouchers for a beneficiary in a single read operation, enabling real-time balance calculations.
  Refund Queries: Queries against GSI-MerchantVoucher with `MerchantID = <merchant_id>` and `SK = <beneficiary_id>` (using a filter expression) allow merchants to quickly locate vouchers for refund processing.
- Cache Hit Ratio (CHR): To maintain a CHR above 92% (CON-527BFA6796), frequently accessed voucher states (e.g., ISSUED) are cached in Redis. The DynamoDB schema is designed to minimize read amplification, reducing the load on the cache.
+ Cache Hit Ratio (CHR): To maintain a CHR above 92% ([CON-527BFA6796](../project_glossary.md#CON-527BFA6796)), frequently accessed voucher states (e.g., ISSUED) are cached in Redis. The DynamoDB schema is designed to minimize read amplification, reducing the load on the cache.
 
 ### 1.5 Knowledge Gaps
 
@@ -54,11 +54,11 @@ To satisfy the strict data isolation requirement, demographic status and legal n
 
 ## 2. Immutable Financial Ledger Schema (Aurora PostgreSQL)
 
-This section defines the Aurora PostgreSQL schema for the Transaction Ledger and Credit Pool tables. It enforces the append-only cryptographic log auditing requirement (CON-1762EA5021) and supports the Donation-to-Redemption Velocity (DRV) metric (CON-D0F5814F21) through strict PII segregation and UUIDv4 mapping (CON-23A501C051).
+This section defines the Aurora PostgreSQL schema for the Transaction Ledger and Credit Pool tables. It enforces the append-only cryptographic log auditing requirement ([CON-1762EA5021](../project_glossary.md#CON-1762EA5021)) and supports the Donation-to-Redemption Velocity (DRV) metric ([CON-D0F5814F21](../project_glossary.md#CON-D0F5814F21)) through strict PII segregation and UUIDv4 mapping ([CON-23A501C051](../project_glossary.md#CON-23A501C051)).
 
 ### 2.1. Cryptographic Audit Log Table (audit_log)
 
-To satisfy CON-1762EA5021, all mutations to the financial ledger are recorded in an append-only table. This table acts as the source of truth for SOC2 Type II evidence (CON-81FB01F06B) and prevents tampering via a cryptographic hash chain.
+To satisfy [CON-1762EA5021](../project_glossary.md#CON-1762EA5021), all mutations to the financial ledger are recorded in an append-only table. This table acts as the source of truth for SOC2 Type II evidence ([CON-81FB01F06B](../project_glossary.md#CON-81FB01F06B)) and prevents tampering via a cryptographic hash chain.
 
 Table: audit_log
 
@@ -77,7 +77,7 @@ A CHECK constraint must be enforced on the current_hash column to ensure it matc
 
 ### 2.2. Transaction Ledger Table (transaction_ledger)
 
-This table records all financial movements. It is designed for high-throughput writes and supports the double-spending prevention logic (CON-61EC670500) via strict state transitions.
+This table records all financial movements. It is designed for high-throughput writes and supports the double-spending prevention logic ([CON-61EC670500](../project_glossary.md#CON-61EC670500)) via strict state transitions.
 
 Table: transaction_ledger
 
@@ -93,12 +93,12 @@ updated_at | TIMESTAMPTZ | `DEFAULT NOW()` | Timestamp of last status change.
 hash_chain_ref | BIGINT | `NOT NULL` | References log_id in audit_log for this transaction's initial creation.
 
 Indexes:
- idx_txn_beneficiary_status: `(beneficiary_anon_id, status)` - Optimizes balance lookups for the Beneficiary-Platform Dispute Flow (JNY-2B038C9362).
- idx_txn_merchant_date: `(merchant_id, created_at DESC)` - Optimizes Merchant Payout Error Handling Flow (JNY-90B07623FB) reconciliation.
+ idx_txn_beneficiary_status: `(beneficiary_anon_id, status)` - Optimizes balance lookups for the Beneficiary-Platform Dispute Flow ([JNY-2B038C9362](../project_glossary.md#JNY-2B038C9362)).
+ idx_txn_merchant_date: `(merchant_id, created_at DESC)` - Optimizes Merchant Payout Error Handling Flow ([JNY-90B07623FB](../project_glossary.md#JNY-90B07623FB)) reconciliation.
 
 ### 2.3. Credit Pool Table (credit_pools)
 
-This table manages the liquidity of donor funds. It supports the Donation-to-Redemption Velocity (DRV) metric (CON-D0F5814F21) by tracking the flow of funds from Donor to Beneficiary.
+This table manages the liquidity of donor funds. It supports the Donation-to-Redemption Velocity (DRV) metric ([CON-D0F5814F21](../project_glossary.md#CON-D0F5814F21)) by tracking the flow of funds from Donor to Beneficiary.
 
 Table: credit_pools
 
@@ -116,11 +116,11 @@ The DRV metric is calculated by joining credit_pools with transaction_ledger on 
 
 ### 2.4. PII Segregation and Anonymization
 
-To satisfy CON-0A0288EED4 and CON-23A501C051, the transaction_ledger and credit_pools tables do not contain any PII fields (names, emails, addresses).
+To satisfy [CON-0A0288EED4](../project_glossary.md#CON-0A0288EED4) and [CON-23A501C051](../project_glossary.md#CON-23A501C051), the transaction_ledger and credit_pools tables do not contain any PII fields (names, emails, addresses).
 
- Beneficiary Identity: The beneficiary_anon_id in transaction_ledger is a UUIDv4 generated by the Identity & Access Management system (CAP-IDENTITY-ACCESS-MANAGEMENT).
+ Beneficiary Identity: The beneficiary_anon_id in transaction_ledger is a UUIDv4 generated by the Identity & Access Management system ([CAP-IDENTITY-ACCESS-MANAGEMENT](../project_glossary.md#CAP-IDENTITY-ACCESS-MANAGEMENT)).
  Mapping: The mapping between beneficiary_anon_id and actual PII is stored in a separate, highly restricted beneficiary_pii table (owned by the User State & Profile Data Model artifact).
- Analytics: Analytics queries (e.g., DRV) operate solely on beneficiary_anon_id, ensuring that no de-anonymization attacks can link beneficiaries to donors through metadata analysis (CON-B3D71A437D).
+ Analytics: Analytics queries (e.g., DRV) operate solely on beneficiary_anon_id, ensuring that no de-anonymization attacks can link beneficiaries to donors through metadata analysis ([CON-B3D71A437D](../project_glossary.md#CON-B3D71A437D)).
 
 ### 2.5. Sibling Dependencies
 
@@ -132,11 +132,11 @@ To satisfy CON-0A0288EED4 and CON-23A501C051, the transaction_ledger and credit_
 
  Integrity Test: A unit test must verify that inserting a row with an incorrect current_hash in audit_log fails the CHECK constraint.
  Anonymity Test: A query test must verify that joining transaction_ledger with credit_pools yields no PII fields, only beneficiary_anon_id.
- Performance Test: A load test must verify that the idx_txn_beneficiary_status index maintains sub-10ms lookup times for balance queries under 10,000 concurrent connections (CON-6D5E21557B).
+ Performance Test: A load test must verify that the idx_txn_beneficiary_status index maintains sub-10ms lookup times for balance queries under 10,000 concurrent connections ([CON-6D5E21557B](../project_glossary.md#CON-6D5E21557B)).
 
 ## 3. Redis Enterprise Cluster Schema for Geo-Indexing and Caching
 
-This section defines the Redis Enterprise Cluster schema to support high-velocity Restaurant Search and Voucher Scanning surfaces. The design prioritizes sub-millisecond read latency for proximity searches and strict atomicity for double-spending prevention, ensuring a Cache Hit Ratio (CHR) above 92% (CON-527BFA6796) through intelligent TTL policies and write-through invalidation.
+This section defines the Redis Enterprise Cluster schema to support high-velocity Restaurant Search and Voucher Scanning surfaces. The design prioritizes sub-millisecond read latency for proximity searches and strict atomicity for double-spending prevention, ensuring a Cache Hit Ratio (CHR) above 92% ([CON-527BFA6796](../project_glossary.md#CON-527BFA6796)) through intelligent TTL policies and write-through invalidation.
 
 ### 3.1. Restaurant Search Geo-Indexing (SUR-43E71C4E2B)
 
@@ -198,17 +198,17 @@ To achieve a CHR above 92%, the following strategies are implemented:
 
 ## 4. PII Segregation and Data Residency Architecture
 
-This section defines the cryptographic and structural boundaries required to segregate 'Highly Sensitive' beneficiary data (CON-<timestamp>) from public-facing voucher tokens, while enforcing strict data residency for the SF, NYC, and Chicago metropolitan footprints (CON-30EA97016B). The design ensures that no single data store or service endpoint can correlate a beneficiary's legal identity with their financial redemption events, satisfying FTC guidelines on anonymity (CON-B3D71A437D) and PCI-DSS Level 1 compliance (CON-66390130AA).
+This section defines the cryptographic and structural boundaries required to segregate 'Highly Sensitive' beneficiary data (CON-<timestamp>) from public-facing voucher tokens, while enforcing strict data residency for the SF, NYC, and Chicago metropolitan footprints ([CON-30EA97016B](../project_glossary.md#CON-30EA97016B)). The design ensures that no single data store or service endpoint can correlate a beneficiary's legal identity with their financial redemption events, satisfying FTC guidelines on anonymity ([CON-B3D71A437D](../project_glossary.md#CON-B3D71A437D)) and PCI-DSS Level 1 compliance ([CON-66390130AA](../project_glossary.md#CON-66390130AA)).
 
 ### 4.1. Cryptographic Data Isolation
 
- Beneficiary PII is stored in a dedicated, highly restricted database table (MealCredit-BeneficiaryProfile) that is physically and logically isolated from the voucher state and transaction ledger tables. Access to this table is restricted to the NGO Operator (ACT-09E028AEB0) and Platform Administrator (ACT-086A974D63) roles only.
+ Beneficiary PII is stored in a dedicated, highly restricted database table (MealCredit-BeneficiaryProfile) that is physically and logically isolated from the voucher state and transaction ledger tables. Access to this table is restricted to the NGO Operator ([ACT-09E028AEB0](../project_glossary.md#ACT-09E028AEB0)) and Platform Administrator ([ACT-086A974D63](../project_glossary.md#ACT-086A974D63)) roles only.
  The RedemptionToken used for POS validation is generated using a deterministic HMAC-SHA256 hash of the VoucherID and a secret key. This ensures that the token itself does not leak any beneficiary information, even if intercepted.
  All analytics queries (e.g., DRV) operate solely on beneficiary_anon_id, ensuring that no de-anonymization attacks can link beneficiaries to donors through metadata analysis (CON-B3D71A437D).
 
 ### 4.2. Data Residency and Jurisdictional Compliance
 
-To satisfy CON-30EA97016B, all user data must be stored within the geographic boundaries of the metropolitan regions where the user resides. This is critical for compliance with local data protection regulations and ensuring low-latency access for the 50,000 MAU target.
+To satisfy [CON-30EA97016B](../project_glossary.md#CON-30EA97016B), all user data must be stored within the geographic boundaries of the metropolitan regions where the user resides. This is critical for compliance with local data protection regulations and ensuring low-latency access for the 50,000 MAU target.
 
  Metro Footprint Mapping:
   `ASSUMPTION: SF Metro Footprint maps to AWS us-west-2 region. NYC Metro Footprint maps to AWS us-east-1 region. Chicago Metro Footprint maps to AWS us-east-2 region. This mapping is reversible pending confirmation from the Infrastructure Topology & Deployment Design artifact.`
@@ -228,7 +228,7 @@ This section defines the synchronous and asynchronous contracts between the plat
 
 ### 5.1. Synchronous POS Clearance Contract
 
-The POS clearance contract defines the interface between the Merchant POS terminal and the MealCredit Redemption Engine. It must support high availability and low latency to prevent queue stagnation (CON-4152F2C7C3).
+The POS clearance contract defines the interface between the Merchant POS terminal and the MealCredit Redemption Engine. It must support high availability and low latency to prevent queue stagnation ([CON-4152F2C7C3](../project_glossary.md#CON-4152F2C7C3)).
 
  Endpoint: `POST /api/v1/redemption/validate`
  Request Body:
@@ -265,7 +265,7 @@ The payout reconciliation process is handled asynchronously via Stripe Connect w
 
 ### 6.2. SOC2 Type II Structural Planning
 
- All administrative ledger operations and infrastructure changes are logged to AWS CloudTrail for SOC2 Type II evidence (CON-BB253DF0A2).
+ All administrative ledger operations and infrastructure changes are logged to AWS CloudTrail for SOC2 Type II evidence ([CON-BB253DF0A2](../project_glossary.md#CON-BB253DF0A2)).
  Access controls are reviewed and audited regularly.
  Incident response procedures are documented and tested.
 
@@ -374,8 +374,8 @@ Table: pii_vault.beneficiary_identity
 
 Access Control:
 - NGO Operator (ACT-09E028AEB0): Can read eligibility_status and legal_name_hash for their assigned beneficiaries. Cannot read raw PII.
-- Platform Administrator (ACT-086A974D63): Can read all fields for audit and compliance purposes (CON-81FB01F06B).
-- Financial Engine (CAP-TRANSACTION-FINANCIAL-ENGINE): Has NO access to this table. It only receives a beneficiary_uuid from the Identity & Access Management (CAP-IDENTITY-ACCESS-MANAGEMENT) service.
+- Platform Administrator (ACT-086A974D63): Can read all fields for audit and compliance purposes ([CON-81FB01F06B](../project_glossary.md#CON-81FB01F06B)).
+- Financial Engine ([CAP-TRANSACTION-FINANCIAL-ENGINE](../project_glossary.md#CAP-TRANSACTION-FINANCIAL-ENGINE)): Has NO access to this table. It only receives a beneficiary_uuid from the Identity & Access Management ([CAP-IDENTITY-ACCESS-MANAGEMENT](../project_glossary.md#CAP-IDENTITY-ACCESS-MANAGEMENT)) service.
 
 ##### 4.1.2. The Voucher Token (DynamoDB)
 
@@ -396,7 +396,7 @@ Table: voucher_state
 
 Data Isolation Enforcement:
 - The beneficiary_uuid in DynamoDB is a blind token. It has no semantic meaning and cannot be correlated with legal_name_hash in PostgreSQL without the Identity & Access Management service, which is strictly gated.
-- Merchant Partners (ACT-AF904DCFF9) only see the voucher_uuid and the amount_cents. They never see the beneficiary_uuid or any PII.
+- Merchant Partners ([ACT-AF904DCFF9](../project_glossary.md#ACT-AF904DCFF9)) only see the voucher_uuid and the amount_cents. They never see the beneficiary_uuid or any PII.
 
 #### 4.2. Metro Footprint Mapping
 
@@ -404,9 +404,9 @@ Each metropolitan footprint (SF, NYC, Chicago) is mapped to a specific AWS Regio
 
 ASSUMPTION: Metro Footprint Mapping
 The specific AWS region-to-footprint mapping (e.g., SF to us-west-2, NYC to us-east-1, CHI to us-east-2) is an open infrastructure decision pending the Infrastructure Topology & Deployment Design artifact.
-Cross-region replication for PII data is disabled to ensure strict residency. Financial ledger data (append-only) may be replicated for disaster recovery (CON-10F4381094), but PII remains local.
-DynamoDB tables are created per region. The API Orchestration Layer (SUR-85E4A5B6E7) routes requests to the correct region based on the beneficiary_uuid's geo-assignment.
-Redis Enterprise Clusters are deployed in each region for geo-indexing (SUR-43E71C4E2B) and caching. Cross-region Redis replication is disabled for PII.
+Cross-region replication for PII data is disabled to ensure strict residency. Financial ledger data (append-only) may be replicated for disaster recovery ([CON-10F4381094](../project_glossary.md#CON-10F4381094)), but PII remains local.
+DynamoDB tables are created per region. The API Orchestration Layer ([SUR-85E4A5B6E7](../project_glossary.md#SUR-85E4A5B6E7)) routes requests to the correct region based on the beneficiary_uuid's geo-assignment.
+Redis Enterprise Clusters are deployed in each region for geo-indexing ([SUR-43E71C4E2B](../project_glossary.md#SUR-43E71C4E2B)) and caching. Cross-region Redis replication is disabled for PII.
 
 #### 4.3. Anonymization for Analytics and DRV
 
@@ -435,19 +435,19 @@ Data Retention Policy:
 
 ### 5. Integration Patterns and API Contracts for Transaction & Financial Engine
 
-This section defines the synchronous and asynchronous integration patterns between the three primary data stores (DynamoDB, Aurora PostgreSQL, Redis) to support the Transaction & Financial Engine (CAP-TRANSACTION-FINANCIAL-ENGINE) and Dispute Resolution & Chargeback Management (CAP-DISPUTE-RESOLUTION-CHARGEBACK-MANAGEMENT). The design prioritizes the p99 latency requirement of 250ms (CON-6D5E21557B) for real-time POS clearance while ensuring eventual consistency for financial reconciliation (JNY-35EBA169C6).
+This section defines the synchronous and asynchronous integration patterns between the three primary data stores (DynamoDB, Aurora PostgreSQL, Redis) to support the Transaction & Financial Engine ([CAP-TRANSACTION-FINANCIAL-ENGINE](../project_glossary.md#CAP-TRANSACTION-FINANCIAL-ENGINE)) and Dispute Resolution & Chargeback Management ([CAP-DISPUTE-RESOLUTION-CHARGEBACK-MANAGEMENT](../project_glossary.md#CAP-DISPUTE-RESOLUTION-CHARGEBACK-MANAGEMENT)). The design prioritizes the p99 latency requirement of 250ms ([CON-6D5E21557B](../project_glossary.md#CON-6D5E21557B)) for real-time POS clearance while ensuring eventual consistency for financial reconciliation ([JNY-35EBA169C6](../project_glossary.md#JNY-35EBA169C6)).
 
 #### 5.1. Synchronous POS Clearance Contract (Real-Time)
 
 The real-time clearance path is the critical latency-sensitive surface. It must validate voucher state, deduct credits, and confirm redemption within 250ms p99.
 
 Integration Flow:
-1. Merchant POS sends a RedemptionRequest to the API Orchestration Layer (SUR-85E4A5B6E7).
+1. Merchant POS sends a RedemptionRequest to the API Orchestration Layer ([SUR-85E4A5B6E7](../project_glossary.md#SUR-85E4A5B6E7)).
 2. Orchestrator validates the request signature and extracts the VoucherID.
-3. Orchestrator queries Redis Enterprise Cluster (SUR-5B18C8719F) for the voucher state. This is the primary read path to ensure CHR > 92% (CON-527BFA6796).
+3. Orchestrator queries Redis Enterprise Cluster ([SUR-5B18C8719F](../project_glossary.md#SUR-5B18C8719F)) for the voucher state. This is the primary read path to ensure CHR > 92% (CON-527BFA6796).
    - Hit: Redis returns the voucher state (Amount, Status, Expiry, BeneficiaryID).
-   - Miss: Orchestrator falls back to DynamoDB (SUR-FA61592CD4) to read the BeneficiaryVoucherState item, updates the Redis cache, and proceeds.
-4. Orchestrator performs a conditional write to DynamoDB to update the voucher status from ISSUED to REDEEMED (or PARTIALLY_REDEEMED). This write is strongly consistent to prevent double-spending (CON-61EC670500).
+   - Miss: Orchestrator falls back to DynamoDB ([SUR-FA61592CD4](../project_glossary.md#SUR-FA61592CD4)) to read the BeneficiaryVoucherState item, updates the Redis cache, and proceeds.
+4. Orchestrator performs a conditional write to DynamoDB to update the voucher status from ISSUED to REDEEMED (or PARTIALLY_REDEEMED). This write is strongly consistent to prevent double-spending ([CON-61EC670500](../project_glossary.md#CON-61EC670500)).
 5. Orchestrator publishes a VoucherRedeemedEvent to the Event Bus for asynchronous processing.
 6. Orchestrator returns a `200 OK` with the redemption confirmation to the Merchant POS.
 
@@ -504,10 +504,10 @@ Data Model: Transaction_Ledger (Aurora PostgreSQL)
 
 #### 5.3. Dispute Resolution & Chargeback Management
 
-The dispute resolution flow (JNY-2B038C9362) relies on the immutable ledger and the voucher state in DynamoDB.
+The dispute resolution flow ([JNY-2B038C9362](../project_glossary.md#JNY-2B038C9362)) relies on the immutable ledger and the voucher state in DynamoDB.
 
 Integration Flow:
-1. Dispute Adjudicator (ACT-7BA340FF76) initiates a dispute via the Admin Dashboard (SUR-43E71C4E2B).
+1. Dispute Adjudicator ([ACT-7BA340FF76](../project_glossary.md#ACT-7BA340FF76)) initiates a dispute via the Admin Dashboard ([SUR-43E71C4E2B](../project_glossary.md#SUR-43E71C4E2B)).
 2. Orchestrator retrieves the Transaction_Ledger records for the disputed TransactionID from Aurora PostgreSQL.
 3. Orchestrator retrieves the current VoucherState from DynamoDB to verify the voucher's status and balance.
 4. Orchestrator validates the dispute against the Dispute_Policy table (defined in Security Architecture & Access Control artifact).
@@ -542,10 +542,10 @@ API Contract: DisputeResolutionResponse
 #### 5.5. Knowledge Gaps and Assumptions
 
 KNOWLEDGE_GAP: Dispute Adjudicator Access Control
-The specific RBAC permissions for the Dispute Adjudicator (ACT-7BA340FF76) to initiate and resolve disputes are not defined in this artifact. This is covered in the Security Architecture & Access Control artifact.
+The specific RBAC permissions for the Dispute Adjudicator ([ACT-7BA340FF76](../project_glossary.md#ACT-7BA340FF76)) to initiate and resolve disputes are not defined in this artifact. This is covered in the Security Architecture & Access Control artifact.
 
 KNOWLEDGE_GAP: Stripe Webhook Latency
-The exact latency contribution of Stripe Webhook processing to the overall POS clearance time is not quantified. This must be measured and optimized to ensure the 150ms target (CON-06232374D9) is met.
+The exact latency contribution of Stripe Webhook processing to the overall POS clearance time is not quantified. This must be measured and optimized to ensure the 150ms target ([CON-06232374D9](../project_glossary.md#CON-06232374D9)) is met.
 
 ASSUMPTION: Event Bus Technology
 The specific event bus technology (e.g., AWS EventBridge, Kafka) is not specified. The design assumes a standard event bus with at-least-once delivery semantics. The implementation details are deferred to the Integration Adapters & External Contracts artifact.

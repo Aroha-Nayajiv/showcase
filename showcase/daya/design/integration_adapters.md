@@ -2,19 +2,19 @@
 
 ## 1. Stripe Issuing Proxy & Virtual Card Provisioning API Contract
 
-This artifact defines the internal API contract for the Stripe Issuing Proxy, enabling the secure provisioning of virtual culinary credits for Beneficiaries (ACT-ADA6716160). The design strictly enforces PCI-DSS Level 1 compliance (CON-66390130AA) by ensuring zero raw card data touches MealCredit servers, relying entirely on Stripe Elements/Checkout for any sensitive data entry.
+This artifact defines the internal API contract for the Stripe Issuing Proxy, enabling the secure provisioning of virtual culinary credits for Beneficiaries ([ACT-ADA6716160](../project_glossary.md#ACT-ADA6716160)). The design strictly enforces PCI-DSS Level 1 compliance ([CON-66390130AA](../project_glossary.md#CON-66390130AA)) by ensuring zero raw card data touches MealCredit servers, relying entirely on Stripe Elements/Checkout for any sensitive data entry.
 
 ### 1.1. Architectural Boundary & Compliance Posture
 
 The Stripe Issuing Proxy acts as a secure adapter between the internal event-driven serverless architecture and the external Stripe Issuing API. Its primary responsibility is to translate internal credit pool allocations into Stripe Issuing Card objects without ever handling, logging, or storing raw Primary Account Numbers (PANs), CVVs, or Expiry dates.
 
  Compliance Constraint: All card data entry must occur client-side via Stripe Elements or hosted checkout flows. The MealCredit backend only receives and processes Stripe-generated tokens.
- Data Isolation: Beneficiary demographic status and legal names are cryptographically segregated from public-facing transaction data (CON-0A0288EED4, CON-92F07E31B0). The proxy only handles the financial instrument mapping.
- Latency Target: Card provisioning requests must be processed asynchronously to maintain the p99 latency target of 250ms for POS clearance (CON-6D5E21557B, CON-7F03CF540E). Provisioning is a setup action, not a real-time transaction, but the API must return immediately with a correlation ID for status polling.
+ Data Isolation: Beneficiary demographic status and legal names are cryptographically segregated from public-facing transaction data ([CON-0A0288EED4](../project_glossary.md#CON-0A0288EED4), [CON-92F07E31B0](../project_glossary.md#CON-92F07E31B0)). The proxy only handles the financial instrument mapping.
+ Latency Target: Card provisioning requests must be processed asynchronously to maintain the p99 latency target of 250ms for POS clearance ([CON-6D5E21557B](../project_glossary.md#CON-6D5E21557B), [CON-7F03CF540E](../project_glossary.md#CON-7F03CF540E)). Provisioning is a setup action, not a real-time transaction, but the API must return immediately with a correlation ID for status polling.
 
 ### 1.2. Internal API Contract: Card Provisioning
 
-The following REST API endpoint is defined for the internal API Orchestration Layer (SUR-85E4A5B6E7) to trigger virtual card creation for a verified Beneficiary.
+The following REST API endpoint is defined for the internal API Orchestration Layer ([SUR-85E4A5B6E7](../project_glossary.md#SUR-85E4A5B6E7)) to trigger virtual card creation for a verified Beneficiary.
 
 Endpoint: `POST /v1/issuing/cards`
 
@@ -106,7 +106,7 @@ Latency Consideration: Webhook processing must be idempotent to handle duplicate
 
 ## 2. POS Gateway Webhook Integration Contract
 
-This section defines the technical contract for the Stripe Webhook Adapter, which processes real-time POS transaction events. The adapter acts as the bridge between the external Payment Processing Surface (SUR-5B18C8719F) and the internal API Orchestration Layer (SUR-85E4A5B6E7), ensuring strict PCI-DSS Level 1 compliance by ensuring zero raw card data touches MealCredit servers, relying entirely on Stripe Elements and Stripe Issuing tokens.
+This section defines the technical contract for the Stripe Webhook Adapter, which processes real-time POS transaction events. The adapter acts as the bridge between the external Payment Processing Surface ([SUR-5B18C8719F](../project_glossary.md#SUR-5B18C8719F)) and the internal API Orchestration Layer ([SUR-85E4A5B6E7](../project_glossary.md#SUR-85E4A5B6E7)), ensuring strict PCI-DSS Level 1 compliance by ensuring zero raw card data touches MealCredit servers, relying entirely on Stripe Elements and Stripe Issuing tokens.
 
 ### 2.2. Event Schema & Payload Mapping
 
@@ -156,18 +156,18 @@ Idempotency Check: Before processing, the adapter MUST check if the stripe_event
 
 ## 3. Offline Token Verification Contract
 
-This contract defines the cryptographic verification logic and state reconciliation process for offline QR/barcode fallback mechanisms. It ensures that MealCredit transactions can proceed with sub-150ms latency (CON-06232374D9) even during network partitions, while strictly preventing replay attacks (CON-AA83B13877) and maintaining financial ledger consistency (CON-10F4381094).
+This contract defines the cryptographic verification logic and state reconciliation process for offline QR/barcode fallback mechanisms. It ensures that MealCredit transactions can proceed with sub-150ms latency ([CON-06232374D9](../project_glossary.md#CON-06232374D9)) even during network partitions, while strictly preventing replay attacks ([CON-AA83B13877](../project_glossary.md#CON-AA83B13877)) and maintaining financial ledger consistency ([CON-10F4381094](../project_glossary.md#CON-10F4381094)).
 
 ### 3.1. Cryptographic Token Structure
 
-The offline token is a self-contained, time-bound JWT (JSON Web Token) signed using the project's master signing key. It is generated by the Beneficiary's Expo mobile application (ACT-ADA6716160) and scanned by the Merchant's (ACT-AF904DCFF9) POS device.
+The offline token is a self-contained, time-bound JWT (JSON Web Token) signed using the project's master signing key. It is generated by the Beneficiary's Expo mobile application ([ACT-ADA6716160](../project_glossary.md#ACT-ADA6716160)) and scanned by the Merchant's ([ACT-AF904DCFF9](../project_glossary.md#ACT-AF904DCFF9)) POS device.
 
 Token Schema:
 
 | Field | Type | Description | Constraint |
 |---|---|---|---|
 | iss | String | Issuer ID | Must be mealcredit-offline |
-| sub | String | Beneficiary UUID | Hashed/Anonymized ID (CON-0A0288EED4) |
+| sub | String | Beneficiary UUID | Hashed/Anonymized ID ([CON-0A0288EED4](../project_glossary.md#CON-0A0288EED4)) |
 | iat | Integer | Issued At (Unix Timestamp) | Must be within T_WINDOW of current time |
 | exp | Integer | Expiration (Unix Timestamp) | iat + T_WINDOW |
 | nonce | String | Random Nonce | 128-bit random string to prevent identical token replay |
@@ -181,9 +181,9 @@ Assumption: T_WINDOW is set to 60 seconds. MASTER_SIGNING_KEY is rotated quarter
 The Offline Token Verification Adapter (part of the API Orchestration Layer, SUR-85E4A5B6E7) performs the following synchronous checks upon receiving a scanned token:
 
 1. Signature Validation: Verify sig against the payload using the current active MASTER_SIGNING_KEY. If invalid, reject immediately (401 Unauthorized).
-2. Time-Bound Check: Ensure exp > current_time and iat < current_time. Reject if outside the T_WINDOW to prevent replay attacks (CON-AA83B13877).
-3. Nonce Uniqueness (Local Cache): Check the local Redis cache (SUR-5B18C8719F) for the nonce. If present, reject as a replay attempt. If absent, add nonce to cache with a TTL of T_WINDOW + 10s.
-4. Credit Pool Validation: Query the Financial Ledger (SUR-FA61592CD4) to ensure the beneficiary_credit_pool has sufficient balance for amt. This query must be optimized for p99 latency < 250ms (CON-6D5E21557B).
+2. Time-Bound Check: Ensure exp > current_time and iat < current_time. Reject if outside the T_WINDOW to prevent replay attacks ([CON-AA83B13877](../project_glossary.md#CON-AA83B13877)).
+3. Nonce Uniqueness (Local Cache): Check the local Redis cache ([SUR-5B18C8719F](../project_glossary.md#SUR-5B18C8719F)) for the nonce. If present, reject as a replay attempt. If absent, add nonce to cache with a TTL of T_WINDOW + 10s.
+4. Credit Pool Validation: Query the Financial Ledger ([SUR-FA61592CD4](../project_glossary.md#SUR-FA61592CD4)) to ensure the beneficiary_credit_pool has sufficient balance for amt. This query must be optimized for p99 latency < 250ms ([CON-6D5E21557B](../project_glossary.md#CON-6D5E21557B)).
 
 ### 3.3. Fallback State Reconciliation
 
@@ -194,12 +194,12 @@ In the event of a network partition where the central ledger is unreachable, the
 3. Reconciliation Process:
  When connectivity is restored, the POS device batches pending transactions and pushes them to the central `POST /v1/reconciliation/offline` endpoint.
  The central system validates the signatures and nonces again (to prevent double-spending across multiple POS devices).
- Valid transactions are committed to the Aurora PostgreSQL ledger (SUR-FA61592CD4).
- Invalid transactions (e.g., double-spent nonces) are flagged for manual review by the Dispute Adjudicator (ACT-7BA340FF76).
+ Valid transactions are committed to the Aurora PostgreSQL ledger ([SUR-FA61592CD4](../project_glossary.md#SUR-FA61592CD4)).
+ Invalid transactions (e.g., double-spent nonces) are flagged for manual review by the Dispute Adjudicator ([ACT-7BA340FF76](../project_glossary.md#ACT-7BA340FF76)).
 
 ### 3.4. Security & Compliance Constraints
 
- PCI-DSS Level 1 (CON-66390130AA): Zero raw card data is stored or transmitted. The token contains only anonymized beneficiary IDs and transaction amounts.
+ PCI-DSS Level 1 ([CON-66390130AA](../project_glossary.md#CON-66390130AA)): Zero raw card data is stored or transmitted. The token contains only anonymized beneficiary IDs and transaction amounts.
  Data Isolation (CON-0A0288EED4): Beneficiary demographic data is never included in the token payload.
  Replay Attack Prevention (CON-AA83B13877): The combination of time-bound expiration and unique nonces ensures that a captured token cannot be reused.
 
@@ -217,7 +217,7 @@ This section defines the Aurora PostgreSQL schema for SUR-FA61592CD4, focusing o
 
 ### 4.1. Beneficiary Identity & PII Segregation
 
-To satisfy CON-0A0288EED4 and CON-FCFF86A326 (Classify all beneficiary-related data as 'Highly Sensitive'), the schema splits beneficiary identity into two distinct tables. The beneficiary_pii table is restricted to cryptographic hashing layers only, while the beneficiary_credit_profile table holds operational data.
+To satisfy CON-0A0288EED4 and [CON-FCFF86A326](../project_glossary.md#CON-FCFF86A326) (Classify all beneficiary-related data as 'Highly Sensitive'), the schema splits beneficiary identity into two distinct tables. The beneficiary_pii table is restricted to cryptographic hashing layers only, while the beneficiary_credit_profile table holds operational data.
 
 Table: beneficiary_pii
 beneficiary_id (UUID, PK): Stable local identifier.
@@ -236,14 +236,14 @@ last_transaction_id (UUID): Reference to the last processed transaction.
 
 ### 4.2. Financial Ledger & Credit Pools
 
-The financial ledger must be append-only to ensure auditability (CON-1762EA5021, CON-6061FCCA83). Credit pools track the aggregate funds from donors (CON-2059B17FB2, CON-7031BE57B3).
+The financial ledger must be append-only to ensure auditability ([CON-1762EA5021](../project_glossary.md#CON-1762EA5021), [CON-6061FCCA83](../project_glossary.md#CON-6061FCCA83)). Credit pools track the aggregate funds from donors ([CON-2059B17FB2](../project_glossary.md#CON-2059B17FB2), [CON-7031BE57B3](../project_glossary.md#CON-7031BE57B3)).
 
 Table: credit_pools
 pool_id (UUID, PK): Unique identifier for the donor-funded pool.
 donor_id (UUID, FK to donors): The donor who funded this pool.
 total_funded (NUMERIC(15, 4), NOT NULL): Total amount funded.
 total_redeemed (NUMERIC(15, 4), NOT NULL, DEFAULT 0): Total amount redeemed.
-utilization_rate (NUMERIC(5, 4), GENERATED ALWAYS AS (total_redeemed / total_funded) STORED): Computed column for monitoring (CON-2059B17FB2).
+utilization_rate (NUMERIC(5, 4), GENERATED ALWAYS AS (total_redeemed / total_funded) STORED): Computed column for monitoring ([CON-2059B17FB2](../project_glossary.md#CON-2059B17FB2)).
 status (ENUM: 'ACTIVE', 'EXHAUSTED', 'FROZEN'): Current state of the pool.
 
 Table: financial_ledger
@@ -259,14 +259,14 @@ previous_hash (VARCHAR(64), NOT NULL): Hash of the previous entry.
 
 ### 4.3. Data Isolation & Access Control
 
-Row-Level Security (RLS): Enabled on all tables. beneficiary_pii is accessible only by the `Platform Administrator` (ACT-086A974D63) role. beneficiary_credit_profile is accessible by `NGO Operator` (ACT-09E028AEB0) and Merchant (ACT-AF904DCFF9) roles, but only for their assigned beneficiaries/merchants.
+Row-Level Security (RLS): Enabled on all tables. beneficiary_pii is accessible only by the `Platform Administrator` ([ACT-086A974D63](../project_glossary.md#ACT-086A974D63)) role. beneficiary_credit_profile is accessible by `NGO Operator` ([ACT-09E028AEB0](../project_glossary.md#ACT-09E028AEB0)) and Merchant ([ACT-AF904DCFF9](../project_glossary.md#ACT-AF904DCFF9)) roles, but only for their assigned beneficiaries/merchants.
 Column-Level Security: legal_name_hash and demographic_status_hash are restricted to the `Platform Administrator` role.
-Audit Logging: All mutations to financial_ledger are logged to AWS CloudTrail (CON-BB253DF0A2, CON-FBBBF07295).
+Audit Logging: All mutations to financial_ledger are logged to AWS CloudTrail ([CON-BB253DF0A2](../project_glossary.md#CON-BB253DF0A2), [CON-FBBBF07295](../project_glossary.md#CON-FBBBF07295)).
 
 ### 4.4. Latency & Performance Considerations
 
 - Indexing: financial_ledger is partitioned by timestamp (monthly) to optimize query performance for recent transactions. Indexes on beneficiary_id and pool_id are created to support fast balance lookups.
-- Connection Pooling: Aurora PostgreSQL Proxy is used to manage connections, ensuring p99 latency below 250ms for voucher creation and scanning callbacks (CON-6D5E21557B, CON-7F03CF540E).
+- Connection Pooling: Aurora PostgreSQL Proxy is used to manage connections, ensuring p99 latency below 250ms for voucher creation and scanning callbacks (CON-6D5E21557B, [CON-7F03CF540E](../project_glossary.md#CON-7F03CF540E)).
 
 ## 5. API Orchestration Layer Contract (SUR-85E4A5B6E7)
 
@@ -284,7 +284,7 @@ Service Boundaries:
  Dependency: Relies on the `Stripe Issuing Proxy Contract` (sibling artifact) for specific API calls to Stripe.
 
 2. POS Gateway Service (PGS):
- Responsibility: Handles real-time POS transaction webhooks from Stripe. It validates the webhook signature, extracts the transaction details, and publishes a TransactionCompleted event to the internal event bus. It also handles the synchronous response to the POS terminal to ensure sub-150ms latency (CON-06232374D9).
+ Responsibility: Handles real-time POS transaction webhooks from Stripe. It validates the webhook signature, extracts the transaction details, and publishes a TransactionCompleted event to the internal event bus. It also handles the synchronous response to the POS terminal to ensure sub-150ms latency ([CON-06232374D9](../project_glossary.md#CON-06232374D9)).
  Boundary: PGS is a high-throughput, low-latency service. It does not perform complex business logic; it only validates, transforms, and publishes events.
  Dependency: Relies on the `POS Gateway Webhook Integration Contract` (sibling artifact) for webhook schema.
 
@@ -366,15 +366,15 @@ Key Events:
 
 ### 5.3. Latency & Throughput SLAs
 
-To prevent restaurant queue stagnation (CON-4152F2C7C3, CON-5D64EBC654), the following SLAs are enforced:
+To prevent restaurant queue stagnation ([CON-4152F2C7C3](../project_glossary.md#CON-4152F2C7C3), [CON-5D64EBC654](../project_glossary.md#CON-5D64EBC654)), the following SLAs are enforced:
 
  POS Clearance Latency: The end-to-end latency from card tap to ledger entry must average below 150ms (CON-06232374D9) and maintain a p99 latency below 250ms (CON-6D5E21557B, CON-7F03CF540E) under 10,000 concurrent connections.
  Throughput: The system must support a minimum of 500 transactions per second (TPS) across the 3 initial metropolitan footprints (SF, NYC, Chicago).
- Availability: 99.99% operational uptime (CON-BF1CD5707E, CON-FD21121DD5).
+ Availability: 99.99% operational uptime ([CON-BF1CD5707E](../project_glossary.md#CON-BF1CD5707E), [CON-FD21121DD5](../project_glossary.md#CON-FD21121DD5)).
 
 ### 5.5. Error Handling & Resilience
 
- Idempotency: All event consumers must be idempotent to handle duplicate events from the event bus. The TransactionCompleted event must include a unique transaction_hash to prevent double-spending (CON-61EC670500, CON-72D9CECAF8).
+ Idempotency: All event consumers must be idempotent to handle duplicate events from the event bus. The TransactionCompleted event must include a unique transaction_hash to prevent double-spending ([CON-61EC670500](../project_glossary.md#CON-61EC670500), [CON-72D9CECAF8](../project_glossary.md#CON-72D9CECAF8)).
  Dead Letter Queues (DLQ): All event consumers must have a DLQ configured. Events that fail processing after 3 retries must be moved to the DLQ for manual inspection.
  Circuit Breakers: The Stripe Proxy Service must implement circuit breakers to prevent cascading failures if Stripe's API is unavailable. The fallback mechanism for offline transactions (OVS) must be independent of the online Stripe API.
 

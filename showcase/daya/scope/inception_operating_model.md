@@ -7,50 +7,50 @@ The core value exchange relies on the seamless interaction between the three pri
 #### Donor (ACT-80C62C7814)
 **Primary Interaction Boundary:** The Donor initiates the value chain by providing real-time financial micro-donations. Their interaction is limited to funding activation and impact visualization.
 **Key Responsibilities:**
-- Activate funding via the Donor Onboarding & Funding Activation journey (JNY-62D850E94B).
-- Configure donation round-ups and redemption history via multi-modal paths (voice, tap, scan) as per CON-2D70EDCDEE.
-- Receive anonymized impact receipts correlated with beneficiary redemption events without PII linkage, using UUIDv4 mapping for analytics (CON-23A501C051).
-**Strategic Constraint:** Donor data must be strictly segregated from beneficiary demographic data to prevent de-anonymization attacks (CON-C22D030D21).
+- Activate funding via the Donor Onboarding & Funding Activation journey ([JNY-62D850E94B](../project_glossary.md#JNY-62D850E94B)).
+- Configure donation round-ups and redemption history via multi-modal paths (voice, tap, scan) as per [CON-2D70EDCDEE](../project_glossary.md#CON-2D70EDCDEE).
+- Receive anonymized impact receipts correlated with beneficiary redemption events without PII linkage, using UUIDv4 mapping for analytics ([CON-23A501C051](../project_glossary.md#CON-23A501C051)).
+**Strategic Constraint:** Donor data must be strictly segregated from beneficiary demographic data to prevent de-anonymization attacks ([CON-C22D030D21](../project_glossary.md#CON-C22D030D21)).
 
 #### Beneficiary (ACT-ADA6716160)
 **Primary Interaction Boundary:** The Beneficiary is the end-user of the culinary credits, interacting with the platform primarily through the NGO Operator for eligibility and through Merchants for redemption.
 **Key Responsibilities:**
-- Undergo eligibility verification and offboarding via NGO Operator governance (JNY-4C4BA15817).
-- Redeem credits at Merchant locations via the Beneficiary Eligibility & Voucher Redemption journey (JNY-E82B8A88D8).
-- Utilize offline fallback interfaces that are intuitive and accessible (CON-FA7A13E601).
-**Strategic Constraint:** All beneficiary-related data is classified as 'Highly Sensitive' and restricted to cryptographic hashing layers only (CON-2788862587). Legal names and demographic status are cryptographically segregated from public-facing data (CON-92F07E31B0).
+- Undergo eligibility verification and offboarding via NGO Operator governance ([JNY-4C4BA15817](../project_glossary.md#JNY-4C4BA15817)).
+- Redeem credits at Merchant locations via the Beneficiary Eligibility & Voucher Redemption journey ([JNY-E82B8A88D8](../project_glossary.md#JNY-E82B8A88D8)).
+- Utilize offline fallback interfaces that are intuitive and accessible ([CON-FA7A13E601](../project_glossary.md#CON-FA7A13E601)).
+**Strategic Constraint:** All beneficiary-related data is classified as 'Highly Sensitive' and restricted to cryptographic hashing layers only ([CON-2788862587](../project_glossary.md#CON-2788862587)). Legal names and demographic status are cryptographically segregated from public-facing data ([CON-92F07E31B0](../project_glossary.md#CON-92F07E31B0)).
 
 #### Merchant (ACT-AF904DCFF9)
 **Primary Interaction Boundary:** The Merchant (Restaurant) partners fulfill the culinary credits, acting as the redemption endpoint. Their interaction is focused on POS integration and payout management.
 **Key Responsibilities:**
-- Complete onboarding and POS integration via the Merchant Onboarding & POS Integration journey (JNY-356F465DB3).
-- Process redemptions in real-time, ensuring latency optimization to prevent queue stagnation (CON-5D64EBC654).
-- Manage payout errors and handle refunds via the Merchant Payout Error Handling Flow (JNY-90B07623FB) and Merchant-Beneficiary Refund Flow (JNY-E5F45D37C6).
-**Strategic Constraint:** Merchants must adhere to strict data retention policies, ensuring donor transaction history is not linked to redemption analytics (CON-4820FAD5A9).
+- Complete onboarding and POS integration via the Merchant Onboarding & POS Integration journey ([JNY-356F465DB3](../project_glossary.md#JNY-356F465DB3)).
+- Process redemptions in real-time, ensuring latency optimization to prevent queue stagnation ([CON-5D64EBC654](../project_glossary.md#CON-5D64EBC654)).
+- Manage payout errors and handle refunds via the Merchant Payout Error Handling Flow ([JNY-90B07623FB](../project_glossary.md#JNY-90B07623FB)) and Merchant-Beneficiary Refund Flow ([JNY-E5F45D37C6](../project_glossary.md#JNY-E5F45D37C6)).
+**Strategic Constraint:** Merchants must adhere to strict data retention policies, ensuring donor transaction history is not linked to redemption analytics ([CON-4820FAD5A9](../project_glossary.md#CON-4820FAD5A9)).
 
 #### NGO Operator (ACT-09E028AEB0)
 **Primary Interaction Boundary:** The NGO Operator acts as the trusted intermediary between the Platform and the Beneficiary community. They are responsible for local compliance, beneficiary onboarding, and offboarding.
 **Key Responsibilities:**
-- Manage NGO Governance and Beneficiary Offboarding (JNY-4C4BA15817).
-- Oversee Merchant & NGO Operations (CAP-MERCHANT-NGO-OPERATIONS).
+- Manage NGO Governance and Beneficiary Offboarding ([JNY-4C4BA15817](../project_glossary.md#JNY-4C4BA15817)).
+- Oversee Merchant & NGO Operations ([CAP-MERCHANT-NGO-OPERATIONS](../project_glossary.md#CAP-MERCHANT-NGO-OPERATIONS)).
 - Ensure local compliance with jurisdictional regulations in SF, NYC, and Chicago.
 **Strategic Constraint:** NGO Operators must ensure that beneficiary eligibility decisions are transparent and auditable, while maintaining the anonymity of the donor-beneficiary link.
 
 #### Platform Administrator (ACT-086A974D63)
 **Primary Interaction Boundary:** The Platform Administrator oversees the technical and operational integrity of the MealCredit platform. They are responsible for system-wide configuration, security, and compliance.
 **Key Responsibilities:**
-- Manage Identity & Access Management (CAP-IDENTITY-ACCESS-MANAGEMENT) for all actor roles.
-- Oversee Compliance, Security & Audit (CAP-COMPLIANCE-SECURITY-AUDIT) to ensure PCI-DSS Level 1 and SOC2 Type II adherence.
-- Monitor system performance, including Credit Pool Utilization Rate (CON-7031BE57B3) and Donation-to-Redemption Velocity (CON-F89C70071E).
-**Strategic Constraint:** The Platform Administrator must ensure that the infrastructure supports 99.99% operational uptime across AWS multi-AZ configurations (CON-FD21121DD5) and that all administrative ledger operations are logged to AWS CloudTrail for SOC2 Type II evidence (CON-FBBBF07295).
+- Manage Identity & Access Management ([CAP-IDENTITY-ACCESS-MANAGEMENT](../project_glossary.md#CAP-IDENTITY-ACCESS-MANAGEMENT)) for all actor roles.
+- Oversee Compliance, Security & Audit ([CAP-COMPLIANCE-SECURITY-AUDIT](../project_glossary.md#CAP-COMPLIANCE-SECURITY-AUDIT)) to ensure PCI-DSS Level 1 and SOC2 Type II adherence.
+- Monitor system performance, including Credit Pool Utilization Rate ([CON-7031BE57B3](../project_glossary.md#CON-7031BE57B3)) and Donation-to-Redemption Velocity ([CON-F89C70071E](../project_glossary.md#CON-F89C70071E)).
+**Strategic Constraint:** The Platform Administrator must ensure that the infrastructure supports 99.99% operational uptime across AWS multi-AZ configurations ([CON-FD21121DD5](../project_glossary.md#CON-FD21121DD5)) and that all administrative ledger operations are logged to AWS CloudTrail for SOC2 Type II evidence ([CON-FBBBF07295](../project_glossary.md#CON-FBBBF07295)).
 
 #### Dispute Adjudicator (ACT-7BA340FF76)
 **Primary Interaction Boundary:** The Dispute Adjudicator handles edge cases and conflicts that cannot be resolved through automated systems or standard operational flows. This role is critical for maintaining trust in the financial and social impact aspects of the platform.
 **Key Responsibilities:**
-- Manage Beneficiary-Platform Dispute Flow (JNY-2B038C9362) and Platform-NGO Fraud Investigation Flow (JNY-CA74D631DC).
-- Oversee Dispute Resolution & Chargeback Management (CAP-DISPUTE-RESOLUTION-CHARGEBACK-MANAGEMENT).
-- Investigate and resolve fraud detection and prevention screening issues (CAP-FRAUD-DETECTION-FRAUD-PREVENTION-SCREENING).
-**Strategic Constraint:** Dispute Adjudicator decisions must be fully auditable and aligned with financial regulations governing quasi-cash instruments, including unclaimed property and escheatment laws (CON-B1DFEBEC8C).
+- Manage Beneficiary-Platform Dispute Flow ([JNY-2B038C9362](../project_glossary.md#JNY-2B038C9362)) and Platform-NGO Fraud Investigation Flow ([JNY-CA74D631DC](../project_glossary.md#JNY-CA74D631DC)).
+- Oversee Dispute Resolution & Chargeback Management ([CAP-DISPUTE-RESOLUTION-CHARGEBACK-MANAGEMENT](../project_glossary.md#CAP-DISPUTE-RESOLUTION-CHARGEBACK-MANAGEMENT)).
+- Investigate and resolve fraud detection and prevention screening issues ([CAP-FRAUD-DETECTION-FRAUD-PREVENTION-SCREENING](../project_glossary.md#CAP-FRAUD-DETECTION-FRAUD-PREVENTION-SCREENING)).
+**Strategic Constraint:** Dispute Adjudicator decisions must be fully auditable and aligned with financial regulations governing quasi-cash instruments, including unclaimed property and escheatment laws ([CON-B1DFEBEC8C](../project_glossary.md#CON-B1DFEBEC8C)).
 
 ### 1.2. NGO Operator Legal Entity Structure
 
@@ -67,12 +67,12 @@ The following matrix maps each actor role to the core capabilities they interact
 
 | Actor Role | Primary Capabilities | Key Constraints & Concerns |
 | :--- | :--- | :--- |
-| Donor (ACT-80C62C7814) | CAP-IDENTITY-ACCESS-MANAGEMENT, CAP-MARKETPLACE-MATCHMAKING | CON-23A501C051 (Anonymity), CON-C22D030D21 (FTC Guidelines) |
-| Beneficiary (ACT-ADA6716160) | CAP-MARKETPLACE-MATCHMAKING, CAP-MERCHANT-NGO-OPERATIONS | CON-2788862587 (Data Sensitivity), CON-92F07E31B0 (Data Isolation) |
-| Merchant (ACT-AF904DCFF9) | CAP-MERCHANT-NGO-OPERATIONS, CAP-TRANSACTION-FINANCIAL-ENGINE | CON-5D64EBC654 (Latency), CON-4820FAD5A9 (Data Retention) |
-| NGO Operator (ACT-09E028AEB0) | CAP-MERCHANT-NGO-OPERATIONS, CAP-IDENTITY-ACCESS-MANAGEMENT | Local Compliance, Beneficiary Eligibility |
-| Platform Administrator (ACT-086A974D63) | CAP-COMPLIANCE-SECURITY-AUDIT, CAP-IDENTITY-ACCESS-MANAGEMENT | PCI-DSS Level 1, SOC2 Type II, CON-FD21121DD5 (Uptime) |
-| Dispute Adjudicator (ACT-7BA340FF76) | CAP-DISPUTE-RESOLUTION-CHARGEBACK-MANAGEMENT, CAP-FRAUD-DETECTION-FRAUD-PREVENTION-SCREENING | CON-B1DFEBEC8C (Quasi-Cash Regulations) |
+| Donor ([ACT-80C62C7814](../project_glossary.md#ACT-80C62C7814)) | [CAP-IDENTITY-ACCESS-MANAGEMENT](../project_glossary.md#CAP-IDENTITY-ACCESS-MANAGEMENT), [CAP-MARKETPLACE-MATCHMAKING](../project_glossary.md#CAP-MARKETPLACE-MATCHMAKING) | [CON-23A501C051](../project_glossary.md#CON-23A501C051) (Anonymity), [CON-C22D030D21](../project_glossary.md#CON-C22D030D21) (FTC Guidelines) |
+| Beneficiary ([ACT-ADA6716160](../project_glossary.md#ACT-ADA6716160)) | [CAP-MARKETPLACE-MATCHMAKING](../project_glossary.md#CAP-MARKETPLACE-MATCHMAKING), [CAP-MERCHANT-NGO-OPERATIONS](../project_glossary.md#CAP-MERCHANT-NGO-OPERATIONS) | [CON-2788862587](../project_glossary.md#CON-2788862587) (Data Sensitivity), [CON-92F07E31B0](../project_glossary.md#CON-92F07E31B0) (Data Isolation) |
+| Merchant ([ACT-AF904DCFF9](../project_glossary.md#ACT-AF904DCFF9)) | CAP-MERCHANT-NGO-OPERATIONS, [CAP-TRANSACTION-FINANCIAL-ENGINE](../project_glossary.md#CAP-TRANSACTION-FINANCIAL-ENGINE) | [CON-5D64EBC654](../project_glossary.md#CON-5D64EBC654) (Latency), [CON-4820FAD5A9](../project_glossary.md#CON-4820FAD5A9) (Data Retention) |
+| NGO Operator ([ACT-09E028AEB0](../project_glossary.md#ACT-09E028AEB0)) | CAP-MERCHANT-NGO-OPERATIONS, CAP-IDENTITY-ACCESS-MANAGEMENT | Local Compliance, Beneficiary Eligibility |
+| Platform Administrator ([ACT-086A974D63](../project_glossary.md#ACT-086A974D63)) | [CAP-COMPLIANCE-SECURITY-AUDIT](../project_glossary.md#CAP-COMPLIANCE-SECURITY-AUDIT), CAP-IDENTITY-ACCESS-MANAGEMENT | PCI-DSS Level 1, SOC2 Type II, [CON-FD21121DD5](../project_glossary.md#CON-FD21121DD5) (Uptime) |
+| Dispute Adjudicator ([ACT-7BA340FF76](../project_glossary.md#ACT-7BA340FF76)) | [CAP-DISPUTE-RESOLUTION-CHARGEBACK-MANAGEMENT](../project_glossary.md#CAP-DISPUTE-RESOLUTION-CHARGEBACK-MANAGEMENT), [CAP-FRAUD-DETECTION-FRAUD-PREVENTION-SCREENING](../project_glossary.md#CAP-FRAUD-DETECTION-FRAUD-PREVENTION-SCREENING) | [CON-B1DFEBEC8C](../project_glossary.md#CON-B1DFEBEC8C) (Quasi-Cash Regulations) |
 
 ### 1.4. Strategic Roadmap & Partnership Requirements
 
@@ -85,7 +85,7 @@ The operating model supports a phased rollout across the three initial metropoli
 **Partnership requirements include:**
 - **NGO Partners:** Local non-profit organizations with established beneficiary networks in each metro footprint.
 - **Merchant Partners:** Commercial restaurant establishments willing to integrate with the MealCredit POS gateway.
-- **Payment Processors:** Stripe Connected Account services for PCI-DSS Level 1 compliant payment processing (CON-66390130AA, CON-62097EBBF3).
+- **Payment Processors:** Stripe Connected Account services for PCI-DSS Level 1 compliant payment processing ([CON-66390130AA](../project_glossary.md#CON-66390130AA), [CON-62097EBBF3](../project_glossary.md#CON-62097EBBF3)).
 
 ### 2.1 Actor-Capability Mapping Matrix
 
@@ -93,30 +93,30 @@ The following matrix defines the primary interaction boundaries for each actor r
 
 | Actor Role | Capability | Operational Boundary |
 | :--- | :--- | :--- |
-| Donor (ACT-80C62C7814) | Transaction & Financial Engine | Initiates micro-donations; receives anonymized impact receipts. No access to beneficiary PII. |
+| Donor ([ACT-80C62C7814](../project_glossary.md#ACT-80C62C7814)) | Transaction & Financial Engine | Initiates micro-donations; receives anonymized impact receipts. No access to beneficiary PII. |
 | | Marketplace & Matchmaking | Views high-level, anonymized impact metrics (e.g., meals funded) to drive engagement. |
-| Beneficiary (ACT-ADA6716160) | Identity & Access Management | Onboarded via NGO Operator; manages personal device security (SecureStore) and redemption preferences. |
+| Beneficiary ([ACT-ADA6716160](../project_glossary.md#ACT-ADA6716160)) | Identity & Access Management | Onboarded via NGO Operator; manages personal device security (SecureStore) and redemption preferences. |
 | | Marketplace & Matchmaking | Discovers participating Merchant Partners (Restaurants) based on location and cuisine preferences. |
 | | Transaction & Financial Engine | Redeems culinary credits via POS scan/tap; receives real-time clearance confirmation. |
-| Merchant (ACT-AF904DCFF9) | Merchant & NGO Operations | Manages POS integration, menu availability, and payout reconciliation. |
+| Merchant ([ACT-AF904DCFF9](../project_glossary.md#ACT-AF904DCFF9)) | Merchant & NGO Operations | Manages POS integration, menu availability, and payout reconciliation. |
 | | Transaction & Financial Engine | Processes redemption callbacks; handles refund/reversal requests initiated by Beneficiaries. |
 | | Merchant Payout Failure & Error Handling | Receives alerts for failed payouts; initiates manual reconciliation if automated clearing fails. |
-| NGO Operator (ACT-09E028AEB0) | Identity & Access Management | Verifies Beneficiary eligibility; manages Beneficiary lifecycle (onboarding/offboarding). |
+| NGO Operator ([ACT-09E028AEB0](../project_glossary.md#ACT-09E028AEB0)) | Identity & Access Management | Verifies Beneficiary eligibility; manages Beneficiary lifecycle (onboarding/offboarding). |
 | | Merchant & NGO Operations | Vets and onboards Merchant Partners within their jurisdiction; monitors local compliance. |
 | | Compliance, Security & Audit | Ensures local data residency compliance; audits Beneficiary data handling for FTC anonymity adherence. |
-| Platform Administrator (ACT-086A974D63) | Identity & Access Management | Manages global RBAC for NGO Operators and Platform Admins; oversees system-wide security policies. |
+| Platform Administrator ([ACT-086A974D63](../project_glossary.md#ACT-086A974D63)) | Identity & Access Management | Manages global RBAC for NGO Operators and Platform Admins; oversees system-wide security policies. |
 | | Transaction & Financial Engine | Monitors Credit Pool Utilization Rate; manages global financial ledger integrity and currency conversion. |
 | | Compliance, Security & Audit | Oversees SOC2 Type II structural planning; manages AWS CloudTrail logging and PCI-DSS Level 1 compliance. |
-| Dispute Adjudicator (ACT-7BA340FF76) | Dispute Resolution & Chargeback Management | Reviews escalated disputes between Beneficiaries and Merchants; issues final rulings on credit reversals. |
+| Dispute Adjudicator ([ACT-7BA340FF76](../project_glossary.md#ACT-7BA340FF76)) | Dispute Resolution & Chargeback Management | Reviews escalated disputes between Beneficiaries and Merchants; issues final rulings on credit reversals. |
 | | Fraud Detection & Fraud Prevention Screening | Analyzes flagged transactions for double-spending or replay attacks; updates fraud prevention rules. |
 
 ### 2.2.1 Transaction & Financial Engine
 
 This capability is the central nervous system of the platform, managing the flow of value from Donors to Merchants. The operating model dictates:
 
-**Credit Pool Management:** The Platform Administrator (ACT-086A974D63) monitors the Credit Pool Utilization Rate (CON-7031BE57B3). Automated alerts trigger when thresholds exceed 85%, requiring operational intervention to prevent liquidity shortfalls during peak redemption periods.
-**Donation-to-Redemption Velocity (DRV):** The system tracks DRV (CON-F89C70071E) to monitor liquidity health against the 14-day target. This metric is critical for the Platform Administrator to adjust donor engagement strategies or merchant payout schedules.
-**Financial Edge Cases:** The engine must handle double-spending prevention (CON-61EC670500) and voided transactions through an append-only cryptographic log (CON-6061FCCA83) in Aurora PostgreSQL, ensuring immutable audit trails for all ledger mutations.
+**Credit Pool Management:** The Platform Administrator (ACT-086A974D63) monitors the Credit Pool Utilization Rate ([CON-7031BE57B3](../project_glossary.md#CON-7031BE57B3)). Automated alerts trigger when thresholds exceed 85%, requiring operational intervention to prevent liquidity shortfalls during peak redemption periods.
+**Donation-to-Redemption Velocity (DRV):** The system tracks DRV ([CON-F89C70071E](../project_glossary.md#CON-F89C70071E)) to monitor liquidity health against the 14-day target. This metric is critical for the Platform Administrator to adjust donor engagement strategies or merchant payout schedules.
+**Financial Edge Cases:** The engine must handle double-spending prevention ([CON-61EC670500](../project_glossary.md#CON-61EC670500)) and voided transactions through an append-only cryptographic log ([CON-6061FCCA83](../project_glossary.md#CON-6061FCCA83)) in Aurora PostgreSQL, ensuring immutable audit trails for all ledger mutations.
 
 ### 2.3 Stakeholder Alignment & Decision Rights
 
@@ -135,9 +135,9 @@ To ensure effective governance, decision rights are distributed across the actor
 
 To achieve PCI-DSS Level 1 compliance, the operating model mandates that zero raw card data touches MealCredit servers. The Platform Administrator (ACT-086A974D63) is responsible for ensuring that all financial interactions are routed exclusively through Stripe Elements and Stripe Issuing virtual card provisioning.
 
-**Data Boundary:** The Architectural surface: Payment Processing Surface (SUR-5B18C8719F) acts as the sole entry point for payment data, immediately tokenizing it via Stripe. The Architectural surface: Data Persistence Layer (SUR-FA61592CD4) is strictly prohibited from storing raw Primary Account Numbers (PANs) or CVV codes.
+**Data Boundary:** The Architectural surface: Payment Processing Surface ([SUR-5B18C8719F](../project_glossary.md#SUR-5B18C8719F)) acts as the sole entry point for payment data, immediately tokenizing it via Stripe. The Architectural surface: Data Persistence Layer ([SUR-FA61592CD4](../project_glossary.md#SUR-FA61592CD4)) is strictly prohibited from storing raw Primary Account Numbers (PANs) or CVV codes.
 **Operational Control:** The Platform Administrator must enforce automated scanning of the codebase and infrastructure-as-code (IaC) to detect any potential leakage of sensitive authentication data (SAD). Any detected leakage triggers an immediate incident response protocol.
-**Constraint Alignment:** This directly addresses CON-66390130AA (Enforce PCI-DSS Level 1 compliance by ensuring zero raw card data touches MealCredit servers, relying entirely on Stripe Elements/...). The Platform Administrator owns the compliance evidence collection for SOC2 Type II structural planning (CON-81FB01F06B).
+**Constraint Alignment:** This directly addresses [CON-66390130AA](../project_glossary.md#CON-66390130AA) (Enforce PCI-DSS Level 1 compliance by ensuring zero raw card data touches MealCredit servers, relying entirely on Stripe Elements/...). The Platform Administrator owns the compliance evidence collection for SOC2 Type II structural planning ([CON-81FB01F06B](../project_glossary.md#CON-81FB01F06B)).
 
 ### 3.2. FTC Anonymity Guidelines and Beneficiary Data Segregation
 
@@ -151,9 +151,9 @@ The core mission of decoupling food assistance from social stigma requires an op
 
 To maintain trust and ensure financial accuracy, the operating model requires an append-only cryptographic log auditing system for all financial ledger mutations. The Platform Administrator is responsible for the integrity of this log.
 
-**Append-Only Logging:** All financial transactions, including donations, credit distributions, and redemptions, must be recorded in an append-only log in Aurora PostgreSQL (CON-6061FCCA83). This ensures that no historical transaction can be altered or deleted, providing a tamper-proof audit trail.
+**Append-Only Logging:** All financial transactions, including donations, credit distributions, and redemptions, must be recorded in an append-only log in Aurora PostgreSQL ([CON-6061FCCA83](../project_glossary.md#CON-6061FCCA83)). This ensures that no historical transaction can be altered or deleted, providing a tamper-proof audit trail.
 **Cryptographic Hashing:** Each log entry must be cryptographically hashed and linked to the previous entry, creating a chain of custody for all financial data. The Platform Administrator must implement automated integrity checks to detect any tampering.
-**SOC2 Type II Evidence:** All administrative ledger operations and infrastructure changes must be logged to AWS CloudTrail for SOC2 Type II evidence (CON-FBBBF07295). The Platform Administrator is responsible for generating and retaining this evidence for audit purposes.
+**SOC2 Type II Evidence:** All administrative ledger operations and infrastructure changes must be logged to AWS CloudTrail for SOC2 Type II evidence ([CON-FBBBF07295](../project_glossary.md#CON-FBBBF07295)). The Platform Administrator is responsible for generating and retaining this evidence for audit purposes.
 **Constraint Alignment:** This addresses CON-6061FCCA83 (Implement append-only cryptographic log auditing in Aurora PostgreSQL for all financial ledger mutations) and CON-FBBBF07295 (Log all administrative ledger operations and infrastructure changes to AWS CloudTrail for SOC2 Type II evidence).
 
 ### 3.5. Unresolved Compliance Dependencies
@@ -176,17 +176,17 @@ This operating model ensures that MealCredit can scale to 50,000 MAU while maint
 This artifact establishes the foundational operating model for the MealCredit platform, explicitly defining the roles, responsibilities, and interaction boundaries for the six key actors: Donor (ACT-80C62C7814), Beneficiary (ACT-ADA6716160), Merchant (ACT-AF904DCFF9), NGO Operator (ACT-09E028AEB0), Platform Administrator (ACT-086A974D63), and Dispute Adjudicator (ACT-7BA340FF76). It maps the tripartite actor ecosystem to the required compliance and financial capabilities, defines the strategic roadmap, regulatory risk posture, and partnership requirements, and establishes the operating model for decoupling food assistance from social stigma through anonymous culinary credits.
 
 ### 4.1. Platform Administrator (ACT-086A974D63) Governance
-The Platform Administrator acts as the neutral arbiter of the financial and technical infrastructure. Their authority is strictly bounded by the requirements of the Transaction & Financial Engine (CAP-TRANSACTION-FINANCIAL-ENGINE) and Compliance, Security & Audit (CAP-COMPLIANCE-SECURITY-AUDIT).
+The Platform Administrator acts as the neutral arbiter of the financial and technical infrastructure. Their authority is strictly bounded by the requirements of the Transaction & Financial Engine ([CAP-TRANSACTION-FINANCIAL-ENGINE](../project_glossary.md#CAP-TRANSACTION-FINANCIAL-ENGINE)) and Compliance, Security & Audit (CAP-COMPLIANCE-SECURITY-AUDIT).
 
  Credit Pool Management: The Platform Administrator owns the global and regional Credit Pool Utilization Rate (CON-7031BE57B3). They are responsible for setting the automated alert thresholds and initiating liquidity injection protocols from Donor funds (ACT-80C62C7814). They do not decide who gets credits, only how much liquidity is available to the system.
- Merchant Onboarding & POS Integration (JNY-356F465DB3): The Platform Administrator defines the technical and financial criteria for Merchant (ACT-AF904DCFF9) acceptance, including PCI-DSS Level 1 compliance verification (CON-66390130AA) and Stripe Connected Account KYC requirements (CON-62097EBBF3). They manage the liability framework for merchant payouts.
- Dispute Adjudication Oversight: The Platform Administrator provides the technical infrastructure for the Dispute Adjudicator (ACT-7BA340FF76) but does not make final adjudication decisions on beneficiary eligibility. They handle technical disputes (e.g., failed POS callbacks, double-spending prevention per CON-61EC670500).
+ Merchant Onboarding & POS Integration ([JNY-356F465DB3](../project_glossary.md#JNY-356F465DB3)): The Platform Administrator defines the technical and financial criteria for Merchant (ACT-AF904DCFF9) acceptance, including PCI-DSS Level 1 compliance verification (CON-66390130AA) and Stripe Connected Account KYC requirements ([CON-62097EBBF3](../project_glossary.md#CON-62097EBBF3)). They manage the liability framework for merchant payouts.
+ Dispute Adjudication Oversight: The Platform Administrator provides the technical infrastructure for the Dispute Adjudicator (ACT-7BA340FF76) but does not make final adjudication decisions on beneficiary eligibility. They handle technical disputes (e.g., failed POS callbacks, double-spending prevention per [CON-61EC670500](../project_glossary.md#CON-61EC670500)).
 
 ### 4.2. Transaction & Financial Engine
 The Transaction & Financial Engine (CAP-TRANSACTION-FINANCIAL-ENGINE) serves as the operational backbone of the platform, governing the flow of funds, credit pool liquidity, and financial reconciliation. This engine ensures that the tripartite ecosystem operates with strict financial integrity and compliance.
 
  Credit Pool Management: The engine aggregates micro-donations into a centralized credit pool, managing liquidity across the three metropolitan footprints (SF, NYC, Chicago). It enforces automated alerts when the Credit Pool Utilization Rate (CON-7031BE57B3) approaches critical thresholds, ensuring sufficient funds are available for Beneficiary (ACT-ADA6716160) redemptions.
- Financial Reconciliation: Daily transaction logs from all Merchant (ACT-AF904DCFF9) partners are aggregated and reconciled against donor funds. The Platform Administrator (ACT-086A974D63) oversees this process to ensure that payouts align with verified redemption events, maintaining an immutable audit trail for SOC2 Type II compliance (CON-81FB01F06B).
+ Financial Reconciliation: Daily transaction logs from all Merchant (ACT-AF904DCFF9) partners are aggregated and reconciled against donor funds. The Platform Administrator (ACT-086A974D63) oversees this process to ensure that payouts align with verified redemption events, maintaining an immutable audit trail for SOC2 Type II compliance ([CON-81FB01F06B](../project_glossary.md#CON-81FB01F06B)).
  Liquidity & Velocity Monitoring: The engine tracks the Donation-to-Redemption Velocity (DRV) (CON-F89C70071E) to monitor the health of the credit distribution cycle. This metric ensures that donor funds are converted into active culinary credits efficiently, balancing donor confidence with operational liquidity.
 
 ### 4.3. Dispute Adjudicator (ACT-7BA340FF76) Escalation Path
@@ -194,18 +194,18 @@ The Dispute Adjudicator serves as the final arbiter for edge cases that cannot b
 
  Escalation Triggers:
  1. Beneficiary Eligibility Disputes: When a Beneficiary challenges an NGO Operator's eligibility decision.
- 2. Merchant Payout Error Handling Flow (JNY-90B07623FB): When a Merchant disputes a payout calculation or a failed transaction that the Platform Administrator's automated systems cannot resolve.
- 3. Fraud Allegations: When the Platform-NGO Fraud Investigation Flow (JNY-CA74D631DC) identifies potential collusion or sophisticated fraud that requires human review.
+ 2. Merchant Payout Error Handling Flow ([JNY-90B07623FB](../project_glossary.md#JNY-90B07623FB)): When a Merchant disputes a payout calculation or a failed transaction that the Platform Administrator's automated systems cannot resolve.
+ 3. Fraud Allegations: When the Platform-NGO Fraud Investigation Flow ([JNY-CA74D631DC](../project_glossary.md#JNY-CA74D631DC)) identifies potential collusion or sophisticated fraud that requires human review.
  Decision Rights: The Dispute Adjudicator has the authority to reverse transactions, suspend NGO Operator privileges, or blacklist Merchant accounts. Their decisions are final and are logged in the append-only cryptographic log (CON-6061FCCA83) for SOC2 Type II evidence (CON-81FB01F06B).
 
 ### 4.4. Donor (ACT-80C62C7814) & Beneficiary (ACT-ADA6716160) Interaction
- Donor: The Donor interacts primarily through the Donor Onboarding & Funding Activation (JNY-62D850E94B) journey. They configure donation preferences (round-up, directed impact, or open pool) and receive immutable transactional receipts within 120 seconds of Beneficiary redemption. They do not interact directly with Beneficiaries or Merchants.
- Beneficiary: The Beneficiary interacts through the Beneficiary Eligibility & Voucher Redemption (JNY-E82B8A88D8) journey. They receive anonymous culinary credits that are visually identical to consumer gift cards, ensuring no demographic data crosses into production logs. They interact with Merchants for redemption but have no direct financial link to Donors.
+ Donor: The Donor interacts primarily through the Donor Onboarding & Funding Activation ([JNY-62D850E94B](../project_glossary.md#JNY-62D850E94B)) journey. They configure donation preferences (round-up, directed impact, or open pool) and receive immutable transactional receipts within 120 seconds of Beneficiary redemption. They do not interact directly with Beneficiaries or Merchants.
+ Beneficiary: The Beneficiary interacts through the Beneficiary Eligibility & Voucher Redemption ([JNY-E82B8A88D8](../project_glossary.md#JNY-E82B8A88D8)) journey. They receive anonymous culinary credits that are visually identical to consumer gift cards, ensuring no demographic data crosses into production logs. They interact with Merchants for redemption but have no direct financial link to Donors.
 
 ### 4.5. Knowledge Gaps and Assumptions
 
  KNOWLEDGE_GAP: The specific legal entity structure for the NGO Operators is not defined. This impacts the KYC/AML requirements for their Stripe Connected Accounts (CON-62097EBBF3). Legal must establish the exact compliance burden for NGO Operators before the Merchant Onboarding & POS Integration (JNY-356F465DB3) can be fully specified.
- ASSUMPTION: It is assumed that the Dispute Adjudicator is a human-in-the-loop role, not an automated system, given the sensitivity of eligibility and fraud decisions. This requires a dedicated interface in the Architectural surface: Client Interface Layer (SUR-43E71C4E2B) for the Dispute Adjudicator.
+ ASSUMPTION: It is assumed that the Dispute Adjudicator is a human-in-the-loop role, not an automated system, given the sensitivity of eligibility and fraud decisions. This requires a dedicated interface in the Architectural surface: Client Interface Layer ([SUR-43E71C4E2B](../project_glossary.md#SUR-43E71C4E2B)) for the Dispute Adjudicator.
  ASSUMPTION: It is assumed that the Platform Administrator does not have access to the raw PII of Beneficiary (ACT-ADA6716160) to maintain strict anonymity. The NGO Operator acts as the trusted intermediary for all PII-related decisions.
 
 This governance structure ensures that the MealCredit platform can scale to 50,000 MAU across three metropolitan footprints while maintaining the highest standards of compliance, security, and social impact integrity.
@@ -220,7 +220,7 @@ This section defines the strategic operating model for the Transaction & Financi
 
 The financial lifecycle begins with the Donor (ACT-80C62C7814) funding the platform. To maintain anonymity and prevent de-anonymization attacks (CON-C22D030D21), donor funds are aggregated into a centralized Credit Pool rather than being directly assigned to specific beneficiaries at the point of donation.
 
- Funding Mechanism: Donors contribute via real-time micro-donations. These transactions are processed through the Payment Processing Surface (SUR-5B18C8719F) using Stripe Elements, ensuring zero raw card data touches MealCredit servers (CON-66390130AA).
+ Funding Mechanism: Donors contribute via real-time micro-donations. These transactions are processed through the Payment Processing Surface ([SUR-5B18C8719F](../project_glossary.md#SUR-5B18C8719F)) using Stripe Elements, ensuring zero raw card data touches MealCredit servers (CON-66390130AA).
  Credit Pool Utilization: The platform must monitor Credit Pool Utilization Rate with automated alerts triggering when thresholds exceed 85% (CON-7031BE57B3). This ensures sufficient liquidity for beneficiary redemptions across all three metro footprints (SF, NYC, Chicago).
  Donation-to-Redemption Velocity (DRV): The financial model tracks DRV to monitor liquidity health against a 14-day target (CON-F89C70071E). This metric is critical for balancing donor confidence (seeing impact) with operational liquidity (ensuring credits are available for redemption).
  Anonymity Preservation: Donor identity is cryptographically segregated from beneficiary redemption events. Analytics rely on UUIDv4 mapping (CON-23A501C051) to correlate impact without linking PII.
@@ -231,13 +231,13 @@ Merchant Partners (ACT-AF904DCFF9) are compensated for fulfilled culinary credit
 
  Payout Flow: Payouts are processed via Stripe Connect, leveraging its native liability framework. The Platform Administrator (ACT-086A974D63) oversees the onboarding of Merchant Connected Accounts, ensuring KYC compliance before funds are released.
  Payout Error Handling: A dedicated Merchant Payout Error Handling Flow (JNY-90B07623FB) is established to manage failed payouts due to KYC expiration, bank account issues, or Stripe API errors. The Merchant & NGO Operations capability (CAP-MERCHANT-NGO-OPERATIONS) is responsible for resolving these errors.
- Data Residency: Payout data must comply with data residency and jurisdictional compliance for user data across multiple metropolitan regions (CON-30EA97016B). Financial records for each metro footprint are logically isolated to ensure jurisdictional integrity.
+ Data Residency: Payout data must comply with data residency and jurisdictional compliance for user data across multiple metropolitan regions ([CON-30EA97016B](../project_glossary.md#CON-30EA97016B)). Financial records for each metro footprint are logically isolated to ensure jurisdictional integrity.
 
 ### 5.3. Refund & Reversal Handling
 
 Refunds and reversals are critical for maintaining trust and financial accuracy. The model must handle edge cases such as double-spending prevention and voided transactions (CON-61EC670500).
 
- Refund Flow: The Merchant-Beneficiary Refund Flow (JNY-E5F45D37C6) allows for refunds initiated by the Merchant or Beneficiary. Refunds are processed through the Transaction Refund & Reversal Engine (CAP-TRANSACTION-REFUND-REVERSAL-ENGINE), which credits the original donor pool or adjusts the merchant's pending payout.
+ Refund Flow: The Merchant-Beneficiary Refund Flow ([JNY-E5F45D37C6](../project_glossary.md#JNY-E5F45D37C6)) allows for refunds initiated by the Merchant or Beneficiary. Refunds are processed through the Transaction Refund & Reversal Engine ([CAP-TRANSACTION-REFUND-REVERSAL-ENGINE](../project_glossary.md#CAP-TRANSACTION-REFUND-REVERSAL-ENGINE)), which credits the original donor pool or adjusts the merchant's pending payout.
  Double-Spending Prevention: The financial ledger must implement strict controls to prevent double-spending. This is achieved through an append-only cryptographic log auditing in Aurora PostgreSQL for all financial ledger mutations (CON-6061FCCA83). Each transaction is hashed and chained, ensuring immutability.
  Reversal Latency: Refund processing must be completed within a defined operational window to maintain merchant cash flow. Any delays trigger an alert to the Platform Administrator.
 
@@ -247,7 +247,7 @@ Fraud prevention is a core component of the financial operating model, protectin
 
  Screening Mechanism: The Fraud Detection & Fraud Prevention Screening capability (CAP-FRAUD-DETECTION-FRAUD-PREVENTION-SCREENING) monitors all transactions for anomalous patterns. This includes monitoring for unusual donation spikes, rapid redemption cycles, or merchant account irregularities.
  Dispute Resolution: The Dispute Resolution & Chargeback Management capability (CAP-DISPUTE-RESOLUTION-CHARGEBACK-MANAGEMENT) handles chargebacks initiated by donors or merchants. The Dispute Adjudicator (ACT-7BA340FF76) reviews flagged transactions and makes final determinations based on evidence from the append-only ledger.
- Offline Fallback Security: For offline fallback QR/barcode tokens, the system must protect against replay attacks using time-bound cryptographic signatures (CON-AA83B13877). This ensures that even in low-connectivity scenarios, fraudulent redemptions are prevented.
+ Offline Fallback Security: For offline fallback QR/barcode tokens, the system must protect against replay attacks using time-bound cryptographic signatures ([CON-AA83B13877](../project_glossary.md#CON-AA83B13877)). This ensures that even in low-connectivity scenarios, fraudulent redemptions are prevented.
 
 ### 5.5. Key Operational Risks
 
@@ -256,7 +256,7 @@ The following risks are identified as critical to the tripartite model (Donor, B
  Double-Spending and Fraudulent Redemption (High Impact)
   Risk: Beneficiaries or malicious actors attempting to redeem the same culinary credit multiple times simultaneously, or using cloned offline fallback tokens.
   Impact: Direct financial loss to the Donor pool and Merchant partners; erosion of trust in the platform's financial integrity.
-  Mitigation Posture: Implement deterministic HMAC-signed fallback vouchers for offline scenarios (CON-AA83B13877) and real-time Stripe Issuing virtual card provisioning for online/POS clearing. All redemption events must be logged in an append-only cryptographic ledger (CON-6061FCCA83) to enable forensic auditing.
+  Mitigation Posture: Implement deterministic HMAC-signed fallback vouchers for offline scenarios ([CON-AA83B13877](../project_glossary.md#CON-AA83B13877)) and real-time Stripe Issuing virtual card provisioning for online/POS clearing. All redemption events must be logged in an append-only cryptographic ledger (CON-6061FCCA83) to enable forensic auditing.
 
  Beneficiary Data Leakage and De-anonymization (Critical Impact)
   Risk: Metadata analysis or database access errors linking Beneficiary (ACT-ADA6716160) identities to Donor (ACT-80C62C7814) contributions, violating the core mission of decoupling food assistance from social stigma.
@@ -266,7 +266,7 @@ The following risks are identified as critical to the tripartite model (Donor, B
  Merchant Payout Failures and Reconciliation Drift (High Impact)
   Risk: Delays or errors in transferring cleared funds from the Platform to Merchant (ACT-AF904DCFF9) partners, leading to cash flow issues for restaurants and potential churn.
   Impact: Merchant dissatisfaction; disruption of service availability for Beneficiaries.
-  Mitigation Posture: Implement robust error handling for Stripe Connected Account payouts (CAP-MERCHANT-PAYOUT-FAILURE-ERROR-HANDLING). Establish automated reconciliation processes to detect drift between ledger entries and bank statements. Define clear SLAs for payout processing.
+  Mitigation Posture: Implement robust error handling for Stripe Connected Account payouts ([CAP-MERCHANT-PAYOUT-FAILURE-ERROR-HANDLING](../project_glossary.md#CAP-MERCHANT-PAYOUT-FAILURE-ERROR-HANDLING)). Establish automated reconciliation processes to detect drift between ledger entries and bank statements. Define clear SLAs for payout processing.
 
  Credit Pool Liquidity Shortfalls (Medium Impact)
   Risk: Rapid depletion of the credit pool in a specific metro footprint due to higher-than-expected redemption rates, leaving Beneficiaries without access to credits.
@@ -289,7 +289,7 @@ The following metrics will be used to monitor the health of the operating model 
 
  POS Clearance Latency (p99)
   Definition: The 99th percentile latency for a redemption transaction from the initial scan/tap to final ledger entry.
-  Target: Maintain p99 latency below 250ms for voucher creation and scanning callbacks under 10,000 concurrent connections (CON-7F03CF540E). Ensure Stripe Webhook Processing Latency averages below 150ms (CON-06232374D9).
+  Target: Maintain p99 latency below 250ms for voucher creation and scanning callbacks under 10,000 concurrent connections ([CON-7F03CF540E](../project_glossary.md#CON-7F03CF540E)). Ensure Stripe Webhook Processing Latency averages below 150ms ([CON-06232374D9](../project_glossary.md#CON-06232374D9)).
   Owner: Platform Administrator (ACT-086A974D63)
 
  Merchant Payout Success Rate
@@ -337,8 +337,8 @@ The **Beneficiary (ACT-ADA6716160)** is the end-user receiving culinary credits.
     *   Adhere to the platform's code of conduct regarding fraud and misuse.
 *   **Compliance & Security Boundaries:**
     *   **Absolute Anonymization:** The platform enforces strict data isolation where beneficiary demographic status and legal names are cryptographically segregated from public-facing data (CON-92F07E31B0). No PII is stored in production logs or exposed to donors.
-    *   **Accessibility:** The mobile application and digital wallet passes must be fully compatible with screen readers and high-contrast modes to ensure equitable access for visually impaired users (CON-68497304B1).
-    *   **Offline Access:** The platform must ensure offline fallback interfaces are intuitive and accessible without requiring complex technical troubleshooting, allowing redemption in low-connectivity environments (CON-FA7A13E601).
+    *   **Accessibility:** The mobile application and digital wallet passes must be fully compatible with screen readers and high-contrast modes to ensure equitable access for visually impaired users ([CON-68497304B1](../project_glossary.md#CON-68497304B1)).
+    *   **Offline Access:** The platform must ensure offline fallback interfaces are intuitive and accessible without requiring complex technical troubleshooting, allowing redemption in low-connectivity environments ([CON-FA7A13E601](../project_glossary.md#CON-FA7A13E601)).
 
 ### 1.2 Donor (ACT-80C62C7814)
 
@@ -379,7 +379,7 @@ The **NGO Operator (ACT-09E028AEB0)** acts as the governance layer for beneficia
 
 ### 1.5 Platform Administrator (ACT-086A974D63)
 
-The **Platform Administrator (ACT-086A974D63)** oversees system integrity, compliance, and financial reconciliation. Their primary journey is **Compliance Failure & Anonymized Recovery (JNY-54963DD39A)**.
+The **Platform Administrator (ACT-086A974D63)** oversees system integrity, compliance, and financial reconciliation. Their primary journey is **Compliance Failure & Anonymized Recovery ([JNY-54963DD39A](../project_glossary.md#JNY-54963DD39A))**.
 
 *   **Core Responsibilities:**
     *   Review and approve Merchant accounts for compliance.
@@ -387,11 +387,11 @@ The **Platform Administrator (ACT-086A974D63)** oversees system integrity, compl
     *   Trigger isolation protocols in the event of compliance failures or technical anomalies.
 *   **Compliance & Security Boundaries:**
     *   **Audit Logging:** All administrative ledger operations and infrastructure changes must be logged to AWS CloudTrail for SOC2 Type II evidence (CON-FBBBF07295).
-    *   **Disaster Recovery:** Robust disaster recovery procedures must be in place for financial ledger consistency in the event of infrastructure failure (CON-94F025D2C8).
+    *   **Disaster Recovery:** Robust disaster recovery procedures must be in place for financial ledger consistency in the event of infrastructure failure ([CON-94F025D2C8](../project_glossary.md#CON-94F025D2C8)).
 
 ### 1.6 Dispute Adjudicator (ACT-7BA340FF76)
 
-The **Dispute Adjudicator (ACT-7BA340FF76)** handles conflicts between users and the platform. Their primary journey is the **Beneficiary-Platform Dispute Flow (JNY-2B038C9362)**.
+The **Dispute Adjudicator (ACT-7BA340FF76)** handles conflicts between users and the platform. Their primary journey is the **Beneficiary-Platform Dispute Flow ([JNY-2B038C9362](../project_glossary.md#JNY-2B038C9362))**.
 
 *   **Core Responsibilities:**
     *   Review disputes related to transaction errors, refund denials, or eligibility issues.
@@ -408,7 +408,7 @@ This section maps the actor ecosystem to the platform's core capabilities, ensur
 *   **Scope:** Manages authentication and authorization for all six actor roles.
 *   **Operational Boundary:**
     *   Implements strict data isolation where beneficiary demographic status and legal names are cryptographically segregated from public-facing data (CON-92F07E31B0).
-    *   Secures client-side storage on Expo devices using SecureStore for offline tokens, preventing token theft or cloning (CON-C42F7B521B).
+    *   Secures client-side storage on Expo devices using SecureStore for offline tokens, preventing token theft or cloning ([CON-C42F7B521B](../project_glossary.md#CON-C42F7B521B)).
     *   Protects against replay attacks on offline fallback QR/barcode tokens using time-bound cryptographic signatures (CON-AA83B13877).
 
 ### 2.2 Transaction & Financial Engine (CAP-TRANSACTION-FINANCIAL-ENGINE)
@@ -432,7 +432,7 @@ This section maps the actor ecosystem to the platform's core capabilities, ensur
 
 *   **Scope:** Detects and prevents fraudulent activities across the platform.
 *   **Operational Boundary:**
-    *   **Anomaly Detection:** Detects anomalies in transaction patterns or POS connectivity failures, triggering isolation protocols for affected transactions (JNY-54963DD39A).
+    *   **Anomaly Detection:** Detects anomalies in transaction patterns or POS connectivity failures, triggering isolation protocols for affected transactions ([JNY-54963DD39A](../project_glossary.md#JNY-54963DD39A)).
     *   **Screening:** Screens new Merchant and NGO Operator accounts against known fraud indicators during onboarding.
 
 ## 3. Strategic Roadmap & Phased Rollout
@@ -450,10 +450,10 @@ The platform will transition from a single-city MVP architecture to a resilient 
 ### Phase 2: Multi-City Scale & Optimization
 *   **Focus:** Expand to SF, NYC, and Chicago; optimize latency and cache performance.
 *   **Key Deliverables:**
-    *   Scale the anonymous credit distribution engine during peak event-driven load (CON-121117F5A2).
-    *   Maintain Cache Hit Ratio (CHR) above 92% for restaurant search queries using the Redis Enterprise Cluster (CON-EA7C3EFECB).
-    *   Maintain p99 latency below 250ms for voucher creation and scanning callbacks under 10,000 concurrent connections (CON-7F03CF540E).
-    *   Ensure Stripe Webhook Processing Latency averages below 150ms from card tap to merchant ledger entry (CON-06232374D9).
+    *   Scale the anonymous credit distribution engine during peak event-driven load ([CON-121117F5A2](../project_glossary.md#CON-121117F5A2)).
+    *   Maintain Cache Hit Ratio (CHR) above 92% for restaurant search queries using the Redis Enterprise Cluster ([CON-EA7C3EFECB](../project_glossary.md#CON-EA7C3EFECB)).
+    *   Maintain p99 latency below 250ms for voucher creation and scanning callbacks under 10,000 concurrent connections ([CON-7F03CF540E](../project_glossary.md#CON-7F03CF540E)).
+    *   Ensure Stripe Webhook Processing Latency averages below 150ms from card tap to merchant ledger entry ([CON-06232374D9](../project_glossary.md#CON-06232374D9)).
 
 ## 4. Unresolved Questions & Knowledge Gaps
 

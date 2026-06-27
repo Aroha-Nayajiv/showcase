@@ -28,7 +28,7 @@ Schema Definition:
 | metadata | object | No | Additional contextual data (e.g., order items, tips). | `{"tip_amount": 200, "order_count": 2}` |
 
 Design Rationale:
-- Anonymization: The beneficiary_token ensures that PII is not exposed in the async logs, adhering to CON-0A0288EED4 (Implied concern: Implement strict data isolation where beneficiary demographic status and legal names are cryptographically segregated from public ...).
+- Anonymization: The beneficiary_token ensures that PII is not exposed in the async logs, adhering to [CON-0A0288EED4](../project_glossary.md#CON-0A0288EED4) (Implied concern: Implement strict data isolation where beneficiary demographic status and legal names are cryptographically segregated from public ...).
 - Idempotency: The idempotency_key is critical for handling retries from the payment processor (e.g., Stripe) without double-processing transactions.
 - Decoupling: By including donor_pool_id and metro_region, the Financial Reconciliation Engine can update the correct credit pool and track regional metrics without needing to query the Redemption Engine.
 
@@ -109,7 +109,7 @@ The core of the reconciliation process is matching the ingested transaction logs
 
 1. Ledger Snapshot: A snapshot of the financial ledger is taken at the end of each business day.
 2. Event Matching: The engine matches the aggregated transaction logs against the ledger snapshot. Any discrepancies (e.g., missing transactions, amount mismatches) are flagged as exceptions.
-3. Hash-Checksum Verification: To ensure tamper-evidence, the engine verifies the cryptographic hash of the previous ledger row for each new entry, as mandated by the append-only logging requirement (CON-1762EA5021, CON-6061FCCA83).
+3. Hash-Checksum Verification: To ensure tamper-evidence, the engine verifies the cryptographic hash of the previous ledger row for each new entry, as mandated by the append-only logging requirement ([CON-1762EA5021](../project_glossary.md#CON-1762EA5021), [CON-6061FCCA83](../project_glossary.md#CON-6061FCCA83)).
 
 Consistency Guarantees:
 - Double-Spending Prevention: The idempotency keys and the immutable ledger structure prevent double-spending of credits.
@@ -130,27 +130,27 @@ Settlement Report Structure:
 - reconciliation_hash: String (A cryptographic hash of the entire settlement report for integrity verification)
 
 Data Flow for DRV Tracking:
-- The settlement report also feeds into the Donation-to-Redemption Velocity (DRV) tracking system. By aggregating redemption events by regional pool, the engine provides the data necessary to monitor liquidity health against the 14-day target (CON-D0F5814F21, CON-F89C70071E).
+- The settlement report also feeds into the Donation-to-Redemption Velocity (DRV) tracking system. By aggregating redemption events by regional pool, the engine provides the data necessary to monitor liquidity health against the 14-day target ([CON-D0F5814F21](../project_glossary.md#CON-D0F5814F21), [CON-F89C70071E](../project_glossary.md#CON-F89C70071E)).
 
 ### 2.4. Reconciliation Discrepancy Remediation Workflow
 
 When the Financial Reconciliation Engine identifies a discrepancy (e.g., missing transactions, amount mismatches, or hash-checksum failures), it triggers a structured remediation workflow to ensure data integrity before proceeding to payout.
 
 Remediation Workflow:
-1. Exception Flagging: The engine logs the discrepancy in the immutable audit log (CON-1762EA5021) and marks the affected transaction(s) as `RECONCILIATION_EXCEPTION`.
+1. Exception Flagging: The engine logs the discrepancy in the immutable audit log ([CON-1762EA5021](../project_glossary.md#CON-1762EA5021)) and marks the affected transaction(s) as `RECONCILIATION_EXCEPTION`.
 2. Automated Retry: For transient errors (e.g., temporary network blips during event ingestion), the engine attempts an automated retry up to 3 times with exponential backoff.
-3. Manual Review Queue: If the discrepancy persists after retries, the exception is routed to a manual review queue accessible by the Platform Administrator (ACT-086A974D63).
+3. Manual Review Queue: If the discrepancy persists after retries, the exception is routed to a manual review queue accessible by the Platform Administrator ([ACT-086A974D63](../project_glossary.md#ACT-086A974D63)).
 4. Resolution Actions: The Platform Administrator can:
    - Manually reconcile the transaction by adjusting the ledger entry.
    - Initiate a refund/reversal if the transaction is deemed invalid.
-   - Escalate to the Dispute Adjudicator (ACT-7BA340FF76) if the discrepancy involves a potential fraud or beneficiary dispute.
-5. Audit Trail: All remediation actions are logged with a timestamp, actor ID, and reason code to maintain a complete audit trail for SOC2 Type II compliance (CON-81FB01F06B, CON-E84412A0FA).
+   - Escalate to the Dispute Adjudicator ([ACT-7BA340FF76](../project_glossary.md#ACT-7BA340FF76)) if the discrepancy involves a potential fraud or beneficiary dispute.
+5. Audit Trail: All remediation actions are logged with a timestamp, actor ID, and reason code to maintain a complete audit trail for SOC2 Type II compliance ([CON-81FB01F06B](../project_glossary.md#CON-81FB01F06B), [CON-E84412A0FA](../project_glossary.md#CON-E84412A0FA)).
 
 ### 2.5. Error Handling and Retry Logic
 
 - Idempotency: The use of idempotency_key ensures that retries do not result in duplicate financial entries.
 - Dead Letter Queue (DLQ): Events that fail processing after a configurable number of retries are moved to a Dead Letter Queue for manual inspection and remediation.
-- Alerting: Automated alerts are triggered if the Credit Pool Utilization Rate exceeds 85% (CON-2059B17FB2, CON-7031BE57B3) or if reconciliation discrepancies exceed a defined threshold.
+- Alerting: Automated alerts are triggered if the Credit Pool Utilization Rate exceeds 85% ([CON-2059B17FB2](../project_glossary.md#CON-2059B17FB2), [CON-7031BE57B3](../project_glossary.md#CON-7031BE57B3)) or if reconciliation discrepancies exceed a defined threshold.
 
 ---
 
@@ -244,9 +244,9 @@ To ensure financial consistency and prevent duplicate payouts, the service imple
 
 ### 3.4. Security and Compliance
 
-- Data Isolation: Payout requests only include the merchant_id and stripe_connect_account_id. No beneficiary PII or donor information is included in the payout payload, ensuring strict data isolation (CON-0A0288EED4).
+- Data Isolation: Payout requests only include the merchant_id and stripe_connect_account_id. No beneficiary PII or donor information is included in the payout payload, ensuring strict data isolation ([CON-0A0288EED4](../project_glossary.md#CON-0A0288EED4)).
 - Secure Vault Access: The service retrieves Stripe API keys and stripe_connect_account_id secrets from a secure vault (e.g., AWS Secrets Manager) at runtime. Secrets are never stored in the application code or configuration files.
-- Audit Logging: All payout initiation, success, and failure events are logged to an append-only cryptographic log in Aurora PostgreSQL (CON-1762EA5021, CON-6061FCCA83) for SOC2 Type II compliance (CON-81FB01F06B, CON-E84412A0FA).
+- Audit Logging: All payout initiation, success, and failure events are logged to an append-only cryptographic log in Aurora PostgreSQL (CON-1762EA5021, [CON-6061FCCA83](../project_glossary.md#CON-6061FCCA83)) for SOC2 Type II compliance ([CON-81FB01F06B](../project_glossary.md#CON-81FB01F06B), [CON-E84412A0FA](../project_glossary.md#CON-E84412A0FA)).
 
 ### 3.5. Knowledge Gaps and Assumptions
 
@@ -281,7 +281,7 @@ All async workers (Financial Reconciliation Engine, Payout Orchestration Service
 
 ### 4.2. Dead Letter Queue (DLQ) Management
 
-Events that fail after all retries are moved to a DLQ. The DLQ is monitored by the Platform Administrator (ACT-086A974D63) for manual intervention.
+Events that fail after all retries are moved to a DLQ. The DLQ is monitored by the Platform Administrator ([ACT-086A974D63](../project_glossary.md#ACT-086A974D63)) for manual intervention.
 
 - Inspection: Failed events are inspected to determine the root cause.
 - Remediation: Based on the root cause, the event is either re-processed, corrected, or discarded.
@@ -306,7 +306,7 @@ The DRV metric measures the speed at which donated funds are redeemed by benefic
 Data Flow:
 1. Event Capture: The Financial Reconciliation Engine captures redemption events from the TransactionEvent schema.
 2. Aggregation: Events are aggregated by metro_region and donor_pool_id.
-3. Velocity Calculation: The DRV is calculated as the ratio of total redeemed amount to total donated amount over a rolling 14-day window (CON-D0F5814F21, CON-F89C70071E).
+3. Velocity Calculation: The DRV is calculated as the ratio of total redeemed amount to total donated amount over a rolling 14-day window ([CON-D0F5814F21](../project_glossary.md#CON-D0F5814F21), [CON-F89C70071E](../project_glossary.md#CON-F89C70071E)).
 4. Storage: DRV metrics are stored in a time-series database (e.g., Amazon Timestream) for efficient querying and visualization.
 
 ### 5.2. Credit Pool Utilization Alerts
@@ -314,8 +314,8 @@ Data Flow:
 The Credit Pool Utilization Rate monitors the percentage of available credits that have been redeemed. Automated alerts are triggered when thresholds are exceeded to prevent liquidity issues.
 
 Alerting Rules:
-- Threshold: Alerts are triggered when the Credit Pool Utilization Rate exceeds 85% (CON-2059B17FB2, CON-7031BE57B3).
-- Notification: Alerts are sent to the Platform Administrator (ACT-086A974D63) and the NGO Operator (ACT-09E028AEB0) via SNS.
+- Threshold: Alerts are triggered when the Credit Pool Utilization Rate exceeds 85% ([CON-2059B17FB2](../project_glossary.md#CON-2059B17FB2), [CON-7031BE57B3](../project_glossary.md#CON-7031BE57B3)).
+- Notification: Alerts are sent to the Platform Administrator (ACT-086A974D63) and the NGO Operator ([ACT-09E028AEB0](../project_glossary.md#ACT-09E028AEB0)) via SNS.
 - Action: The Platform Administrator can initiate emergency credit top-ups or adjust donation flows to rebalance the pool.
 
 ### 5.3. Knowledge Gaps
@@ -533,7 +533,7 @@ The Financial Reconciliation Engine uses this schema to track the state of daily
 | `discrepancy_notes` | TEXT | | Notes explaining any discrepancy, including manual resolution codes. |
 
 **Design Rationale:**
-- **Batch Processing:** Reconciliation is performed in daily batches, aligning with the `Financial Reconciliation & Payout` journey (JNY-35EBA169C6).
+- **Batch Processing:** Reconciliation is performed in daily batches, aligning with the `Financial Reconciliation & Payout` journey ([JNY-35EBA169C6](../project_glossary.md#JNY-35EBA169C6)).
 - **Traceability:** Each line item links a processor transaction to a specific ledger entry, providing full auditability.
 - **Discrepancy Handling:** The `match_status` and `discrepancy_notes` fields allow for manual or automated investigation of mismatches, supporting the remediation workflow in Section 4.4.
 
@@ -558,7 +558,7 @@ This schema tracks the status and details of merchant payouts. It is updated by 
 
 **Design Rationale:**
 - **Idempotency:** The `stripe_payout_id` allows the Payout Worker to safely retry failed payouts without creating duplicates.
-- **Status Tracking:** The `status` field provides clear visibility into the payout lifecycle, supporting the `Merchant Payout Error Handling Flow` (JNY-90B07623FB).
+- **Status Tracking:** The `status` field provides clear visibility into the payout lifecycle, supporting the `Merchant Payout Error Handling Flow` ([JNY-90B07623FB](../project_glossary.md#JNY-90B07623FB)).
 
 ### 5.4. Donation-to-Redemption Velocity (DRV) Tracking
 
@@ -580,7 +580,7 @@ To support the `Donation-to-Redemption Velocity (DRV)` metric (CON-D0F5814F21, C
 
 ### 5.5. Data Retention and Archival
 
-To comply with data retention policies (CON-4820FAD5A9, CON-6F604D5455) and manage storage costs, historical data will be archived to cold storage (e.g., Amazon S3 Glacier) after a defined period.
+To comply with data retention policies ([CON-4820FAD5A9](../project_glossary.md#CON-4820FAD5A9), [CON-6F604D5455](../project_glossary.md#CON-6F604D5455)) and manage storage costs, historical data will be archived to cold storage (e.g., Amazon S3 Glacier) after a defined period.
 
 - **Active Data:** All data in the above tables is retained in the primary Aurora PostgreSQL database for 13 months.
 - **Archival:** After 13 months, data is moved to S3 Glacier in a compressed, encrypted format. The primary database retains only summary-level aggregates for reporting.

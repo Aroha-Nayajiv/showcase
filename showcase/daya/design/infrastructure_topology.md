@@ -2,17 +2,17 @@
 
 ## 1. Regional Deployment Strategy
 
-To meet the target scale of 50,000 MAU and ensure high availability, the platform will adopt a Single-Region, Multi-AZ deployment model for each metro footprint. This approach minimizes latency for local users and simplifies data residency compliance (CON-30EA97016B, CON-4093C26BCC) while avoiding the complexity and cost of active-active cross-region replication for financial transactions.
+To meet the target scale of 50,000 MAU and ensure high availability, the platform will adopt a Single-Region, Multi-AZ deployment model for each metro footprint. This approach minimizes latency for local users and simplifies data residency compliance ([CON-30EA97016B](../project_glossary.md#CON-30EA97016B), [CON-4093C26BCC](../project_glossary.md#CON-4093C26BCC)) while avoiding the complexity and cost of active-active cross-region replication for financial transactions.
 
 *   **SF Region:** AWS us-west-2 (Oregon). Primary hub for West Coast operations.
 *   **NYC Region:** AWS us-east-1 (N. Virginia). Primary hub for East Coast operations.
 *   **CHI Region:** AWS us-east-2 (Ohio). Primary hub for Midwest operations.
 
-Each region operates as an independent logical tenant with isolated VPCs, databases, and compute resources. Cross-region replication is reserved for disaster recovery (CON-10F4381094) and is not used for active transaction processing to prevent split-brain financial ledger issues.
+Each region operates as an independent logical tenant with isolated VPCs, databases, and compute resources. Cross-region replication is reserved for disaster recovery ([CON-10F4381094](../project_glossary.md#CON-10F4381094)) and is not used for active transaction processing to prevent split-brain financial ledger issues.
 
 ### 1.1. Network Topology & Segmentation
 
-Each regional VPC is segmented into public, private, and isolated subnets to enforce strict security boundaries and PCI-DSS Level 1 compliance (CON-66390130AA).
+Each regional VPC is segmented into public, private, and isolated subnets to enforce strict security boundaries and PCI-DSS Level 1 compliance ([CON-66390130AA](../project_glossary.md#CON-66390130AA)).
 
 *   **Public Subnets:** Host NAT Gateways for outbound internet access from private subnets. No compute resources reside here.
 *   **Private Subnets (Application Tier):** Host the API Gateway endpoints, Lambda functions for event-driven processing, and ECS Fargate tasks for gRPC services. These subnets have no direct internet access.
@@ -24,15 +24,15 @@ Each regional VPC is segmented into public, private, and isolated subnets to enf
 #### 1.2.1. Compute & Orchestration
 
 *   **API Gateway:** Serves as the ingress for RESTful APIs and GraphQL queries. Configured with WAF for DDoS protection and rate limiting.
-*   **AWS Lambda:** Handles event-driven serverless functions, including Stripe webhook processing, voucher validation, and notification dispatch. Provisioned Concurrency is used for critical webhook handlers to ensure <150ms latency (CON-06232374D9).
+*   **AWS Lambda:** Handles event-driven serverless functions, including Stripe webhook processing, voucher validation, and notification dispatch. Provisioned Concurrency is used for critical webhook handlers to ensure <150ms latency ([CON-06232374D9](../project_glossary.md#CON-06232374D9)).
 *   **ECS Fargate:** Hosts the gRPC financial services for high-throughput, low-latency POS callbacks. Fargate allows for precise resource allocation and scaling based on concurrent connection load.
 
 #### 1.2.2. Data Persistence
 
-*   **Aurora PostgreSQL (Serverless v2):** The primary database for the financial ledger. Chosen for its ACID compliance, high availability, and ability to support append-only cryptographic logging (CON-1762EA5021). Data is encrypted at rest using AWS KMS keys managed by the Platform Administrator.
+*   **Aurora PostgreSQL (Serverless v2):** The primary database for the financial ledger. Chosen for its ACID compliance, high availability, and ability to support append-only cryptographic logging ([CON-1762EA5021](../project_glossary.md#CON-1762EA5021)). Data is encrypted at rest using AWS KMS keys managed by the Platform Administrator.
 *   **DynamoDB:** Used for high-scale, low-latency event storage and caching of non-financial data (e.g., merchant profiles, restaurant search indices). If used for financial data, it must be paired with a robust reconciliation process.
     *   `KNOWLEDGE_GAP: Financial ledger reconciliation strategy - The decision to use Aurora PostgreSQL for the financial ledger is based on ACID requirements. However, the specific reconciliation process (e.g., periodic hash-checksums vs. distributed write-ahead ledger) is not yet defined. This must be detailed in the Financial Ledger Data Model artifact.`
-*   **Redis Enterprise Cluster:** Provides caching for restaurant search queries and session data, targeting a Cache Hit Ratio (CHR) above 92% (CON-527BFA6796). Deployed in a multi-AZ configuration for high availability.
+*   **Redis Enterprise Cluster:** Provides caching for restaurant search queries and session data, targeting a Cache Hit Ratio (CHR) above 92% ([CON-527BFA6796](../project_glossary.md#CON-527BFA6796)). Deployed in a multi-AZ configuration for high availability.
 
 ### 1.3. Knowledge Gaps & Assumptions
 
@@ -50,17 +50,17 @@ This section defines the logical and physical data isolation boundaries for the 
 The platform utilizes a Multi-Tenant Logical Isolation model within a shared AWS infrastructure footprint per metropolitan region. This approach balances cost-efficiency with strict data segregation requirements.
 
 *   **Tenant Boundary Definition:**
-    *   **NGO Operator (ACT-09E028AEB0):** Each NGO Operator is treated as a distinct logical tenant. Their operational data (merchant onboarding, payout reconciliation, user management) is isolated via Row-Level Security (RLS) policies in the primary data store.
-    *   **Beneficiary (ACT-ADA6716160):** Beneficiary data is further segmented. While beneficiaries are associated with an NGO Operator, their Personally Identifiable Information (PII) is cryptographically segregated from the NGO Operator's direct query scope.
-    *   **Donor (ACT-80C62C7814) & Merchant (ACT-AF904DCFF9):** Donor and Merchant data are treated as separate logical domains with cross-referencing via anonymized UUIDs to prevent PII linkage.
+    *   **NGO Operator ([ACT-09E028AEB0](../project_glossary.md#ACT-09E028AEB0)):** Each NGO Operator is treated as a distinct logical tenant. Their operational data (merchant onboarding, payout reconciliation, user management) is isolated via Row-Level Security (RLS) policies in the primary data store.
+    *   **Beneficiary ([ACT-ADA6716160](../project_glossary.md#ACT-ADA6716160)):** Beneficiary data is further segmented. While beneficiaries are associated with an NGO Operator, their Personally Identifiable Information (PII) is cryptographically segregated from the NGO Operator's direct query scope.
+    *   **Donor ([ACT-80C62C7814](../project_glossary.md#ACT-80C62C7814)) & Merchant ([ACT-AF904DCFF9](../project_glossary.md#ACT-AF904DCFF9)):** Donor and Merchant data are treated as separate logical domains with cross-referencing via anonymized UUIDs to prevent PII linkage.
 
 *   **Implementation Mechanism:**
     *   **Database Level:** Aurora PostgreSQL (Serverless v2) will enforce isolation using Row-Level Security (RLS) policies. Each query must include a tenant_id context variable. RLS policies will automatically filter rows based on the authenticated user's NGO Operator association.
-    *   **Application Level:** The API Orchestration Layer (SUR-85E4A5B6E7) will inject the tenant_id into the database connection context for every request originating from an NGO Operator or Beneficiary client.
+    *   **Application Level:** The API Orchestration Layer ([SUR-85E4A5B6E7](../project_glossary.md#SUR-85E4A5B6E7)) will inject the tenant_id into the database connection context for every request originating from an NGO Operator or Beneficiary client.
 
 ### 2.2. Cryptographic Segregation of Highly Sensitive Data
 
-To adhere to CON-<timestamp> (Classify all beneficiary-related data as 'Highly Sensitive') and CON-92F07E31B0 (Implement strict data isolation where beneficiary demographic status and legal names are cryptographically segregated), the following strategy is implemented:
+To adhere to CON-<timestamp> (Classify all beneficiary-related data as 'Highly Sensitive') and [CON-92F07E31B0](../project_glossary.md#CON-92F07E31B0) (Implement strict data isolation where beneficiary demographic status and legal names are cryptographically segregated), the following strategy is implemented:
 
 *   **Data Classification:**
     *   **Highly Sensitive Data (HSD):** Legal names, government-issued ID numbers, demographic status, and contact information.
@@ -69,10 +69,10 @@ To adhere to CON-<timestamp> (Classify all beneficiary-related data as 'Highly S
 *   **Cryptographic Hashing Strategy:**
     *   **Deterministic Hashing for Linkage:** Beneficiary PII (e.g., legal name + DOB) will be hashed using HMAC-SHA256 with a rotating salt key stored in AWS KMS. This allows for deterministic matching (e.g., for fraud prevention) without storing plaintext PII.
     *   **One-Way Hashing for Storage:** All HSD fields will be stored as one-way hashes in the primary operational schema. The plaintext PII will be stored in a separate, highly restricted HSD Vault (a dedicated Aurora PostgreSQL schema with stricter IAM policies and encryption keys).
-    *   **Access Control:** Access to the HSD Vault is restricted to the Platform Administrator (ACT-086A974D63) and authorized NGO Operator (ACT-09E028AEB0) roles for specific, audited offboarding or dispute resolution workflows (JNY-4C4BA15817, JNY-2B038C9362).
+    *   **Access Control:** Access to the HSD Vault is restricted to the Platform Administrator ([ACT-086A974D63](../project_glossary.md#ACT-086A974D63)) and authorized NGO Operator ([ACT-09E028AEB0](../project_glossary.md#ACT-09E028AEB0)) roles for specific, audited offboarding or dispute resolution workflows ([JNY-4C4BA15817](../project_glossary.md#JNY-4C4BA15817), [JNY-2B038C9362](../project_glossary.md#JNY-2B038C9362)).
 
 *   **Anonymization for Analytics:**
-    *   CON-23A501C051 (Correlate donor impact receipts with beneficiary redemption events without linking PII) is addressed by using UUIDv4 mapping for analytics. The mapping table between UUIDs and hashed PII is stored in the HSD Vault and is never exposed to the analytics engine or NGO Operator dashboards.
+    *   [CON-23A501C051](../project_glossary.md#CON-23A501C051) (Correlate donor impact receipts with beneficiary redemption events without linking PII) is addressed by using UUIDv4 mapping for analytics. The mapping table between UUIDs and hashed PII is stored in the HSD Vault and is never exposed to the analytics engine or NGO Operator dashboards.
 
 ### 2.3. Network & Infrastructure Isolation
 
@@ -104,14 +104,14 @@ This section defines the physical and logical topology for the MealCredit platfo
 
 The financial ledger is the system's source of truth for all monetary movements. It must guarantee ACID compliance and support append-only cryptographic logging for SOC2 Type II auditability.
 
-*   **Deployment Topology:** Multi-AZ deployment within each metro region (us-west-2 for SF, us-east-1 for NYC, us-east-2 for Chicago). Cross-region replication is configured for Disaster Recovery (CON-10F4381094) but is not active-active for transaction processing to prevent split-brain financial states.
+*   **Deployment Topology:** Multi-AZ deployment within each metro region (us-west-2 for SF, us-east-1 for NYC, us-east-2 for Chicago). Cross-region replication is configured for Disaster Recovery ([CON-10F4381094](../project_glossary.md#CON-10F4381094)) but is not active-active for transaction processing to prevent split-brain financial states.
 *   **Compliance & Security:**
     *   **Encryption:** Data at rest is encrypted using AWS KMS keys managed by the Platform Administrator. Data in transit is encrypted via TLS 1.3.
-    *   **Audit Logging:** All financial ledger mutations are logged to an append-only cryptographic log (CON-1762EA5021). These logs are streamed to AWS CloudTrail for SOC2 Type II evidence (CON-BB253DF0A2).
+    *   **Audit Logging:** All financial ledger mutations are logged to an append-only cryptographic log ([CON-1762EA5021](../project_glossary.md#CON-1762EA5021)). These logs are streamed to AWS CloudTrail for SOC2 Type II evidence ([CON-BB253DF0A2](../project_glossary.md#CON-BB253DF0A2)).
     *   **Access Control:** Database access is restricted to the API Orchestration Layer and gRPC Financial Services via VPC endpoints. No direct public internet access is permitted.
 *   **Performance Constraints:**
-    *   **Latency:** The ledger must support real-time debit/credit operations with p99 latency < 100ms to ensure Stripe Webhook Processing Latency averages below 150ms (CON-06232374D9).
-    *   **Scalability:** Serverless v2 scaling units are configured to handle peak event-driven load (CON-121117F5A2) during donation spikes.
+    *   **Latency:** The ledger must support real-time debit/credit operations with p99 latency < 100ms to ensure Stripe Webhook Processing Latency averages below 150ms ([CON-06232374D9](../project_glossary.md#CON-06232374D9)).
+    *   **Scalability:** Serverless v2 scaling units are configured to handle peak event-driven load ([CON-121117F5A2](../project_glossary.md#CON-121117F5A2)) during donation spikes.
 
 ### 3.2. High-Scale Event Storage: DynamoDB
 
@@ -119,11 +119,11 @@ DynamoDB is utilized for high-throughput, low-latency storage of non-financial e
 
 *   **Deployment Topology:** Single-region deployment per metro footprint (SF, NYC, Chicago) with global tables enabled for cross-region read replication. This ensures low-latency access for local users while maintaining data durability.
 *   **Data Isolation:**
-    *   **Multi-Tenancy:** Logical isolation is enforced via partition keys that include the metro_region and tenant_id (NGO Operator ID). This aligns with the multi-tenant architecture requirement (CON-30EA97016B).
-    *   **Anonymization:** Beneficiary demographic data is never stored in DynamoDB. Only anonymized UUIDs and redemption counts are persisted, ensuring FTC guidelines on anonymity are met (CON-B3D71A437D).
+    *   **Multi-Tenancy:** Logical isolation is enforced via partition keys that include the metro_region and tenant_id (NGO Operator ID). This aligns with the multi-tenant architecture requirement ([CON-30EA97016B](../project_glossary.md#CON-30EA97016B)).
+    *   **Anonymization:** Beneficiary demographic data is never stored in DynamoDB. Only anonymized UUIDs and redemption counts are persisted, ensuring FTC guidelines on anonymity are met ([CON-B3D71A437D](../project_glossary.md#CON-B3D71A437D)).
 *   **Performance Constraints:**
     *   **Throughput:** Provisioned capacity is set to auto-scale with a minimum of 1,000 WCUs/RCUs per table, scaling up to handle 50,000 MAU.
-    *   **Latency:** p99 latency for read/write operations must be < 50ms to support real-time POS clearance (CON-4152F2C7C3).
+    *   **Latency:** p99 latency for read/write operations must be < 50ms to support real-time POS clearance ([CON-4152F2C7C3](../project_glossary.md#CON-4152F2C7C3)).
 
 ### 3.3. Caching Layer: Redis Enterprise Cluster
 
@@ -134,14 +134,14 @@ Redis Enterprise Cluster is deployed to cache high-frequency read data, such as 
     *   **Cache-Aside Pattern:** Used for restaurant search and merchant profiles. TTL is set to 5 minutes for merchant profiles and 1 minute for search results to balance freshness and load reduction.
     *   **Session Storage:** User sessions for the Expo app and web dashboards are stored in Redis with a 24-hour TTL.
 *   **Performance Constraints:**
-    *   **Cache Hit Ratio (CHR):** Target CHR > 92% for restaurant search queries (CON-527BFA6796). Automated alerts are configured to trigger if CHR drops below 85%.
+    *   **Cache Hit Ratio (CHR):** Target CHR > 92% for restaurant search queries ([CON-527BFA6796](../project_glossary.md#CON-527BFA6796)). Automated alerts are configured to trigger if CHR drops below 85%.
     *   **Latency:** p99 latency for cache read/write operations must be < 10ms.
 
 ---
 
 ## 4. API Orchestration Layer and Integration Patterns
 
-This section defines the API Orchestration Layer (SUR-85E4A5B6E7), serving as the central nervous system for the MealCredit platform. It details the interaction between the GraphQL API, gRPC financial services, and Stripe Webhooks to ensure real-time POS clearance latency targets are met while maintaining strict PCI-DSS Level 1 and SOC2 Type II compliance.
+This section defines the API Orchestration Layer ([SUR-85E4A5B6E7](../project_glossary.md#SUR-85E4A5B6E7)), serving as the central nervous system for the MealCredit platform. It details the interaction between the GraphQL API, gRPC financial services, and Stripe Webhooks to ensure real-time POS clearance latency targets are met while maintaining strict PCI-DSS Level 1 and SOC2 Type II compliance.
 
 ### 4.1. Architectural Overview and Service Boundaries
 
@@ -157,17 +157,17 @@ The GraphQL API is the public-facing contract for all non-financial interactions
 
 #### 4.2.1. Core GraphQL Operations
 
-*   **Beneficiary Eligibility & Voucher Redemption (JNY-E82B8A88D8):**
+*   **Beneficiary Eligibility & Voucher Redemption ([JNY-E82B8A88D8](../project_glossary.md#JNY-E82B8A88D8)):**
     *   `query getBeneficiaryStatus(ngoId: ID!, beneficiaryId: ID!): BeneficiaryStatus!` - Returns the current credit balance and eligibility status. This query is heavily cached (Redis) to ensure <50ms response times.
     *   `mutation requestVoucher(amount: Float!, metroRegion: MetroRegion!): Voucher!` - Initiates the voucher creation process. This mutation triggers an asynchronous gRPC call to the Financial Service and returns a Voucher object with a `status: PENDING`. The client polls for completion or receives a Server-Sent Event (SSE) update.
 
-*   **Merchant & NGO Operations (JNY-356F465DB3, JNY-4C4BA15817):**
+*   **Merchant & NGO Operations ([JNY-356F465DB3](../project_glossary.md#JNY-356F465DB3), [JNY-4C4BA15817](../project_glossary.md#JNY-4C4BA15817)):**
     *   `query getMerchantDashboard(merchantId: ID!): MerchantDashboard!` - Returns real-time sales data, pending payouts, and dispute notifications.
     *   `mutation updateMerchantProfile(merchantId: ID!, profile: MerchantProfileInput!): Merchant!` - Allows NGO Operators to update merchant KYC and operational details.
 
-*   **Donor Onboarding & Funding Activation (JNY-62D850E94B):**
+*   **Donor Onboarding & Funding Activation ([JNY-62D850E94B](../project_glossary.md#JNY-62D850E94B)):**
     *   `mutation activateDonorFunding(donorId: ID!, fundingSource: FundingSourceInput!): DonorAccount!` - Integrates with Stripe Checkout to activate recurring or one-time donations.
-    *   `query getDonorImpactReceipts(donorId: ID!): [ImpactReceipt!]!` - Returns anonymized impact metrics, correlating donor contributions with redemption events without linking PII (CON-23A501C051).
+    *   `query getDonorImpactReceipts(donorId: ID!): [ImpactReceipt!]!` - Returns anonymized impact metrics, correlating donor contributions with redemption events without linking PII ([CON-23A501C051](../project_glossary.md#CON-23A501C051)).
 
 #### 4.2.2. Performance and Caching Strategy
 
@@ -184,14 +184,14 @@ The gRPC layer is the critical path for financial integrity. It is designed to h
     *   `rpc CreateVoucher(CreateVoucherRequest) returns (CreateVoucherResponse);`
     *   Input: beneficiaryId, amount, metroRegion.
     *   Output: voucherId, token, expiry, status.
-    *   Latency Target: p99 latency below 250ms for voucher creation under 10,000 concurrent connections (CON-6D5E21557B).
+    *   Latency Target: p99 latency below 250ms for voucher creation under 10,000 concurrent connections ([CON-6D5E21557B](../project_glossary.md#CON-6D5E21557B)).
 
 *   **POS Clearance Service:**
     *   `rpc ClearTransaction(ClearTransactionRequest) returns (ClearTransactionResponse);`
     *   Input: voucherToken, merchantId, amount, timestamp.
     *   Output: transactionId, status (APPROVED/DECLINED), remainingBalance.
-    *   Latency Target: p99 latency below 250ms for scanning callbacks (CON-6D5E21557B).
-    *   Double-Spending Prevention: The service must implement strict idempotency keys to prevent double-spending (CON-61EC670500). Each voucherToken can only be cleared once per transaction.
+    *   Latency Target: p99 latency below 250ms for scanning callbacks ([CON-6D5E21557B](../project_glossary.md#CON-6D5E21557B)).
+    *   Double-Spending Prevention: The service must implement strict idempotency keys to prevent double-spending ([CON-61EC670500](../project_glossary.md#CON-61EC670500)). Each voucherToken can only be cleared once per transaction.
 
 #### 4.3.2. Inter-Service Communication
 
@@ -219,8 +219,8 @@ Stripe Webhooks are the primary mechanism for receiving real-time updates on pay
 ### 4.5. Validation Criteria
 
 *   **Latency:** p99 latency for voucher creation and scanning callbacks < 250ms under 10,000 concurrent connections (CON-6D5E21557B).
-*   **Availability:** 99.99% operational uptime across AWS multi-AZ configurations (CON-BF1CD5707E).
-*   **Compliance:** SOC2 Type II structural planning baked into IaC (CON-81FB01F06B). PCI-DSS Level 1 compliance via zero raw card data touch (CON-66390130AA).
+*   **Availability:** 99.99% operational uptime across AWS multi-AZ configurations ([CON-BF1CD5707E](../project_glossary.md#CON-BF1CD5707E)).
+*   **Compliance:** SOC2 Type II structural planning baked into IaC ([CON-81FB01F06B](../project_glossary.md#CON-81FB01F06B)). PCI-DSS Level 1 compliance via zero raw card data touch ([CON-66390130AA](../project_glossary.md#CON-66390130AA)).
 *   **Data Isolation:** Strict multi-tenant isolation enforced via RLS policies and VPC endpoints.
 
 This design ensures that the API Orchestration Layer is robust, scalable, and compliant, providing a solid foundation for the MealCredit platform's growth to 50,000 MAU across three metropolitan footprints.
@@ -261,10 +261,10 @@ To ensure resilience during network outages while maintaining security, the Expo
 *   **Time-Bound Cryptographic Signatures:** Offline vouchers must be generated as JWT-like tokens signed with a time-bound HMAC-SHA256 signature. The token must include:
     *   `beneficiary_id_hash`: A deterministic hash of the beneficiary ID (no PII).
     *   `credit_amount`: The fractional credit value.
-    *   `expiry_timestamp`: A short-lived validity window (e.g., 15 minutes) to prevent replay attacks (CON-3335D67672).
+    *   `expiry_timestamp`: A short-lived validity window (e.g., 15 minutes) to prevent replay attacks ([CON-3335D67672](../project_glossary.md#CON-3335D67672)).
     *   `merchant_id`: The target merchant ID to restrict token usage.
 *   **Replay Attack Prevention:** The merchant POS system must validate the token's signature and timestamp upon scan. If the timestamp is outside the validity window, the token is rejected. Additionally, the platform must maintain a short-term cache of recently used token hashes to prevent immediate replay within the validity window.
-*   **Offline Fallback Interface:** The Expo app must provide a simplified, intuitive interface for offline redemption, clearly displaying the token's expiry time and remaining credit. This interface must be accessible via voice commands and high-contrast modes to meet WCAG standards (CON-68497304B1, CON-FA7A13E601).
+*   **Offline Fallback Interface:** The Expo app must provide a simplified, intuitive interface for offline redemption, clearly displaying the token's expiry time and remaining credit. This interface must be accessible via voice commands and high-contrast modes to meet WCAG standards ([CON-68497304B1](../project_glossary.md#CON-68497304B1), [CON-FA7A13E601](../project_glossary.md#CON-FA7A13E601)).
 
 ### 5.4 Implementation Notes
 
