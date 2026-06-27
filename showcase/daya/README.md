@@ -10,6 +10,7 @@
 - [design api surface](design/design_api_surface.md)
 - [design frontend presentation](design/design_frontend_presentation.md)
 - [design integration adapters offline tokens](design/design_integration_adapters_offline_tokens.md)
+- [design integration adapters stripe proxy](design/design_integration_adapters_stripe_proxy.md)
 - [design observability](design/design_observability.md)
 - [infrastructure topology](design/infrastructure_topology.md)
 - [integration adapters](design/integration_adapters.md)
