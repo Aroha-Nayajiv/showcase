@@ -8,6 +8,7 @@
 - [data model schema](design/data_model_schema.md)
 - [design api surface graphql schema](design/design_api_surface_graphql_schema.md)
 - [design api surface](design/design_api_surface.md)
+- [design data model financial ledger](design/design_data_model_financial_ledger.md)
 - [design frontend presentation](design/design_frontend_presentation.md)
 - [design integration adapters offline tokens](design/design_integration_adapters_offline_tokens.md)
 - [design integration adapters stripe proxy](design/design_integration_adapters_stripe_proxy.md)
