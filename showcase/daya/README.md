@@ -12,7 +12,7 @@
 - [infrastructure topology](design/infrastructure_topology.md)
 - [integration adapters](design/integration_adapters.md)
 - [security architecture](design/security_architecture.md)
-- [project glossary](docs/project_glossary.md)
+- [project glossary](project_glossary.md)
 - [dispute resolution fraud](requirements/dispute_resolution_fraud.md)
 - [donor funding activation](requirements/donor_funding_activation.md)
 - [merchant pos integration](requirements/merchant_pos_integration.md)
