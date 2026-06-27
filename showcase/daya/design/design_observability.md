@@ -23,7 +23,7 @@ AWS X-Ray SDKs will be integrated into the Node.js (GraphQL API) and Go (gRPC se
 
 ### 1.3. PII Sanitization and Data Isolation
 
-Strict data isolation constraints ([CON-0A0288EED4](../project_glossary.md#CON-0A0288EED4), [CON-92F07E31B0](../project_glossary.md#CON-92F07E31B0)) must be enforced at the tracing layer to prevent PII or beneficiary demographic data from being exposed in monitoring dashboards or logs.
+Strict data isolation constraints ([CON-0A0288EED4](../project_glossary.md#con-0a0288eed4), [CON-92F07E31B0](../project_glossary.md#con-92f07e31b0)) must be enforced at the tracing layer to prevent PII or beneficiary demographic data from being exposed in monitoring dashboards or logs.
 
  Automatic Redaction: The X-Ray SDKs will be configured with a custom filter rule that automatically redacts any field containing known PII patterns (e.g., email, phone, legal_name, ssn) from trace segments before they are sent to AWS X-Ray.
  Annotation Policy: Only non-PII business keys (e.g., anonymous_voucher_id, donor_pool_id, merchant_id) will be captured as X-Ray annotations. These annotations are searchable and filterable in the X-Ray console but do not contain sensitive data.
@@ -45,7 +45,7 @@ To balance observability depth with cost and latency, a tiered sampling strategy
 
 ## 2. CloudWatch Metric and Log Schema for Financial Ledger Auditing
 
-This section defines the CloudWatch metric and log schema for financial ledger auditing, ensuring all mutations are captured with append-only cryptographic log auditing in Aurora PostgreSQL. This design directly supports the project's compliance and trust objectives, specifically Implied concern: Implement append-only cryptographic log auditing in Aurora PostgreSQL for all financial ledger mutations. ([CON-1762EA5021](../project_glossary.md#CON-1762EA5021)) and Implied concern: Log all administrative ledger operations and infrastructure changes to AWS CloudTrail for SOC2 Type II evidence. ([CON-BB253DF0A2](../project_glossary.md#CON-BB253DF0A2)).
+This section defines the CloudWatch metric and log schema for financial ledger auditing, ensuring all mutations are captured with append-only cryptographic log auditing in Aurora PostgreSQL. This design directly supports the project's compliance and trust objectives, specifically Implied concern: Implement append-only cryptographic log auditing in Aurora PostgreSQL for all financial ledger mutations. ([CON-1762EA5021](../project_glossary.md#con-1762ea5021)) and Implied concern: Log all administrative ledger operations and infrastructure changes to AWS CloudTrail for SOC2 Type II evidence. ([CON-BB253DF0A2](../project_glossary.md#con-bb253df0a2)).
 
 ### 2.1. Aurora PostgreSQL Append-Only Ledger Schema
 
@@ -62,7 +62,7 @@ Table Schema:
 | row_id | UUID | `NOT NULL` | The primary key of the row in the affected table that was mutated. |
 | old_values | JSONB | `DEFAULT '{}'::jsonb` | The state of the affected row before the mutation. Captured via OLD in triggers. |
 | new_values | JSONB | `DEFAULT '{}'::jsonb` | The state of the affected row after the mutation. Captured via NEW in triggers. |
-| actor_id | UUID | `NOT NULL` | The ID of the actor (e.g., Platform Administrator ([ACT-086A974D63](../project_glossary.md#ACT-086A974D63)), NGO Operator ([ACT-09E028AEB0](../project_glossary.md#ACT-09E028AEB0))) initiating the mutation. |
+| actor_id | UUID | `NOT NULL` | The ID of the actor (e.g., Platform Administrator ([ACT-086A974D63](../project_glossary.md#act-086a974d63)), NGO Operator ([ACT-09E028AEB0](../project_glossary.md#act-09e028aeb0))) initiating the mutation. |
 | cryptographic_hash | `VARCHAR(64)` | `NOT NULL` | SHA-256 hash of the previous row's cryptographic_hash concatenated with the current mutation's data. Ensures chain integrity. |
 | previous_hash | `VARCHAR(64)` | `NOT NULL` | The cryptographic_hash of the immediately preceding row in this audit log. |
 
@@ -94,7 +94,7 @@ Log Event Schema:
 
 Data Isolation & PII Protection:
 
-To adhere to Implied concern: Implement strict data isolation where beneficiary demographic status and legal names are cryptographically segregated from public ... ([CON-92F07E31B0](../project_glossary.md#CON-92F07E31B0)) and Implied concern: Adhere to FTC guidelines on anonymity, ensuring no de-anonymization attacks can link beneficiaries to donors through metadata anal... ([CON-C22D030D21](../project_glossary.md#CON-C22D030D21)), the CloudWatch log schema will strictly exclude any PII or beneficiary demographic data. The metadata field will only contain anonymized identifiers (e.g., anonymous_voucher_id) and non-sensitive operational data. Any attempt to log PII will be caught by a pre-log sanitization layer in the application code, which will redact sensitive fields before the log event is emitted.
+To adhere to Implied concern: Implement strict data isolation where beneficiary demographic status and legal names are cryptographically segregated from public ... (CON-92F07E31B0) and Implied concern: Adhere to FTC guidelines on anonymity, ensuring no de-anonymization attacks can link beneficiaries to donors through metadata anal... ([CON-C22D030D21](../project_glossary.md#con-c22d030d21)), the CloudWatch log schema will strictly exclude any PII or beneficiary demographic data. The metadata field will only contain anonymized identifiers (e.g., anonymous_voucher_id) and non-sensitive operational data. Any attempt to log PII will be caught by a pre-log sanitization layer in the application code, which will redact sensitive fields before the log event is emitted.
 
 ### 2.3. CloudWatch Custom Metrics for Ledger Integrity
 
@@ -133,12 +133,12 @@ Namespace: `MealCredit/Financial`
 Metric Name: CreditPoolUtilizationRate
 Dimensions: MetroRegion
 Unit: Percent
-Description: The percentage of the total credit pool that has been utilized in a given metro region. This supports Implied concern: Monitor Credit Pool Utilization Rate with automated alerts triggering when thresholds exceed 85%. ([CON-2059B17FB2](../project_glossary.md#CON-2059B17FB2)).
+Description: The percentage of the total credit pool that has been utilized in a given metro region. This supports Implied concern: Monitor Credit Pool Utilization Rate with automated alerts triggering when thresholds exceed 85%. ([CON-2059B17FB2](../project_glossary.md#con-2059b17fb2)).
 Alert Threshold: `> 85%` (Warning), `> 95%` (Critical).
 
 ### 2.4. SOC2 Type II Evidence Integration
 
-To streamline SOC2 Type II compliance, CloudWatch Logs will be integrated with AWS CloudTrail. All administrative ledger operations (e.g., manual adjustments by a Platform Administrator ([ACT-086A974D63](../project_glossary.md#ACT-086A974D63))) and infrastructure changes will be logged to CloudTrail. CloudWatch Logs will then ingest these CloudTrail logs, creating a unified audit trail.
+To streamline SOC2 Type II compliance, CloudWatch Logs will be integrated with AWS CloudTrail. All administrative ledger operations (e.g., manual adjustments by a Platform Administrator (ACT-086A974D63)) and infrastructure changes will be logged to CloudTrail. CloudWatch Logs will then ingest these CloudTrail logs, creating a unified audit trail.
 
 Integration Pattern:
 
@@ -146,7 +146,7 @@ Integration Pattern:
 2. CloudWatch Logs: Ingests CloudTrail logs via a CloudWatch Logs subscription filter.
 3. CloudWatch Metrics: Custom metrics are derived from both application logs and CloudTrail logs to provide a holistic view of system integrity.
 
-This integration ensures that all administrative actions are immutable, traceable, and readily available for SOC2 Type II audits, supporting Implied concern: Ensure SOC2 Type II structural planning is baked into the infrastructure-as-code and access control policies. ([CON-81FB01F06B](../project_glossary.md#CON-81FB01F06B)).
+This integration ensures that all administrative actions are immutable, traceable, and readily available for SOC2 Type II audits, supporting Implied concern: Ensure SOC2 Type II structural planning is baked into the infrastructure-as-code and access control policies. ([CON-81FB01F06B](../project_glossary.md#con-81fb01f06b)).
 
 ### 2.5. Validation and Verification
 
@@ -155,7 +155,7 @@ This integration ensures that all administrative actions are immutable, traceabl
 
 ### 2.6. Knowledge Gaps and Assumptions
 
-KNOWLEDGE_GAP: Audit Log Retention Period - The exact retention period for the ledger_audit_log table and CloudWatch Logs must be established by the Compliance & Legal team to align with financial regulations governing quasi-cash instruments, specifically regarding unclaimed property and escheatment laws (Implied concern: Comply with financial regulations governing quasi-cash instruments, specifically regarding unclaimed property and escheatment laws... ([CON-B1DFEBEC8C](../project_glossary.md#CON-B1DFEBEC8C))).
+KNOWLEDGE_GAP: Audit Log Retention Period - The exact retention period for the ledger_audit_log table and CloudWatch Logs must be established by the Compliance & Legal team to align with financial regulations governing quasi-cash instruments, specifically regarding unclaimed property and escheatment laws (Implied concern: Comply with financial regulations governing quasi-cash instruments, specifically regarding unclaimed property and escheatment laws... ([CON-B1DFEBEC8C](../project_glossary.md#con-b1dfebec8c))).
 ASSUMPTION: SHA-256 Hashing Algorithm - SHA-256 is assumed to be the approved cryptographic hashing algorithm for the ledger chain. If a different algorithm is mandated by PCI-DSS Level 1 or SOC2 Type II requirements, this must be updated. Owner: Security Architecture & Access Control.
 ASSUMPTION: Aurora PostgreSQL Trigger Performance - It is assumed that the overhead of the PostgreSQL trigger for the ledger_audit_log table will not significantly impact the p99 latency of financial transactions. If performance degradation is observed, an asynchronous logging mechanism (e.g., using a message queue) may be required. Owner: Infrastructure Topology & Deployment Design.
 
@@ -178,18 +178,18 @@ The Credit Pool Utilization Rate is a critical liquidity metric that tracks the 
   ngo_tenant_id: (Optional) For granular monitoring of specific NGO operator pools.
  Calculation Logic:
   `CPU = (Total_Credits_Redemptions / Total_Credits_Issued)  100`
-  Calculated in real-time by the Transaction & Financial Engine ([CAP-TRANSACTION-FINANCIAL-ENGINE](../project_glossary.md#CAP-TRANSACTION-FINANCIAL-ENGINE)) upon successful POS clearance.
+  Calculated in real-time by the Transaction & Financial Engine ([CAP-TRANSACTION-FINANCIAL-ENGINE](../project_glossary.md#cap-transaction-financial-engine)) upon successful POS clearance.
   Aggregated via a serverless stream processor (e.g., AWS Lambda triggered by DynamoDB Streams or Kinesis) to update a high-performance time-series store (e.g., Amazon Timestream or CloudWatch Custom Metrics).
 
 #### 3.1.3. Automated Alert Thresholds
 
-To proactively manage liquidity, the following alert thresholds are established, aligned with the requirement to monitor Credit Pool Utilization Rate with automated alerts triggering when thresholds exceed 85% ([CON-2059B17FB2](../project_glossary.md#CON-2059B17FB2), [CON-7031BE57B3](../project_glossary.md#CON-7031BE57B3)).
+To proactively manage liquidity, the following alert thresholds are established, aligned with the requirement to monitor Credit Pool Utilization Rate with automated alerts triggering when thresholds exceed 85% (CON-2059B17FB2, [CON-7031BE57B3](../project_glossary.md#con-7031be57b3)).
 
 | Severity Level | Threshold | Action | Notification Channel |
 | :--- | :--- | :--- | :--- |
 | Info | > 60% | Log to CloudWatch; Update Dashboard | Internal Ops Dashboard |
 | Warning | > 75% | Trigger automated liquidity check; Notify Platform Administrator (ACT-086A974D63) | Slack / PagerDuty |
-| Critical | > 85% | Automated Alert Trigger; Initiate emergency donor funding request workflow; Notify NGO Operator ([ACT-09E028AEB0](../project_glossary.md#ACT-09E028AEB0)) and Platform Administrator | PagerDuty / SMS / Email |
+| Critical | > 85% | Automated Alert Trigger; Initiate emergency donor funding request workflow; Notify NGO Operator (ACT-09E028AEB0) and Platform Administrator | PagerDuty / SMS / Email |
 | Emergency | > 95% | Halt New Credit Issuance (if configured); Escalate to Executive Leadership | Executive PagerDuty |
 
 ### 3.2. Donation-to-Redemption Velocity (DRV) Architecture
@@ -199,7 +199,7 @@ The Donation-to-Redemption Velocity (DRV) measures the speed at which donated fu
 #### 3.2.2. Data Ingestion Pipeline
 
 1. Event Sources:
-  DonationReceivedEvent emitted by the Donor Onboarding & Funding Activation flow ([JNY-62D850E94B](../project_glossary.md#JNY-62D850E94B)).
+  DonationReceivedEvent emitted by the Donor Onboarding & Funding Activation flow ([JNY-62D850E94B](../project_glossary.md#jny-62d850e94b)).
   CreditRedemptionEvent emitted by the Transaction & Financial Engine.
 2. Stream Processing: A dedicated Lambda function consumes both event streams, maintaining a rolling window state (stored in DynamoDB or Redis) to calculate the current DRV for each metro_region.
 3. Storage: Metrics are stored with a 1-hour granularity for real-time dashboards.
@@ -213,7 +213,7 @@ To ensure a seamless user experience, the platform must monitor the latency of S
  Dimensions:
   event_type: (e.g., "payment_intent.succeeded", "charge.refunded")
   metro_region: (Optional)
- Target: Average latency below 150ms from card tap to merchant ledger entry ([CON-06232374D9](../project_glossary.md#CON-06232374D9), [CON-A0B785A40D](../project_glossary.md#CON-A0B785A40D)).
+ Target: Average latency below 150ms from card tap to merchant ledger entry ([CON-06232374D9](../project_glossary.md#con-06232374d9), [CON-A0B785A40D](../project_glossary.md#con-a0b785a40d)).
  Alert Threshold:
   Warning: p95 latency > 200ms.
   Critical: p99 latency > 500ms or failure rate > 1%.
@@ -224,7 +224,7 @@ This section defines the specific distributed tracing standards for asynchronous
 
 ### 4.1. Synchronous GraphQL Tracing Standards
 
-For the synchronous GraphQL API layer, tracing must adhere to the W3C TraceContext standard to ensure seamless propagation from the Expo client through the API Orchestration Layer ([SUR-85E4A5B6E7](../project_glossary.md#SUR-85E4A5B6E7)) to downstream services.
+For the synchronous GraphQL API layer, tracing must adhere to the W3C TraceContext standard to ensure seamless propagation from the Expo client through the API Orchestration Layer ([SUR-85E4A5B6E7](../project_glossary.md#sur-85e4a5b6e7)) to downstream services.
 
  Header Propagation: The `traceparent` header must be injected by the Expo client and extracted by the GraphQL API resolvers. The API must propagate this context to all downstream gRPC calls.
  Span Naming Convention: GraphQL spans must follow the pattern `GraphQL/{OperationType}/{FieldName}` (e.g., `GraphQL/Mutation/redemptionScan`).
@@ -262,7 +262,7 @@ RDS/Aurora Events: All changes to the Aurora PostgreSQL database configuration, 
 
 To support SOC2 Type II evidence for data integrity and access, CloudTrail will capture data events for critical resources:
 
-- Aurora PostgreSQL Data Events: Capture all INSERT, UPDATE, and DELETE operations on the financial ledger tables. This is critical for verifying the append-only cryptographic log auditing ([CON-1762EA5021](../project_glossary.md#CON-1762EA5021), [CON-6061FCCA83](../project_glossary.md#CON-6061FCCA83)).
+- Aurora PostgreSQL Data Events: Capture all INSERT, UPDATE, and DELETE operations on the financial ledger tables. This is critical for verifying the append-only cryptographic log auditing (CON-1762EA5021, [CON-6061FCCA83](../project_glossary.md#con-6061fcca83)).
 - S3 Data Events: Capture all GetObject, PutObject, and DeleteObject events for sensitive data buckets, ensuring no unauthorized access or modification occurs.
 
 #### 4.1.3. CloudTrail Log File Integrity and Storage
@@ -319,11 +319,11 @@ Data Integrity Reports: Automated reports will be generated from CloudTrail data
 
 ### 4.4. Data Isolation and PII Protection in Logs
 
-To ensure compliance with data isolation constraints ([CON-0A0288EED4](../project_glossary.md#CON-0A0288EED4), CON-92F07E31B0) and PCI-DSS Level 1 requirements, all logs will be sanitized to remove PII and sensitive data before storage.
+To ensure compliance with data isolation constraints (CON-0A0288EED4, CON-92F07E31B0) and PCI-DSS Level 1 requirements, all logs will be sanitized to remove PII and sensitive data before storage.
 
 PII Redaction: All logs will be processed through a PII redaction layer before being written to CloudWatch Logs or S3. This layer will identify and redact fields such as beneficiary names, donor PII, and payment card details.
 Anonymization: Beneficiary-related data will be anonymized in logs, using hashed identifiers or UUIDs instead of raw PII. This ensures that beneficiary demographic status and legal names are cryptographically segregated from public logs (CON-0A0288EED4, CON-92F07E31B0).
-PCI-DSS Compliance: No raw card data will be present in any logs. All payment-related events will reference Stripe token IDs or transaction IDs, ensuring PCI-DSS Level 1 compliance ([CON-66390130AA](../project_glossary.md#CON-66390130AA), [CON-C4F0E02638](../project_glossary.md#CON-C4F0E02638)).
+PCI-DSS Compliance: No raw card data will be present in any logs. All payment-related events will reference Stripe token IDs or transaction IDs, ensuring PCI-DSS Level 1 compliance ([CON-66390130AA](../project_glossary.md#con-66390130aa), [CON-C4F0E02638](../project_glossary.md#con-c4f0e02638)).
 
 ### 4.5. Cross-Reference and Deferrals
 
@@ -352,18 +352,18 @@ The validation plan ensures that distributed traces correctly propagate context 
 
  Trace Context Propagation Test:
   Objective: Verify that a traceparent header injected by the Expo client is correctly parsed by the GraphQL API and mapped to gRPC metadata for the financial transaction service.
-  Method: Execute a synthetic `Beneficiary Eligibility & Voucher Redemption` ([JNY-E82B8A88D8](../project_glossary.md#JNY-E82B8A88D8)) flow using a test beneficiary account. Inject a known traceparent value.
+  Method: Execute a synthetic `Beneficiary Eligibility & Voucher Redemption` ([JNY-E82B8A88D8](../project_glossary.md#jny-e82b8a88d8)) flow using a test beneficiary account. Inject a known traceparent value.
   Success Criteria: The AWS X-Ray console must display a single, contiguous service map showing the request path: `Expo Client -> GraphQL API -> gRPC Transaction Service -> Aurora PostgreSQL`. The traceparent ID must be visible in the root segment of the GraphQL API.
   Compliance Check: Ensure that the trace segment metadata does not contain any PII fields (e.g., beneficiary_name, donor_email). Only anonymous voucher IDs and transaction amounts should be present.
 
  gRPC Asynchronous Trace Correlation:
   Objective: Validate that asynchronous gRPC calls (e.g., Stripe webhook processing) are correctly correlated with the originating GraphQL request.
-  Method: Trigger a Stripe webhook event (simulated) and verify that the traceparent from the original donor funding activation ([JNY-62D850E94B](../project_glossary.md#JNY-62D850E94B)) is propagated to the webhook handler.
+  Method: Trigger a Stripe webhook event (simulated) and verify that the traceparent from the original donor funding activation (JNY-62D850E94B) is propagated to the webhook handler.
   Success Criteria: The X-Ray service map must link the webhook handler segment to the original donor funding segment via the shared trace ID.
 
 ### 5.2. Financial Ledger Audit Integrity Validation
 
-This validates the append-only cryptographic log auditing mechanism in Aurora PostgreSQL (CON-1762EA5021, [CON-6061FCCA83](../project_glossary.md#CON-6061FCCA83)) to ensure financial mutations are immutable and verifiable.
+This validates the append-only cryptographic log auditing mechanism in Aurora PostgreSQL (CON-1762EA5021, CON-6061FCCA83) to ensure financial mutations are immutable and verifiable.
 
  Append-Only Mutation Test:
   Objective: Confirm that the ledger_audit_log table rejects any UPDATE or DELETE operations on financial records.
@@ -380,23 +380,23 @@ This validates the append-only cryptographic log auditing mechanism in Aurora Po
 This validates the accuracy and latency of key business and operational metrics, including Credit Pool Utilization, Donation-to-Redemption Velocity (DRV), and Stripe Webhook Processing Latency.
 
  Credit Pool Utilization Rate Validation:
-  Objective: Verify that the `Credit Pool Utilization Rate` metric (CON-2059B17FB2, [CON-7031BE57B3](../project_glossary.md#CON-7031BE57B3)) accurately reflects the ratio of redeemed credits to total available credits in real-time.
-  Method: Simulate a batch of donor funding activations (JNY-62D850E94B) and subsequent beneficiary redemptions ([JNY-E82B8A88D8](../project_glossary.md#JNY-E82B8A88D8)). Compare the calculated utilization rate from the CloudWatch metric against a direct query of the financial ledger.
+  Objective: Verify that the `Credit Pool Utilization Rate` metric (CON-2059B17FB2, CON-7031BE57B3) accurately reflects the ratio of redeemed credits to total available credits in real-time.
+  Method: Simulate a batch of donor funding activations (JNY-62D850E94B) and subsequent beneficiary redemptions (JNY-E82B8A88D8). Compare the calculated utilization rate from the CloudWatch metric against a direct query of the financial ledger.
   Success Criteria: The CloudWatch metric value must match the ledger query result within a 1% tolerance. Alerts must trigger when the threshold exceeds 85%.
 
  Donation-to-Redemption Velocity (DRV) Validation:
-  Objective: Ensure the DRV metric ([CON-D0F5814F21](../project_glossary.md#CON-D0F5814F21), [CON-F89C70071E](../project_glossary.md#CON-F89C70071E)) accurately tracks the time delta between donor funding and beneficiary redemption.
+  Objective: Ensure the DRV metric ([CON-D0F5814F21](../project_glossary.md#con-d0f5814f21), [CON-F89C70071E](../project_glossary.md#con-f89c70071e)) accurately tracks the time delta between donor funding and beneficiary redemption.
   Method: Inject a donor funding event and immediately trigger a beneficiary redemption. Measure the time delta recorded in the CloudWatch custom metric.
   Success Criteria: The recorded DRV must match the actual time delta within 100ms. The metric must correctly aggregate DRV across the 3 metro footprints (SF, NYC, Chicago).
 
  Stripe Webhook Processing Latency Validation:
-  Objective: Verify that Stripe Webhook Processing Latency ([CON-06232374D9](../project_glossary.md#CON-06232374D9), [CON-A0B785A40D](../project_glossary.md#CON-A0B785A40D)) averages below 150ms.
+  Objective: Verify that Stripe Webhook Processing Latency (CON-06232374D9, CON-A0B785A40D) averages below 150ms.
   Method: Simulate high-volume Stripe webhook events (1000 events/minute) and measure the end-to-end processing time from webhook receipt to financial ledger update.
   Success Criteria: The p99 latency must remain below 250ms, and the average latency must be below 150ms. If thresholds are exceeded, the system must trigger an automated alert to the Platform Administrator (ACT-086A974D63).
 
 ### 5.4. Data Isolation and PII Leakage Validation
 
-This ensures that no PII or raw card data touches MealCredit servers or appears in monitoring dashboards, adhering to PCI-DSS Level 1 and FTC guidelines on anonymity ([CON-66390130AA](../project_glossary.md#CON-66390130AA), [CON-B3D71A437D](../project_glossary.md#CON-B3D71A437D)).
+This ensures that no PII or raw card data touches MealCredit servers or appears in monitoring dashboards, adhering to PCI-DSS Level 1 and FTC guidelines on anonymity (CON-66390130AA, [CON-B3D71A437D](../project_glossary.md#con-b3d71a437d)).
 
  PII Redaction Verification:
   Objective: Confirm that all PII fields are redacted before being sent to AWS X-Ray or CloudWatch.
